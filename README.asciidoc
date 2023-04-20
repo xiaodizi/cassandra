@@ -21,6 +21,7 @@ https://cwiki.apache.org/confluence/display/CASSANDRA2/DataModel[Row store] 的�
 . v4.1.1.1 完善了数据写入 elasticsearch 的逻辑 xref:TestData.adoc[测试数据]
 . v4.1.1.3 cassandra.yaml 增加 配置，配置哪些表需要同步到elasticsearch
 . v4.1.1.3 修改同步到elasticsearch 的索引名称为 keyspace+"-"+表名
+. v4.1.1.6 这个版本完全是为了集成到 opensearch 里边做的修改，作为 opensearch 的一个子项目。单独使用慎用。
 
 
 == 其他的一些内容
