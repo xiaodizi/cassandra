@@ -79,7 +79,7 @@ jvmoptions_variant="-server"
 
 if [ "x$CASSANDRA_INCLUDE" = "x" ]; then
     # Locations (in order) to use when searching for an include file.
-    for include in "`dirname "$1"`/casandra/bin/cassandra.in.sh" \
+    for include in "`dirname "$1"`/cassandra/bin/cassandra.in.sh" \
                    "$HOME/.cassandra.in.sh" \
                    /usr/share/cassandra/cassandra.in.sh \
                    /usr/local/share/cassandra/cassandra.in.sh \
