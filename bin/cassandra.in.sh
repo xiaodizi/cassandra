@@ -46,7 +46,7 @@ fi
 
 # the default location for commitlogs, sstables, and saved caches
 # if not set in cassandra.yaml
-cassandra_storagedir="$CASSANDRA_HOME/data"
+cassandra_storagedir="$PWD/data"
 
 # JAVA_HOME can optionally be set here
 #JAVA_HOME=/usr/local/jdk6
