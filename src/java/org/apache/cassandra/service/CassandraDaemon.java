@@ -666,6 +666,11 @@ public class CassandraDaemon
      */
     public void start()
     {
+        String pathLogs = DatabaseDescriptor.getPathLogs();
+        if (!StringUtils.isBlank(pathLogs)) {
+            System.setProperty("CASSANDRA_LOG_DIR", pathLogs);
+        }
+
         StartupClusterConnectivityChecker connectivityChecker = StartupClusterConnectivityChecker.create(DatabaseDescriptor.getBlockForPeersTimeoutInSeconds(),
                                                                                                          DatabaseDescriptor.getBlockForPeersInRemoteDatacenters());
         connectivityChecker.execute(Gossiper.instance.getEndpoints(), DatabaseDescriptor.getEndpointSnitch()::getDatacenter);
@@ -750,11 +755,6 @@ public class CassandraDaemon
         try
         {
             applyConfig();
-
-            String pathLogs = DatabaseDescriptor.getPathLogs();
-            if (!StringUtils.isBlank(pathLogs)) {
-                System.setProperty("CASSANDRA_LOG_DIR", pathLogs);
-            }
 
             registerNativeAccess();
 
