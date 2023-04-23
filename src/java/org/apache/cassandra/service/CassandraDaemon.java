@@ -768,6 +768,11 @@ public class CassandraDaemon
                 System.err.close();
             }
 
+            String pathLogs = DatabaseDescriptor.getPathLogs();
+            if (!StringUtils.isBlank(pathLogs)) {
+                System.setProperty("CASSANDRA_LOG_DIR", pathLogs);
+            }
+
             start();
             logger.info("Startup complete");
         }
@@ -876,10 +881,6 @@ public class CassandraDaemon
 
     public static void main(String[] args)
     {
-        String pathLogs = DatabaseDescriptor.getPathLogs();
-        if (!StringUtils.isBlank(pathLogs)) {
-            System.setProperty("CASSANDRA_LOG_DIR", pathLogs);
-        }
         // 实例激活
         instance.activate();
     }
