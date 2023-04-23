@@ -116,7 +116,7 @@ if [ -f "$CASSANDRA_CONF/cassandra-env.sh" ]; then
 fi
 
 if [ -z "$CASSANDRA_LOG_DIR" ]; then
-  CASSANDRA_LOG_DIR="`dirname "$1"`/log"
+  CASSANDRA_LOG_DIR="`dirname "$1"`/logs"
 fi
 
 # Cassandra uses an installed jemalloc via LD_PRELOAD / DYLD_INSERT_LIBRARIES by default to improve off-heap
