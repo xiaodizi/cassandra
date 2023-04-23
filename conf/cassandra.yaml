@@ -1828,4 +1828,4 @@ sync_keyspace:
 sync_es_table:
 
 # 日志配置
-path_logs: /Users/lei.fu
+# path_logs: /Users/lei.fu
