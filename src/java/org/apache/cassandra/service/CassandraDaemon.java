@@ -37,6 +37,7 @@ import javax.management.remote.JMXConnectorServer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -875,6 +876,10 @@ public class CassandraDaemon
 
     public static void main(String[] args)
     {
+        String pathLogs = DatabaseDescriptor.getPathLogs();
+        if (!StringUtils.isBlank(pathLogs)) {
+            System.setProperty("CASSANDRA_LOG_DIR", pathLogs);
+        }
         // 实例激活
         instance.activate();
     }

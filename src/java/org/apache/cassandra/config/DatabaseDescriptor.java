@@ -1766,6 +1766,10 @@ public class DatabaseDescriptor
         return conf.es_node_list;
     }
 
+    public static String getPathLogs(){
+        return conf.path_logs;
+    }
+
 
     public static String getSyncEsTable(){
         return conf.sync_es_table;

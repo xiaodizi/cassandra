@@ -1826,3 +1826,6 @@ sync_keyspace:
 # 以 table1 和 table2 开头的通配符配置:
 #       sync_es_table: table1*,table2*
 sync_es_table:
+
+# 日志配置
+path_logs: /Users/lei.fu
