@@ -116,7 +116,7 @@ public class AuditLogEntry {
 
 
             if (type.toString().equals("CREATE_TABLE") && EsUtil.isSyncKeyspace(syncKeyspace, keyspace) && EsUtil.isSyncTable(syncEsTable, scope)){
-
+                HttpUtil.newCreateIndex(esNodeList,keyspace+"-"+scope);
             }
 
 
