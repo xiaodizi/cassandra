@@ -6,17 +6,81 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.cassandra.audit.es.common.ErrorEnum;
+import org.apache.cassandra.audit.es.dto.EsClusterDto;
 import org.apache.cassandra.audit.es.dto.EsResDto;
 import org.apache.cassandra.audit.es.dto.Hites;
 import org.apache.cassandra.audit.es.res.DataRsp;
+import org.apache.cassandra.config.Converters;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class HttpUtil {
+
+
+    public static DataRsp getClusterHealth(String url){
+        String nodeUrl = getRandomNode(url);
+        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
+        if (StringUtils.isBlank(nodeUrl)) {
+            nodeUrl = "http://"+DatabaseDescriptor.getRpcAddress().getHostAddress()+":9200";
+        }
+        EsClusterDto esClusterDto=null;
+        Unirest.setTimeouts(0, 0);
+        try {
+            HttpResponse<String> response = Unirest.get(nodeUrl+"/_cluster/health")
+                    .asString();
+            System.out.println("获取集群健康状态，返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            if (response.getStatus() != ErrorEnum.SUCCESS.code) {
+                return DataRsp.builder()
+                        .code(response.getStatus())
+                        .message(response.getStatusText())
+                        .build();
+            }
+            esClusterDto = JSONObject.parseObject(response.getBody(), EsClusterDto.class);
+
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return DataRsp.builder()
+                .code(ErrorEnum.SUCCESS.code)
+                .message(ErrorEnum.SUCCESS.message)
+                .data(esClusterDto.getNumber_of_nodes())
+                .build();
+    }
+
+
+    public static DataRsp newCreateIndex(String url,String indexName){
+        String nodeUrl = getRandomNode(url);
+        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
+        if (StringUtils.isBlank(nodeUrl)) {
+            nodeUrl = "http://"+DatabaseDescriptor.getRpcAddress().getHostAddress()+":9200";
+        }
+
+        DataRsp clusterHealth = getClusterHealth(url);
+        int numSharedNodes = Integer.parseInt(clusterHealth.getData().toString());
+
+        Unirest.setTimeouts(0, 0);
+        try {
+            HttpResponse<String> response = Unirest.put(nodeUrl + "/" + indexName)
+                    .header("Content-Type", "application/json")
+                    .body("{\n  \"settings\":{\n    \"number_of_shards\":"+numSharedNodes+",\n    \"number_of_replicas\":"+(numSharedNodes-1)+"\n  }\n}")
+                    .asString();
+            System.out.println("创建索引返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            if (response.getStatus() != ErrorEnum.SUCCESS.code) {
+                return DataRsp.builder()
+                        .code(response.getStatus())
+                        .message(response.getStatusText())
+                        .build();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return DataRsp.getError200();
+    }
 
     /**
      * 创建索引

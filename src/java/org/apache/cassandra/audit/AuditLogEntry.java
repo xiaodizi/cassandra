@@ -115,6 +115,11 @@ public class AuditLogEntry {
             String syncKeyspace = DatabaseDescriptor.getSyncKeyspace();
 
 
+            if (type.toString().equals("CREATE_TABLE") && EsUtil.isSyncKeyspace(syncKeyspace, keyspace) && EsUtil.isSyncTable(syncEsTable, scope)){
+
+            }
+
+
             if (type.toString().equals("UPDATE") && EsUtil.isSyncKeyspace(syncKeyspace, keyspace) && EsUtil.isSyncTable(syncEsTable, scope)) {
                 if (s.toLowerCase(Locale.ROOT).contains("update")) {
                     Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
