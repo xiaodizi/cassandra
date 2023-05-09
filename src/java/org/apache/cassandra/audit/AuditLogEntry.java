@@ -110,17 +110,17 @@ public class AuditLogEntry {
             System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
 
-            String syncEsTable = DatabaseDescriptor.getSyncEsTable();
+            boolean cdcEnabled = DatabaseDescriptor.isCDCEnabled();
 
-            String syncKeyspace = DatabaseDescriptor.getSyncKeyspace();
+            System.out.println("cdc 配置开关:"+cdcEnabled);
 
 
-            if (type.toString().equals("CREATE_TABLE") && EsUtil.isSyncKeyspace(syncKeyspace, keyspace) && EsUtil.isSyncTable(syncEsTable, scope)){
+            if (type.toString().equals("CREATE_TABLE")){
                 HttpUtil.newCreateIndex(esNodeList,keyspace+"-"+scope);
             }
 
 
-            if (type.toString().equals("UPDATE") && EsUtil.isSyncKeyspace(syncKeyspace, keyspace) && EsUtil.isSyncTable(syncEsTable, scope)) {
+            if (type.toString().equals("UPDATE")) {
                 if (s.toLowerCase(Locale.ROOT).contains("update")) {
                     Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
 
@@ -141,12 +141,12 @@ public class AuditLogEntry {
             }
 
 
-            if (type.toString().equals("DELETE") && EsUtil.isSyncKeyspace(syncKeyspace, keyspace) && EsUtil.isSyncTable(syncEsTable, scope)) {
+            if (type.toString().equals("DELETE")) {
                 Map maps = SqlToJson.sqlDeleteToJson(s);
                 HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
             }
 
-            if (type.toString().equals("DROP_TABLE") && EsUtil.isSyncKeyspace(syncKeyspace, keyspace) && EsUtil.isSyncTable(syncEsTable, scope)) {
+            if (type.toString().equals("DROP_TABLE")) {
                 HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
             }
 
