@@ -37,10 +37,8 @@ import org.apache.cassandra.utils.ByteBufferUtil;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 
-public final class TableParams
-{
-    public enum Option
-    {
+public final class TableParams {
+    public enum Option {
         BLOOM_FILTER_FP_CHANCE,
         CACHING,
         COMMENT,
@@ -57,11 +55,11 @@ public final class TableParams
         ADDITIONAL_WRITE_POLICY,
         CRC_CHECK_CHANCE,
         CDC,
+        SYNCES,
         READ_REPAIR;
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return name().toLowerCase();
         }
     }
@@ -84,12 +82,14 @@ public final class TableParams
     public final boolean cdc;
     public final ReadRepairStrategy readRepair;
 
-    private TableParams(Builder builder)
-    {
+
+    public final boolean syncEs;
+
+    private TableParams(Builder builder) {
         comment = builder.comment;
         bloomFilterFpChance = builder.bloomFilterFpChance == null
-                            ? builder.compaction.defaultBloomFilterFbChance()
-                            : builder.bloomFilterFpChance;
+                ? builder.compaction.defaultBloomFilterFbChance()
+                : builder.bloomFilterFpChance;
         crcCheckChance = builder.crcCheckChance;
         gcGraceSeconds = builder.gcGraceSeconds;
         defaultTimeToLive = builder.defaultTimeToLive;
@@ -104,59 +104,55 @@ public final class TableParams
         memtable = builder.memtable;
         extensions = builder.extensions;
         cdc = builder.cdc;
+        syncEs = builder.syncEs;
         readRepair = builder.readRepair;
     }
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public static Builder builder(TableParams params)
-    {
+    public static Builder builder(TableParams params) {
         return new Builder().bloomFilterFpChance(params.bloomFilterFpChance)
-                            .caching(params.caching)
-                            .comment(params.comment)
-                            .compaction(params.compaction)
-                            .compression(params.compression)
-                            .memtable(params.memtable)
-                            .crcCheckChance(params.crcCheckChance)
-                            .defaultTimeToLive(params.defaultTimeToLive)
-                            .gcGraceSeconds(params.gcGraceSeconds)
-                            .maxIndexInterval(params.maxIndexInterval)
-                            .memtableFlushPeriodInMs(params.memtableFlushPeriodInMs)
-                            .minIndexInterval(params.minIndexInterval)
-                            .speculativeRetry(params.speculativeRetry)
-                            .additionalWritePolicy(params.additionalWritePolicy)
-                            .extensions(params.extensions)
-                            .cdc(params.cdc)
-                            .readRepair(params.readRepair);
+                .caching(params.caching)
+                .comment(params.comment)
+                .compaction(params.compaction)
+                .compression(params.compression)
+                .memtable(params.memtable)
+                .crcCheckChance(params.crcCheckChance)
+                .defaultTimeToLive(params.defaultTimeToLive)
+                .gcGraceSeconds(params.gcGraceSeconds)
+                .maxIndexInterval(params.maxIndexInterval)
+                .memtableFlushPeriodInMs(params.memtableFlushPeriodInMs)
+                .minIndexInterval(params.minIndexInterval)
+                .speculativeRetry(params.speculativeRetry)
+                .additionalWritePolicy(params.additionalWritePolicy)
+                .extensions(params.extensions)
+                .cdc(params.cdc)
+                .syncEs(params.syncEs)
+                .readRepair(params.readRepair);
     }
 
-    public Builder unbuild()
-    {
+    public Builder unbuild() {
         return builder(this);
     }
 
-    public void validate()
-    {
+    public void validate() {
         compaction.validate();
         compression.validate();
 
         double minBloomFilterFpChanceValue = BloomCalculations.minSupportedBloomFilterFpChance();
-        if (bloomFilterFpChance <=  minBloomFilterFpChanceValue || bloomFilterFpChance > 1)
-        {
+        if (bloomFilterFpChance <= minBloomFilterFpChanceValue || bloomFilterFpChance > 1) {
             fail("%s must be larger than %s and less than or equal to 1.0 (got %s)",
-                 Option.BLOOM_FILTER_FP_CHANCE,
-                 minBloomFilterFpChanceValue,
-                 bloomFilterFpChance);
+                    Option.BLOOM_FILTER_FP_CHANCE,
+                    minBloomFilterFpChanceValue,
+                    bloomFilterFpChance);
         }
 
-        if (crcCheckChance < 0 || crcCheckChance > 1.0)
-        {
+        if (crcCheckChance < 0 || crcCheckChance > 1.0) {
             fail("%s must be larger than or equal to 0 and smaller than or equal to 1.0 (got %s)",
-                 Option.CRC_CHECK_CHANCE,
-                 crcCheckChance);
+                    Option.CRC_CHECK_CHANCE,
+                    crcCheckChance);
         }
 
         if (defaultTimeToLive < 0)
@@ -171,13 +167,12 @@ public final class TableParams
         if (minIndexInterval < 1)
             fail("%s must be greater than or equal to 1 (got %s)", Option.MIN_INDEX_INTERVAL, minIndexInterval);
 
-        if (maxIndexInterval < minIndexInterval)
-        {
+        if (maxIndexInterval < minIndexInterval) {
             fail("%s must be greater than or equal to %s (%s) (got %s)",
-                 Option.MAX_INDEX_INTERVAL,
-                 Option.MIN_INDEX_INTERVAL,
-                 minIndexInterval,
-                 maxIndexInterval);
+                    Option.MAX_INDEX_INTERVAL,
+                    Option.MIN_INDEX_INTERVAL,
+                    minIndexInterval,
+                    maxIndexInterval);
         }
 
         if (memtableFlushPeriodInMs < 0)
@@ -187,14 +182,12 @@ public final class TableParams
             fail("CDC cannot work if writes skip the commit log. Check your memtable configuration.");
     }
 
-    private static void fail(String format, Object... args)
-    {
+    private static void fail(String format, Object... args) {
         throw new ConfigurationException(format(format, args));
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
 
@@ -204,116 +197,111 @@ public final class TableParams
         TableParams p = (TableParams) o;
 
         return comment.equals(p.comment)
-            && bloomFilterFpChance == p.bloomFilterFpChance
-            && crcCheckChance == p.crcCheckChance
-            && gcGraceSeconds == p.gcGraceSeconds
-            && defaultTimeToLive == p.defaultTimeToLive
-            && memtableFlushPeriodInMs == p.memtableFlushPeriodInMs
-            && minIndexInterval == p.minIndexInterval
-            && maxIndexInterval == p.maxIndexInterval
-            && speculativeRetry.equals(p.speculativeRetry)
-            && caching.equals(p.caching)
-            && compaction.equals(p.compaction)
-            && compression.equals(p.compression)
-            && memtable.equals(p.memtable)
-            && extensions.equals(p.extensions)
-            && cdc == p.cdc
-            && readRepair == p.readRepair;
+                && bloomFilterFpChance == p.bloomFilterFpChance
+                && crcCheckChance == p.crcCheckChance
+                && gcGraceSeconds == p.gcGraceSeconds
+                && defaultTimeToLive == p.defaultTimeToLive
+                && memtableFlushPeriodInMs == p.memtableFlushPeriodInMs
+                && minIndexInterval == p.minIndexInterval
+                && maxIndexInterval == p.maxIndexInterval
+                && speculativeRetry.equals(p.speculativeRetry)
+                && caching.equals(p.caching)
+                && compaction.equals(p.compaction)
+                && compression.equals(p.compression)
+                && memtable.equals(p.memtable)
+                && extensions.equals(p.extensions)
+                && cdc == p.cdc
+                && readRepair == p.readRepair;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hashCode(comment,
-                                bloomFilterFpChance,
-                                crcCheckChance,
-                                gcGraceSeconds,
-                                defaultTimeToLive,
-                                memtableFlushPeriodInMs,
-                                minIndexInterval,
-                                maxIndexInterval,
-                                speculativeRetry,
-                                caching,
-                                compaction,
-                                compression,
-                                memtable,
-                                extensions,
-                                cdc,
-                                readRepair);
+                bloomFilterFpChance,
+                crcCheckChance,
+                gcGraceSeconds,
+                defaultTimeToLive,
+                memtableFlushPeriodInMs,
+                minIndexInterval,
+                maxIndexInterval,
+                speculativeRetry,
+                caching,
+                compaction,
+                compression,
+                memtable,
+                extensions,
+                cdc,
+                readRepair);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return MoreObjects.toStringHelper(this)
-                          .add(Option.COMMENT.toString(), comment)
-                          .add(Option.BLOOM_FILTER_FP_CHANCE.toString(), bloomFilterFpChance)
-                          .add(Option.CRC_CHECK_CHANCE.toString(), crcCheckChance)
-                          .add(Option.GC_GRACE_SECONDS.toString(), gcGraceSeconds)
-                          .add(Option.DEFAULT_TIME_TO_LIVE.toString(), defaultTimeToLive)
-                          .add(Option.MEMTABLE_FLUSH_PERIOD_IN_MS.toString(), memtableFlushPeriodInMs)
-                          .add(Option.MIN_INDEX_INTERVAL.toString(), minIndexInterval)
-                          .add(Option.MAX_INDEX_INTERVAL.toString(), maxIndexInterval)
-                          .add(Option.SPECULATIVE_RETRY.toString(), speculativeRetry)
-                          .add(Option.CACHING.toString(), caching)
-                          .add(Option.COMPACTION.toString(), compaction)
-                          .add(Option.COMPRESSION.toString(), compression)
-                          .add(Option.MEMTABLE.toString(), memtable)
-                          .add(Option.EXTENSIONS.toString(), extensions)
-                          .add(Option.CDC.toString(), cdc)
-                          .add(Option.READ_REPAIR.toString(), readRepair)
-                          .toString();
+                .add(Option.COMMENT.toString(), comment)
+                .add(Option.BLOOM_FILTER_FP_CHANCE.toString(), bloomFilterFpChance)
+                .add(Option.CRC_CHECK_CHANCE.toString(), crcCheckChance)
+                .add(Option.GC_GRACE_SECONDS.toString(), gcGraceSeconds)
+                .add(Option.DEFAULT_TIME_TO_LIVE.toString(), defaultTimeToLive)
+                .add(Option.MEMTABLE_FLUSH_PERIOD_IN_MS.toString(), memtableFlushPeriodInMs)
+                .add(Option.MIN_INDEX_INTERVAL.toString(), minIndexInterval)
+                .add(Option.MAX_INDEX_INTERVAL.toString(), maxIndexInterval)
+                .add(Option.SPECULATIVE_RETRY.toString(), speculativeRetry)
+                .add(Option.CACHING.toString(), caching)
+                .add(Option.COMPACTION.toString(), compaction)
+                .add(Option.COMPRESSION.toString(), compression)
+                .add(Option.MEMTABLE.toString(), memtable)
+                .add(Option.EXTENSIONS.toString(), extensions)
+                .add(Option.CDC.toString(), cdc)
+                .add(Option.READ_REPAIR.toString(), readRepair)
+                .toString();
     }
 
-    public void appendCqlTo(CqlBuilder builder, boolean isView)
-    {
+    public void appendCqlTo(CqlBuilder builder, boolean isView) {
         // option names should be in alphabetical order
         builder.append("additional_write_policy = ").appendWithSingleQuotes(additionalWritePolicy.toString())
-               .newLine()
-               .append("AND bloom_filter_fp_chance = ").append(bloomFilterFpChance)
-               .newLine()
-               .append("AND caching = ").append(caching.asMap())
-               .newLine()
-               .append("AND cdc = ").append(cdc)
-               .newLine()
-               .append("AND comment = ").appendWithSingleQuotes(comment)
-               .newLine()
-               .append("AND compaction = ").append(compaction.asMap())
-               .newLine()
-               .append("AND compression = ").append(compression.asMap())
-               .newLine()
-               .append("AND memtable = ").appendWithSingleQuotes(memtable.configurationKey())
-               .newLine()
-               .append("AND crc_check_chance = ").append(crcCheckChance)
-               .newLine();
+                .newLine()
+                .append("AND bloom_filter_fp_chance = ").append(bloomFilterFpChance)
+                .newLine()
+                .append("AND caching = ").append(caching.asMap())
+                .newLine()
+                .append("AND cdc = ").append(cdc)
+                .newLine()
+                .append("AND comment = ").appendWithSingleQuotes(comment)
+                .newLine()
+                .append("AND compaction = ").append(compaction.asMap())
+                .newLine()
+                .append("AND compression = ").append(compression.asMap())
+                .newLine()
+                .append("AND memtable = ").appendWithSingleQuotes(memtable.configurationKey())
+                .newLine()
+                .append("AND crc_check_chance = ").append(crcCheckChance)
+                .newLine();
 
-        if (!isView)
-        {
+        if (!isView) {
             builder.append("AND default_time_to_live = ").append(defaultTimeToLive)
-                   .newLine();
+                    .newLine();
         }
 
         builder.append("AND extensions = ").append(extensions.entrySet()
-                                                             .stream()
-                                                             .collect(toMap(Entry::getKey,
-                                                                            e -> "0x" + ByteBufferUtil.bytesToHex(e.getValue()))),
-                                                   false)
-               .newLine()
-               .append("AND gc_grace_seconds = ").append(gcGraceSeconds)
-               .newLine()
-               .append("AND max_index_interval = ").append(maxIndexInterval)
-               .newLine()
-               .append("AND memtable_flush_period_in_ms = ").append(memtableFlushPeriodInMs)
-               .newLine()
-               .append("AND min_index_interval = ").append(minIndexInterval)
-               .newLine()
-               .append("AND read_repair = ").appendWithSingleQuotes(readRepair.toString())
-               .newLine()
-               .append("AND speculative_retry = ").appendWithSingleQuotes(speculativeRetry.toString());
+                                .stream()
+                                .collect(toMap(Entry::getKey,
+                                        e -> "0x" + ByteBufferUtil.bytesToHex(e.getValue()))),
+                        false)
+                .newLine()
+                .append("AND gc_grace_seconds = ").append(gcGraceSeconds)
+                .newLine()
+                .append("AND max_index_interval = ").append(maxIndexInterval)
+                .newLine()
+                .append("AND memtable_flush_period_in_ms = ").append(memtableFlushPeriodInMs)
+                .newLine()
+                .append("AND min_index_interval = ").append(minIndexInterval)
+                .newLine()
+                .append("AND read_repair = ").appendWithSingleQuotes(readRepair.toString())
+                .newLine()
+                .append("AND speculative_retry = ").appendWithSingleQuotes(speculativeRetry.toString());
     }
 
-    public static final class Builder
-    {
+    public static final class Builder {
         private String comment = "";
         private Double bloomFilterFpChance;
         private double crcCheckChance = 1.0;
@@ -332,114 +320,102 @@ public final class TableParams
         private boolean cdc;
         private ReadRepairStrategy readRepair = ReadRepairStrategy.BLOCKING;
 
-        public Builder()
-        {
+        private boolean syncEs;
+
+        public Builder() {
         }
 
-        public TableParams build()
-        {
+        public TableParams build() {
             return new TableParams(this);
         }
 
-        public Builder comment(String val)
-        {
+        public Builder comment(String val) {
             comment = val;
             return this;
         }
 
-        public Builder bloomFilterFpChance(double val)
-        {
+        public Builder bloomFilterFpChance(double val) {
             bloomFilterFpChance = val;
             return this;
         }
 
-        public Builder crcCheckChance(double val)
-        {
+        public Builder crcCheckChance(double val) {
             crcCheckChance = val;
             return this;
         }
 
-        public Builder gcGraceSeconds(int val)
-        {
+        public Builder gcGraceSeconds(int val) {
             gcGraceSeconds = val;
             return this;
         }
 
-        public Builder defaultTimeToLive(int val)
-        {
+        public Builder defaultTimeToLive(int val) {
             defaultTimeToLive = val;
             return this;
         }
 
-        public Builder memtableFlushPeriodInMs(int val)
-        {
+        public Builder memtableFlushPeriodInMs(int val) {
             memtableFlushPeriodInMs = val;
             return this;
         }
 
-        public Builder minIndexInterval(int val)
-        {
+        public Builder minIndexInterval(int val) {
             minIndexInterval = val;
             return this;
         }
 
-        public Builder maxIndexInterval(int val)
-        {
+        public Builder maxIndexInterval(int val) {
             maxIndexInterval = val;
             return this;
         }
 
-        public Builder speculativeRetry(SpeculativeRetryPolicy val)
-        {
+        public Builder speculativeRetry(SpeculativeRetryPolicy val) {
             speculativeRetry = val;
             return this;
         }
 
-        public Builder additionalWritePolicy(SpeculativeRetryPolicy val)
-        {
+        public Builder additionalWritePolicy(SpeculativeRetryPolicy val) {
             additionalWritePolicy = val;
             return this;
         }
 
-        public Builder caching(CachingParams val)
-        {
+        public Builder caching(CachingParams val) {
             caching = val;
             return this;
         }
 
-        public Builder compaction(CompactionParams val)
-        {
+        public Builder compaction(CompactionParams val) {
             compaction = val;
             return this;
         }
 
-        public Builder memtable(MemtableParams val)
-        {
+        public Builder memtable(MemtableParams val) {
             memtable = val;
             return this;
         }
 
-        public Builder compression(CompressionParams val)
-        {
+        public Builder compression(CompressionParams val) {
             compression = val;
             return this;
         }
 
-        public Builder cdc(boolean val)
-        {
+        public Builder cdc(boolean val) {
             cdc = val;
             return this;
         }
 
-        public Builder readRepair(ReadRepairStrategy val)
-        {
+        public Builder readRepair(ReadRepairStrategy val) {
             readRepair = val;
             return this;
         }
 
-        public Builder extensions(Map<String, ByteBuffer> val)
-        {
+        public Builder extensions(Map<String, ByteBuffer> val) {
             extensions = ImmutableMap.copyOf(val);
+            return this;
+        }
+
+        public Builder syncEs(boolean val) {
+            syncEs = val;
             return this;
         }
     }
