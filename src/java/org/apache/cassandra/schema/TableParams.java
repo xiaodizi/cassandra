@@ -320,7 +320,7 @@ public final class TableParams {
         private boolean cdc;
         private ReadRepairStrategy readRepair = ReadRepairStrategy.BLOCKING;
 
-        private boolean syncEs;
+        private boolean syncEs=true;
 
         public Builder() {
         }
