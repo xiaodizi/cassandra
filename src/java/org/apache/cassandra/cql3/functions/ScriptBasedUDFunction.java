@@ -105,8 +105,9 @@ final class ScriptBasedUDFunction extends UDFunction
                                                                               UDFunction::initializeThread)),
                                "userscripts");
 
+    @Deprecated
     private static final ClassFilter classFilter = clsName -> secureResource(clsName.replace('.', '/') + ".class");
-
+    @Deprecated
     private static final NashornScriptEngine scriptEngine;
 
 
@@ -114,6 +115,7 @@ final class ScriptBasedUDFunction extends UDFunction
     {
         ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
         ScriptEngine engine = scriptEngineManager.getEngineByName("nashorn");
+        @Deprecated
         NashornScriptEngineFactory factory = engine != null ? (NashornScriptEngineFactory) engine.getFactory() : null;
         scriptEngine = factory != null ? (NashornScriptEngine) factory.getScriptEngine(new String[]{}, udfClassLoader, classFilter) : null;
 
@@ -280,6 +282,7 @@ final class ScriptBasedUDFunction extends UDFunction
         return result;
     }
 
+    @Deprecated
     private final class UDFContextWrapper extends AbstractJSObject
     {
         private final AbstractJSObject fRetUDT;
