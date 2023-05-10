@@ -105,8 +105,9 @@ final class ScriptBasedUDFunction extends UDFunction
                                                                               UDFunction::initializeThread)),
                                "userscripts");
 
+    @Deprecated
     private static final ClassFilter classFilter = clsName -> secureResource(clsName.replace('.', '/') + ".class");
-
+    @Deprecated
     private static final NashornScriptEngine scriptEngine;
 
 
