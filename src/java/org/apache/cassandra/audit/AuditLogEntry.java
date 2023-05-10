@@ -23,12 +23,19 @@ import java.util.*;
 import javax.annotation.Nullable;
 
 import com.alibaba.fastjson2.JSON;
+import org.apache.cassandra.audit.es.CassandraUtil;
 import org.apache.cassandra.audit.es.EsUtil;
 import org.apache.cassandra.audit.es.HttpUtil;
 import org.apache.cassandra.audit.es.SqlToJson;
 import org.apache.cassandra.audit.es.dto.Hites;
 import org.apache.cassandra.audit.es.res.DataRsp;
 import org.apache.cassandra.config.DatabaseDescriptor;
+import org.apache.cassandra.cql3.statements.PropertyDefinitions;
+import org.apache.cassandra.db.ColumnFamilyStore;
+import org.apache.cassandra.db.Keyspace;
+import org.apache.cassandra.schema.Schema;
+import org.apache.cassandra.schema.TableMetadata;
+import org.apache.cassandra.schema.TableParams;
 import org.apache.commons.lang3.StringUtils;
 
 import org.apache.cassandra.auth.AuthenticatedUser;
@@ -109,18 +116,21 @@ public class AuditLogEntry {
 
             System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
+            Keyspace schema1 = Keyspace.open(keyspace, Schema.instance, false);
 
-            boolean cdcEnabled = DatabaseDescriptor.isCDCEnabled();
+            ColumnFamilyStore users = schema1.getColumnFamilyStore(scope);
 
-            System.out.println("cdc 配置开关:"+cdcEnabled);
+            TableMetadata tableMetadata = users.metadata.get();
+            boolean syncEs = tableMetadata.params.syncEs;
+
+            System.out.println("是否同步ES："+syncEs);
 
 
-            if (type.toString().equals("CREATE_TABLE")){
+            if (type.toString().equals("CREATE_TABLE") && syncEs){
                 HttpUtil.newCreateIndex(esNodeList,keyspace+"-"+scope);
             }
 
-
-            if (type.toString().equals("UPDATE")) {
+            if (type.toString().equals("UPDATE") && syncEs) {
                 if (s.toLowerCase(Locale.ROOT).contains("update")) {
                     Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
 
@@ -140,13 +150,12 @@ public class AuditLogEntry {
                 }
             }
 
-
-            if (type.toString().equals("DELETE")) {
+            if (type.toString().equals("DELETE") && syncEs) {
                 Map maps = SqlToJson.sqlDeleteToJson(s);
                 HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
             }
 
-            if (type.toString().equals("DROP_TABLE")) {
+            if (type.toString().equals("DROP_TABLE") && syncEs) {
                 HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
             }
 

@@ -21,7 +21,6 @@ import java.util.Map;
 
 public class HttpUtil {
 
-
     public static DataRsp getClusterHealth(String url){
         String nodeUrl = getRandomNode(url);
         System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);

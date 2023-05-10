@@ -70,6 +70,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.RateLimiter;
+import org.apache.cassandra.audit.es.CassandraUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -482,6 +483,9 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean, Memtable.Owner
         memtableFactory = metadata.get().params.memtable.factory();
 
         logger.info("Initializing {}.{}", keyspace.getName(), name);
+
+
+        CassandraUtil.getTableParams(metadata.get().params);
 
         // Create Memtable and its metrics object only on online
         Memtable initialMemtable = null;

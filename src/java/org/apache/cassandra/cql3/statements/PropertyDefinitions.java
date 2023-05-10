@@ -123,6 +123,7 @@ public class PropertyDefinitions
         return (value == null) ? defaultValue : parseBoolean(key, value);
     }
 
+
     // Return a property value, typed as a double
     public double getDouble(String key, double defaultValue) throws SyntaxException
     {

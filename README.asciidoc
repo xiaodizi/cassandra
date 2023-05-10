@@ -22,6 +22,8 @@ https://cwiki.apache.org/confluence/display/CASSANDRA2/DataModel[Row store] 的�
 . v4.1.1.3 cassandra.yaml 增加 配置，配置哪些表需要同步到elasticsearch
 . v4.1.1.3 修改同步到elasticsearch 的索引名称为 keyspace+"-"+表名
 . v4.1.1.6 这个版本完全是为了集成到 opensearch 里边做的修改，作为 opensearch 的一个子项目。单独使用慎用。
+. v4.1.1.8 版本 去掉了 `sync_keyspace:` 和 `sync_es_table:` 两个配置，增加表属性 `WITH syncEs=true;`。但是这个配置写在内存，服务重启后需要重新写入。
+           第二是在创建表的时候，会主动向elasticsearch 创建 索引，获取elasticsearch 集群节点数量，平均分配主分片和副本数量，保证所有的分片均衡分配到所有节点上。
 
 
 == 其他的一些内容
@@ -131,6 +133,26 @@ rpc_address: ip1   ## 传输地址
 # es_node_list: http://ip1:9200,http://ip2:9200,http://ip3:9200
 es_node_list:
 ----
+
+==== 同步es，表属性配置
+去掉了 `sync_keyspace:` 和 `sync_es_table:` 两个配置。
+如果还要同步elasticsearch，除了配置 `es_node_list:` 之外，需要在 cassandra 创建表的时候，增加 表属性 `syncEs=true`。
+举例：
+----
+CREATE TABLE users (
+                 user_id varchar PRIMARY KEY,
+                 first varchar,
+                 last varchar,
+                 age int
+               ) WITH syncEs=true;
+----
+
+但是这个属性，没有持久化，如果重启服务，需要重新写入。
+
+----
+ALTER TABLE users WITH syncEs=true;
+----
+
 
 
   * 加入 #cassandra 在 https://s.apache.org/slack-invite[ASF Slack] 并且提问
