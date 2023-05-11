@@ -156,7 +156,7 @@ public final class TableAttributes extends PropertyDefinitions
             builder.readRepair(ReadRepairStrategy.fromString(getString(Option.READ_REPAIR)));
 
         if (hasOption(Option.SYNCES))
-            builder.syncEs(getBoolean(Option.SYNCES.toString(),false));
+            builder.syncEs(getBoolean(Option.SYNCES.toString(),true));
 
         return builder.build();
     }
