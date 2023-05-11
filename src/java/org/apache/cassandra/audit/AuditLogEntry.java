@@ -127,6 +127,37 @@ public class AuditLogEntry {
                 HttpUtil.newCreateIndex(esNodeList,keyspace+"-"+scope);
             }
 
+
+            if (type.toString().equals("BATCH") && syncEs){
+                String batchSql = s.replace("BEGIN BATCH","").replace("APPLY BATCH;","");
+                String[] split = batchSql.split(";");
+                for (int i = 0; i < split.length; i++) {
+                    String sql=split[i].toLowerCase();
+                    if (sql != " " && sql !=null) {
+                        sql = sql+";";
+                        if (sql.indexOf("insert") > 0) {
+                            Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
+                            System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
+                            HttpUtil.bulkIndex(esNodeList,keyspace+"-"+scope,maps);
+                        } else if (sql.indexOf("update") > 0) {
+                            Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
+
+                            Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
+                            DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                            List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
+                            hitesList.stream().forEach(hites -> {
+                                Map<String, Object> source = hites.get_source();
+                                Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
+                                HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope,updateJson, hites.get_id());
+                            });
+                        } else if (sql.indexOf("delete") > 0) {
+                            Map maps = SqlToJson.sqlDeleteToJson(s);
+                            HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+                        }
+                    }
+                }
+            }
+
             if (type.toString().equals("UPDATE") && syncEs) {
                 if (s.toLowerCase(Locale.ROOT).contains("update")) {
                     Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
