@@ -116,12 +116,16 @@ public class AuditLogEntry {
 
             System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
-            Keyspace schema1 = Keyspace.open(keyspace, Schema.instance, false);
+            boolean syncEs=true;
 
-            ColumnFamilyStore users = schema1.getColumnFamilyStore(scope);
+            if (!StringUtils.isBlank(scope)) {
+                Keyspace schema1 = Keyspace.open(keyspace, Schema.instance, false);
 
-            TableMetadata tableMetadata = users.metadata.get();
-            boolean syncEs = tableMetadata.params.syncEs;
+                ColumnFamilyStore users = schema1.getColumnFamilyStore(scope);
+
+                TableMetadata tableMetadata = users.metadata.get();
+                syncEs = tableMetadata.params.syncEs;
+            }
 
             System.out.println("是否同步ES："+syncEs);
 
