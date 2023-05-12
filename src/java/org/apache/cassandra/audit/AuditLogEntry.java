@@ -23,9 +23,7 @@ import java.util.*;
 import javax.annotation.Nullable;
 
 import com.alibaba.fastjson2.JSON;
-import org.apache.cassandra.audit.es.EsUtil;
-import org.apache.cassandra.audit.es.HttpUtil;
-import org.apache.cassandra.audit.es.SqlToJson;
+import org.apache.cassandra.audit.es.*;
 import org.apache.cassandra.audit.es.dto.Hites;
 import org.apache.cassandra.audit.es.res.DataRsp;
 import org.apache.cassandra.config.DatabaseDescriptor;
@@ -33,6 +31,7 @@ import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.schema.Schema;
 import org.apache.cassandra.schema.TableMetadata;
+import org.apache.cassandra.schema.TableParams;
 import org.apache.commons.lang3.StringUtils;
 
 import org.apache.cassandra.auth.AuthenticatedUser;
@@ -113,22 +112,13 @@ public class AuditLogEntry {
 
             System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
-            System.out.println("----------LEI TEST----------");
-
-            System.out.println(scope);
-
-            System.out.println("----------------------------");
-
-            Keyspace schema1 = Keyspace.open(keyspace, Schema.instance, false);
-
             boolean syncEs = true;
 
             if (!StringUtils.isBlank(scope)) {
-
-                ColumnFamilyStore users = schema1.getColumnFamilyStore(scope);
-
-                TableMetadata tableMetadata = users.metadata.get();
-                syncEs = tableMetadata.params.syncEs;
+                Boolean sync = CassandraUtil.syncTablesInfo.get(keyspace + "." + scope);
+                syncEs = sync;
+            }else {
+                syncEs = false;
             }
 
             System.out.println("是否同步ES：" + syncEs);

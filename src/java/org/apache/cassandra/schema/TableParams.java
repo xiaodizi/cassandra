@@ -211,6 +211,7 @@ public final class TableParams {
                 && memtable.equals(p.memtable)
                 && extensions.equals(p.extensions)
                 && cdc == p.cdc
+                && syncEs == p.syncEs
                 && readRepair == p.readRepair;
     }
 
@@ -231,6 +232,7 @@ public final class TableParams {
                 memtable,
                 extensions,
                 cdc,
+                syncEs,
                 readRepair);
     }
 
@@ -252,6 +254,7 @@ public final class TableParams {
                 .add(Option.MEMTABLE.toString(), memtable)
                 .add(Option.EXTENSIONS.toString(), extensions)
                 .add(Option.CDC.toString(), cdc)
+                .add(Option.SYNCES.toString(),syncEs)
                 .add(Option.READ_REPAIR.toString(), readRepair)
                 .toString();
     }
@@ -265,6 +268,8 @@ public final class TableParams {
                 .append("AND caching = ").append(caching.asMap())
                 .newLine()
                 .append("AND cdc = ").append(cdc)
+                .newLine()
+                .append("AND syncEs = ").append(syncEs)
                 .newLine()
                 .append("AND comment = ").appendWithSingleQuotes(comment)
                 .newLine()

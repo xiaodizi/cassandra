@@ -482,10 +482,10 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean, Memtable.Owner
         additionalWriteLatencyMicros = DatabaseDescriptor.getWriteRpcTimeout(TimeUnit.MICROSECONDS) / 2;
         memtableFactory = metadata.get().params.memtable.factory();
 
+
         logger.info("Initializing {}.{}", keyspace.getName(), name);
 
 
-        CassandraUtil.getTableParams(metadata.get().params);
 
         // Create Memtable and its metrics object only on online
         Memtable initialMemtable = null;
@@ -557,6 +557,8 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean, Memtable.Owner
             topPartitions = null;
         else
             topPartitions = new TopPartitionTracker(metadata());
+
+        CassandraUtil.getTableParams(metadata.get().keyspace+"."+metadata().name,metadata.get().params.syncEs);
     }
 
     public static String getTableMBeanName(String ks, String name, boolean isIndex)
@@ -971,6 +973,7 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean, Memtable.Owner
      */
     public Future<CommitLogPosition> switchMemtableIfCurrent(Memtable memtable, FlushReason reason)
     {
+
         synchronized (data)
         {
             if (data.getView().getCurrentMemtable() == memtable)
@@ -1009,6 +1012,10 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean, Memtable.Owner
 
         for (ColumnFamilyStore indexCfs : indexManager.getAllIndexColumnFamilyStores())
             indexCfs.getTracker().getView().getCurrentMemtable().addMemoryUsageTo(usage);
+
+        if (keyspace.getName().equals("system_schema") && name.equals("tables")){
+            CassandraUtil.getTableParams(keyspace.getName()+"."+name,this.metadata.get().params.syncEs);
+        }
 
         logger.info("Enqueuing flush of {}.{}, Reason: {}, Usage: {}", keyspace.getName(), name, reason, usage);
     }

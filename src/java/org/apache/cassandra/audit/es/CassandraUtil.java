@@ -18,13 +18,18 @@
 
 package org.apache.cassandra.audit.es;
 
-import org.apache.cassandra.schema.TableParams;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CassandraUtil {
 
-    public static volatile TableParams metadata;
+    public static Map<String,Boolean> syncTablesInfo=new HashMap<>();
 
-    public static void getTableParams(TableParams params){
-        metadata = params;
+    static {
+
+    }
+
+    public static void getTableParams(String tableName,Boolean syncEs){
+        syncTablesInfo.put(tableName,syncEs);
     }
 }

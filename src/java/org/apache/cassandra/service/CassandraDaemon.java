@@ -365,6 +365,8 @@ public class CassandraDaemon
         // Re-populate token metadata after commit log recover (new peers might be loaded onto system keyspace #10293)
         StorageService.instance.populateTokenMetadata();
 
+
+
         try
         {
             PaxosState.maybeRebuildUncommittedState();
