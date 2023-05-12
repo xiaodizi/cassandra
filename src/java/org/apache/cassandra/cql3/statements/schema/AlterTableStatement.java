@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 
+import org.apache.cassandra.audit.es.CassandraUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -436,7 +437,10 @@ public abstract class AlterTableStatement extends AlterSchemaStatement
         {
             attrs.validate();
 
+
             TableParams params = attrs.asAlteredTableParams(table.params);
+
+            CassandraUtil.getTableParams(keyspaceName+"."+table.name,params.syncEs);
 
             if (table.isCounter() && params.defaultTimeToLive > 0)
                 throw ire("Cannot set default_time_to_live on a table with counters");

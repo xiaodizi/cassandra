@@ -19,10 +19,6 @@
          xmlns:if="ant:if"
          xmlns:unless="ant:unless">
 
-    <echo>-------------LEI TEST--------------</echo>
-    <echo>${basedir}</echo>
-    <echo>-----------------------------------</echo>
-
     <!--    <fail message="You need to use Ant of version at least 1.10 to continue.">-->
     <!--      <condition>-->
     <!--        <not>-->

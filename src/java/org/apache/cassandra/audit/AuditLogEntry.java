@@ -23,14 +23,10 @@ import java.util.*;
 import javax.annotation.Nullable;
 
 import com.alibaba.fastjson2.JSON;
-import org.apache.cassandra.audit.es.CassandraUtil;
-import org.apache.cassandra.audit.es.EsUtil;
-import org.apache.cassandra.audit.es.HttpUtil;
-import org.apache.cassandra.audit.es.SqlToJson;
+import org.apache.cassandra.audit.es.*;
 import org.apache.cassandra.audit.es.dto.Hites;
 import org.apache.cassandra.audit.es.res.DataRsp;
 import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.cql3.statements.PropertyDefinitions;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.schema.Schema;
@@ -116,22 +112,50 @@ public class AuditLogEntry {
 
             System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
-            boolean syncEs=true;
+            boolean syncEs = true;
 
             if (!StringUtils.isBlank(scope)) {
-                Keyspace schema1 = Keyspace.open(keyspace, Schema.instance, false);
-
-                ColumnFamilyStore users = schema1.getColumnFamilyStore(scope);
-
-                TableMetadata tableMetadata = users.metadata.get();
-                syncEs = tableMetadata.params.syncEs;
+                Boolean sync = CassandraUtil.syncTablesInfo.get(keyspace + "." + scope);
+                syncEs = sync;
+            }else {
+                syncEs = false;
             }
 
-            System.out.println("是否同步ES："+syncEs);
+            System.out.println("是否同步ES：" + syncEs);
+
+            if (type.toString().equals("CREATE_TABLE") && syncEs) {
+                HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
+            }
 
 
-            if (type.toString().equals("CREATE_TABLE") && syncEs){
-                HttpUtil.newCreateIndex(esNodeList,keyspace+"-"+scope);
+            if (type.toString().equals("BATCH") && syncEs) {
+                String batchSql = s.replace("BEGIN BATCH", "").replace("APPLY BATCH;", "");
+                String[] split = batchSql.split(";");
+                for (int i = 0; i < split.length; i++) {
+                    String sql = split[i].toLowerCase();
+                    if (sql != " " && sql != null) {
+                        sql = sql + ";";
+                        if (sql.indexOf("insert") > 0) {
+                            Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
+                            System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
+                            HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
+                        } else if (sql.indexOf("update") > 0) {
+                            Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
+
+                            Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
+                            DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                            List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
+                            hitesList.stream().forEach(hites -> {
+                                Map<String, Object> source = hites.get_source();
+                                Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
+                                HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
+                            });
+                        } else if (sql.indexOf("delete") > 0) {
+                            Map maps = SqlToJson.sqlDeleteToJson(s);
+                            HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+                        }
+                    }
+                }
             }
 
             if (type.toString().equals("BATCH") && syncEs){
@@ -174,13 +198,13 @@ public class AuditLogEntry {
                     hitesList.stream().forEach(hites -> {
                         Map<String, Object> source = hites.get_source();
                         Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                        HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope,updateJson, hites.get_id());
+                        HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
                     });
 
                 } else {
                     Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
                     System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
-                    HttpUtil.bulkIndex(esNodeList,keyspace+"-"+scope,maps);
+                    HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
                 }
             }
 

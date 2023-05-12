@@ -159,7 +159,6 @@ public class BatchlogManager implements BatchlogManagerMBean
                .timestamp(batch.creationTime)
                .add("version", MessagingService.current_version)
                .appendAll("mutations", mutations);
-
         builder.buildAsMutation().apply(durableWrites);
     }
 

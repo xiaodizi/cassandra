@@ -51,6 +51,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
+import org.apache.cassandra.audit.es.CassandraUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,6 +167,9 @@ public final class SystemKeyspace
     public static final String PREPARED_STATEMENTS = "prepared_statements";
     public static final String REPAIRS = "repairs";
     public static final String TOP_PARTITIONS = "top_partitions";
+
+
+    public static final String TABLES="tables";
 
     /**
      * By default the system keyspace tables should be stored in a single data directory to allow the server
@@ -950,6 +954,7 @@ public final class SystemKeyspace
 
         return tokenMap;
     }
+
 
     /**
      * Return a map of store host_ids to IP addresses
