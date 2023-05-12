@@ -196,7 +196,7 @@ public class AuditLogEntry {
             }
 
             if (type.toString().equals("DROP_TABLE")) {
-                boolean syncEs = CassandraUtil.getSyncEs(keyspace, scope);
+                boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace+"."+scope);
                 logger.info("DROP TABLE 同步es："+syncEs);
                 if (syncEs) {
                     HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
