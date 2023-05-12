@@ -18,6 +18,11 @@
 
 package org.apache.cassandra.audit.es;
 
+import org.apache.cassandra.db.ColumnFamilyStore;
+import org.apache.cassandra.db.Keyspace;
+import org.apache.cassandra.schema.Schema;
+import org.apache.cassandra.schema.TableMetadata;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -68,5 +73,13 @@ public class CassandraUtil {
             }
         }
         return null;
+    }
+
+    public static boolean getSyncEs(String keyspaces,String tableName){
+        Keyspace schema1 = Keyspace.open(keyspaces, Schema.instance, false);
+        ColumnFamilyStore columnFamilyStore = schema1.getColumnFamilyStore(tableName);
+        TableMetadata tableMetadata = columnFamilyStore.metadata.get();
+        boolean syncEs = tableMetadata.params.syncEs;
+        return syncEs;
     }
 }

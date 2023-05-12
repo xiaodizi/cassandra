@@ -27,11 +27,8 @@ import org.apache.cassandra.audit.es.*;
 import org.apache.cassandra.audit.es.dto.Hites;
 import org.apache.cassandra.audit.es.res.DataRsp;
 import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.db.ColumnFamilyStore;
-import org.apache.cassandra.db.Keyspace;
-import org.apache.cassandra.schema.Schema;
-import org.apache.cassandra.schema.TableMetadata;
-import org.apache.cassandra.schema.TableParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import org.apache.cassandra.auth.AuthenticatedUser;
@@ -45,6 +42,9 @@ import org.apache.cassandra.utils.FBUtilities;
 import static org.apache.cassandra.utils.Clock.Global.currentTimeMillis;
 
 public class AuditLogEntry {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuditLogEntry.class);
+
     private final InetAddressAndPort host = FBUtilities.getBroadcastAddressAndPort();
     private final InetAddressAndPort source;
     private final String user;
@@ -112,20 +112,12 @@ public class AuditLogEntry {
 
             System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
-            boolean syncEs = true;
-
-            if (!StringUtils.isBlank(scope)) {
-                Boolean sync = CassandraUtil.syncTablesInfo.get(keyspace + "." + scope);
-                syncEs = sync;
-            }else {
-                syncEs = false;
-            }
-
-            System.out.println("是否同步ES：" + syncEs);
-
-
-            if (type.toString().equals("CREATE_TABLE") && syncEs) {
-                HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
+            if (type.toString().equals("CREATE_TABLE")) {
+                boolean syncEs = CassandraUtil.getSyncEs(keyspace, scope);
+                logger.info("CREATE_TABLE 同步ES："+syncEs);
+                if (syncEs) {
+                    HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
+                }
             }
 
 
@@ -136,14 +128,11 @@ public class AuditLogEntry {
                     String sql = split[i].toLowerCase();
                     if (!StringUtils.isBlank(sql)) {
                         sql = sql + ";";
-                        System.out.println("BATCH 解析 CQL 语句:"+sql);
+                        logger.info("BATCH 解析 CQL 语句:"+sql);
                         String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
-                        Boolean aBoolean = CassandraUtil.syncTablesInfo.get(keyspace + "." + matchSqlTableName);
-
-                        System.out.println("同步es："+aBoolean);
-
+                        Boolean aBoolean = CassandraUtil.getSyncEs(keyspace,matchSqlTableName);
+                        logger.info("BATCH 同步es："+aBoolean);
                         if (aBoolean) {
-
                             if (sql.indexOf("insert") > 0) {
                                 Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
                                 HttpUtil.bulkIndex(esNodeList, keyspace + "-" + matchSqlTableName, maps);
@@ -167,34 +156,46 @@ public class AuditLogEntry {
                 }
             }
 
-            if (type.toString().equals("UPDATE") && syncEs) {
-                if (s.toLowerCase(Locale.ROOT).contains("update")) {
-                    Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
+            if (type.toString().equals("UPDATE")) {
+                boolean syncEs = CassandraUtil.getSyncEs(keyspace, scope);
+                logger.info("UPDATE 同步es："+syncEs);
+                if (syncEs) {
+                    if (s.toLowerCase(Locale.ROOT).contains("update")) {
+                        Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
 
-                    Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
-                    DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
-                    List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
-                    hitesList.stream().forEach(hites -> {
-                        Map<String, Object> source = hites.get_source();
-                        Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                        HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
-                    });
+                        Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
+                        DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                        List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
+                        hitesList.stream().forEach(hites -> {
+                            Map<String, Object> source = hites.get_source();
+                            Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
+                            HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
+                        });
 
-                } else {
-                    Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
-                    System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
-                    HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
+                    } else {
+                        Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
+                        System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
+                        HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
+                    }
                 }
             }
 
 
-            if (type.toString().equals("DELETE") && syncEs) {
-                Map maps = SqlToJson.sqlDeleteToJson(s);
-                HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+            if (type.toString().equals("DELETE")) {
+                boolean syncEs = CassandraUtil.getSyncEs(keyspace, scope);
+                logger.info("DELETE 同步es："+syncEs);
+                if (syncEs) {
+                    Map maps = SqlToJson.sqlDeleteToJson(s);
+                    HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+                }
             }
 
-            if (type.toString().equals("DROP_TABLE") && syncEs) {
-                HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
+            if (type.toString().equals("DROP_TABLE")) {
+                boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace+"."+scope);
+                logger.info("DROP TABLE 同步es："+syncEs);
+                if (syncEs) {
+                    HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
+                }
             }
 
         }
