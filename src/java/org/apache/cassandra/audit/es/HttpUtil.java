@@ -298,7 +298,7 @@ public class HttpUtil {
 
         String nodeUrl = getRandomNode(url);
         if (StringUtils.isBlank(nodeUrl)) {
-            return DataRsp.getError406();
+            nodeUrl = "http://"+DatabaseDescriptor.getRpcAddress().getHostAddress()+":9200";
         }
         Unirest.setTimeouts(0, 0);
         try {
