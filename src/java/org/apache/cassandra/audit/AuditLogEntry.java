@@ -113,7 +113,7 @@ public class AuditLogEntry {
             System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
             if (type.toString().equals("CREATE_TABLE")) {
-                boolean syncEs = CassandraUtil.getSyncEs(keyspace, scope);
+                boolean syncEs = !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+scope)? true:false;
                 logger.info("CREATE_TABLE 同步ES："+syncEs);
                 if (syncEs) {
                     HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
@@ -130,7 +130,7 @@ public class AuditLogEntry {
                         sql = sql + ";";
                         logger.info("BATCH 解析 CQL 语句:"+sql);
                         String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
-                        Boolean aBoolean = CassandraUtil.getSyncEs(keyspace,matchSqlTableName);
+                        Boolean aBoolean = !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+matchSqlTableName)? true:false;
                         logger.info("BATCH 同步es："+aBoolean);
                         if (aBoolean) {
                             if (sql.indexOf("insert") > 0) {
@@ -157,7 +157,7 @@ public class AuditLogEntry {
             }
 
             if (type.toString().equals("UPDATE")) {
-                boolean syncEs = CassandraUtil.getSyncEs(keyspace, scope);
+                boolean syncEs = !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+scope)? true:false;
                 logger.info("UPDATE 同步es："+syncEs);
                 if (syncEs) {
                     if (s.toLowerCase(Locale.ROOT).contains("update")) {
@@ -182,7 +182,7 @@ public class AuditLogEntry {
 
 
             if (type.toString().equals("DELETE")) {
-                boolean syncEs = CassandraUtil.getSyncEs(keyspace, scope);
+                boolean syncEs = !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+scope)? true:false;
                 logger.info("DELETE 同步es："+syncEs);
                 if (syncEs) {
                     Map maps = SqlToJson.sqlDeleteToJson(s);
@@ -191,7 +191,7 @@ public class AuditLogEntry {
             }
 
             if (type.toString().equals("DROP_TABLE")) {
-                boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace+"."+scope);
+                boolean syncEs = !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+scope)? true:false;
                 logger.info("DROP TABLE 同步es："+syncEs);
                 if (syncEs) {
                     HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
