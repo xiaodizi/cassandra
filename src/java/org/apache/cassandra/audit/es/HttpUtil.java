@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.cassandra.audit.AuditLogEntry;
 import org.apache.cassandra.audit.es.common.ErrorEnum;
 import org.apache.cassandra.audit.es.dto.EsClusterDto;
 import org.apache.cassandra.audit.es.dto.EsResDto;
@@ -12,12 +13,16 @@ import org.apache.cassandra.audit.es.dto.Hites;
 import org.apache.cassandra.audit.es.res.DataRsp;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class HttpUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
     public static DataRsp getClusterHealth(String url) {
         String nodeUrl = getRandomNode(url);
@@ -343,7 +348,7 @@ public class HttpUtil {
                     .body(json)
                     .asString();
 
-            System.out.println("创建元数据配置索引.cassandra_metadata返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("创建元数据配置索引.cassandra_metadata返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
             if (ErrorEnum.SUCCESS.code != response.getStatus()) {
                 return DataRsp.builder()
                         .code(response.getStatus())
@@ -352,8 +357,7 @@ public class HttpUtil {
             }
 
         } catch (Exception e) {
-            System.out.print("LEI TEST ERROR:");
-            throw new RuntimeException(e);
+            logger.error("异常2",e);
         }
         return DataRsp.getError200();
     }
@@ -368,12 +372,12 @@ public class HttpUtil {
         try {
             HttpResponse<String> response = Unirest.head(nodeUrl + "/.cassandra_metadata")
                     .asString();
-
+            logger.info("判断cassnadra元数据索引是否存在:"+response.getStatus());
             if (response.getStatus() == 200) {
                 return true;
             }
         } catch (UnirestException e) {
-            e.printStackTrace();
+            logger.error("异常1",e);
         } finally {
             return false;
         }
