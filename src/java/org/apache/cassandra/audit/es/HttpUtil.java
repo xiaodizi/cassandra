@@ -57,7 +57,6 @@ public class HttpUtil {
 
     public static DataRsp newCreateIndex(String url, String indexName) {
         String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         }
@@ -71,7 +70,7 @@ public class HttpUtil {
                     .header("Content-Type", "application/json")
                     .body("{\n  \"settings\":{\n    \"number_of_shards\":" + numSharedNodes + ",\n    \"number_of_replicas\":" + (numSharedNodes - 1) + "\n  }\n}")
                     .asString();
-            System.out.println("创建索引返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("创建索引返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
             if (response.getStatus() != ErrorEnum.SUCCESS.code) {
                 return DataRsp.builder()
                         .code(response.getStatus())
