@@ -342,8 +342,8 @@ public class HttpUtil {
                     "  \"isSyncEs\":" + isSyncEs + ",\n" +
                     "  \"tips\":\"cassandra配置元数据，请误删除!!!!\"\n" +
                     "}";
-            HttpResponse<String> response = Unirest.post(nodeUrl + "/_doc/" + keyspace + "-" + table)
-                    .header("Content-Type", "application/x-ndjson")
+            HttpResponse<String> response = Unirest.put(nodeUrl + "/_doc/" + keyspace + "-" + table)
+                    .header("Content-Type", "application/json")
                     .body(json)
                     .asString();
 
