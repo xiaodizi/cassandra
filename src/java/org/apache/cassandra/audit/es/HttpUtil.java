@@ -26,7 +26,7 @@ public class HttpUtil {
 
     public static DataRsp getClusterHealth(String url) {
         String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
+        logger.info("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         }
@@ -35,7 +35,7 @@ public class HttpUtil {
         try {
             HttpResponse<String> response = Unirest.get(nodeUrl + "/_cluster/health")
                     .asString();
-            System.out.println("获取集群健康状态，返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("获取集群健康状态，返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
             if (response.getStatus() != ErrorEnum.SUCCESS.code) {
                 return DataRsp.builder()
                         .code(response.getStatus())
@@ -94,7 +94,7 @@ public class HttpUtil {
      */
     public static DataRsp createIndex(String url, String indexName, String json, String id) {
         String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
+        logger.info("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         }
@@ -106,7 +106,7 @@ public class HttpUtil {
                     .asString();
 
 
-            System.out.println("Insert 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("Insert 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
 
             if (response.getStatus() != ErrorEnum.SUCCESS.code) {
                 return DataRsp.builder()
@@ -124,7 +124,6 @@ public class HttpUtil {
 
     public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps) {
         String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         }
@@ -135,7 +134,7 @@ public class HttpUtil {
                     .header("Content-Type", "application/x-ndjson")
                     .body(bulkApiJson)
                     .asString();
-            System.out.println("Bulk 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("Bulk 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,7 +144,6 @@ public class HttpUtil {
 
     public static DataRsp bulkUpdate(String url, String indexName, Map<String, Object> maps, String docId) {
         String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         }
@@ -156,7 +154,7 @@ public class HttpUtil {
                     .header("Content-Type", "application/x-ndjson")
                     .body(bulkApiJson)
                     .asString();
-            System.out.println("Bulk 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("Bulk 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -173,7 +171,6 @@ public class HttpUtil {
      */
     public static DataRsp<Object> getSearch(String url, String indexName, Map<String, Object> maps) {
         String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         }
@@ -182,7 +179,7 @@ public class HttpUtil {
         try {
 
             String requestJson = EsUtil.getDslQueryJson(maps);
-            System.out.println("查询 DSL：" + requestJson);
+            logger.info("查询 DSL：" + requestJson);
             HttpResponse<String> response = Unirest.post(nodeUrl + "/" + indexName + "/_search")
                     .header("Content-Type", "application/json")
                     .body(requestJson)
@@ -194,9 +191,9 @@ public class HttpUtil {
                         .data(hitesList)
                         .build();
             }
-            System.out.println("结果1：" + response.getBody());
+            logger.info("结果1：" + response.getBody());
             EsResDto esResDto = JSONObject.parseObject(response.getBody(), EsResDto.class);
-            System.out.println("结果2：" + JSON.toJSONString(esResDto));
+            logger.info("结果2：" + JSON.toJSONString(esResDto));
             hitesList = esResDto.getHits().getHits();
 
         } catch (UnirestException e) {
@@ -220,7 +217,6 @@ public class HttpUtil {
      */
     public static DataRsp<Object> getIndex(String url, String indexName, String id) {
         String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         }
@@ -237,7 +233,6 @@ public class HttpUtil {
                         .build();
             }
         } catch (Exception e) {
-            System.out.print("LEI TEST ERROR:");
             throw new RuntimeException(e);
         }
         return DataRsp.getError200();
@@ -259,12 +254,12 @@ public class HttpUtil {
         Unirest.setTimeouts(0, 0);
         try {
             String requestJson = EsUtil.getDslQueryJson(maps);
-            System.out.println("删除 DSL：" + requestJson);
+            logger.info("删除 DSL：" + requestJson);
             HttpResponse<String> response = Unirest.post(nodeUrl + "/" + indexName + "/_delete_by_query?slices=auto&conflicts=proceed&wait_for_completion=false")
                     .header("Content-Type", "application/json")
                     .body(requestJson)
                     .asString();
-            System.out.println("删除返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("删除返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
             if (ErrorEnum.SUCCESS.code != response.getStatus()) {
                 return DataRsp.builder()
                         .code(response.getStatus())
@@ -272,7 +267,6 @@ public class HttpUtil {
                         .build();
             }
         } catch (Exception e) {
-            System.out.print("LEI TEST ERROR:");
             throw new RuntimeException(e);
         }
         return DataRsp.getError200();
@@ -281,7 +275,7 @@ public class HttpUtil {
 
     public static String getRandomNode(String esNodeList) {
         if (StringUtils.isBlank(esNodeList)) {
-            System.out.println("LEI TEST WARN :es_node_list 配置为空,");
+            logger.info("LEI TEST WARN :es_node_list 配置为空,");
             return "";
         }
         String[] nodeList = esNodeList.split(",");
@@ -308,7 +302,7 @@ public class HttpUtil {
             HttpResponse<String> response = Unirest.delete(nodeUrl + "/" + indexName)
                     .asString();
 
-            System.out.println("删除索引返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("删除索引返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
             if (ErrorEnum.SUCCESS.code != response.getStatus()) {
                 return DataRsp.builder()
                         .code(response.getStatus())
@@ -317,7 +311,6 @@ public class HttpUtil {
             }
 
         } catch (Exception e) {
-            System.out.print("LEI TEST ERROR:");
             throw new RuntimeException(e);
         }
         return DataRsp.getError200();
@@ -419,7 +412,7 @@ public class HttpUtil {
             HttpResponse<String> response = Unirest.post(nodeUrl + "/.cassandra_metadata/_doc/"+indexName)
                     .header("Content-Type", "application/json")
                     .asString();
-            System.out.println("删除元数据索引数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            logger.info("删除元数据索引数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
             if (ErrorEnum.SUCCESS.code != response.getStatus()) {
                 return DataRsp.builder()
                         .code(response.getStatus())
@@ -427,7 +420,6 @@ public class HttpUtil {
                         .build();
             }
         } catch (Exception e) {
-            System.out.print("LEI TEST ERROR:");
             throw new RuntimeException(e);
         }
         return DataRsp.getError200();

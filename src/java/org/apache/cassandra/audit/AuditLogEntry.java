@@ -110,12 +110,12 @@ public class AuditLogEntry {
             String s = operation.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}+", " ");
             builder.append("|operation:").append(s);
 
-            System.out.println("LEI TEST [INFO] 打印 sql :" + s);
-            System.out.println("LEI TEST [INFO] 操作类型:" + type.toString());
+            logger.info("LEI TEST [INFO] 打印 sql :" + s);
+            logger.info("LEI TEST [INFO] 操作类型:" + type.toString());
 
             String esNodeList = DatabaseDescriptor.getEsNodeList();
 
-            System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
+            logger.info("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
             if (type.toString().equals("CREATE_TABLE")) {
                 boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace+"."+scope);
@@ -180,7 +180,7 @@ public class AuditLogEntry {
 
                     } else {
                         Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
-                        System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
+                        logger.info("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
                         HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
                     }
                 }
