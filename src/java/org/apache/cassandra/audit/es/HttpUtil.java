@@ -330,7 +330,7 @@ public class HttpUtil {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         }
 
-        if (!getCassandraMetadata(url)) {
+        if (!isExitsCassandraMetadata(url)) {
             newCreateIndex(url, ".cassandra_metadata");
         }
 
@@ -362,7 +362,7 @@ public class HttpUtil {
     }
 
 
-    private static boolean getCassandraMetadata(String url) {
+    private static boolean isExitsCassandraMetadata(String url) {
         String nodeUrl = getRandomNode(url);
         if (StringUtils.isBlank(nodeUrl)) {
             nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
@@ -377,9 +377,8 @@ public class HttpUtil {
             }
         } catch (UnirestException e) {
             logger.error("异常1",e);
-        } finally {
-            return false;
         }
+        return false;
     }
 
     public static boolean newGetSyncEs(String url, String keyspace, String table) {
@@ -403,9 +402,8 @@ public class HttpUtil {
             }
         } catch (UnirestException e) {
             e.printStackTrace();
-        }finally {
-            return true;
         }
+        return true;
     }
 
 
