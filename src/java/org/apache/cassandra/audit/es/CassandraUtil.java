@@ -18,6 +18,8 @@
 
 package org.apache.cassandra.audit.es;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.schema.Schema;
@@ -30,45 +32,45 @@ import java.util.regex.Pattern;
 
 public class CassandraUtil {
 
-    public static Map<String,Boolean> syncTablesInfo=new HashMap<>();
+    public static Map<String, Boolean> syncTablesInfo = new HashMap<>();
 
     static {
 
     }
 
-    public static void getTableParams(String tableName,Boolean syncEs){
-        syncTablesInfo.put(tableName,syncEs);
+    public static void getTableParams(String tableName, Boolean syncEs) {
+        syncTablesInfo.put(tableName, syncEs);
     }
 
-    public static String matchSqlTableName(String sql){
+    public static String matchSqlTableName(String sql) {
         Matcher matcher = null;
         //SELECT 列名称 FROM 表名称
         //SELECT * FROM 表名称
-        if( sql.startsWith("select") ){
+        if (sql.startsWith("select")) {
             matcher = Pattern.compile("select\\s.+from\\s(.+)where\\s(.*)").matcher(sql);
-            if(matcher.find()){
+            if (matcher.find()) {
                 return matcher.group(1).trim();
             }
         }
         //INSERT INTO 表名称 VALUES (值1, 值2,....)
         //INSERT INTO table_name (列1, 列2,...) VALUES (值1, 值2,....)
-        if( sql.startsWith("insert") ){
+        if (sql.startsWith("insert")) {
             matcher = Pattern.compile("insert\\sinto\\s(.+)\\(.*\\)\\s.*").matcher(sql);
-            if(matcher.find()){
+            if (matcher.find()) {
                 return matcher.group(1).trim();
             }
         }
         //UPDATE 表名称 SET 列名称 = 新值 WHERE 列名称 = 某值
-        if( sql.startsWith("update") ){
+        if (sql.startsWith("update")) {
             matcher = Pattern.compile("update\\s(.+)set\\s.*").matcher(sql);
-            if(matcher.find()){
+            if (matcher.find()) {
                 return matcher.group(1).trim();
             }
         }
         //DELETE FROM 表名称 WHERE 列名称 = 值
-        if( sql.startsWith("delete") ){
+        if (sql.startsWith("delete")) {
             matcher = Pattern.compile("delete\\sfrom\\s(.+)where\\s(.*)").matcher(sql);
-            if(matcher.find()){
+            if (matcher.find()) {
                 return matcher.group(1).trim();
             }
         }
@@ -76,8 +78,7 @@ public class CassandraUtil {
     }
 
 
-
-    public static boolean getSyncEs(String keyspaces,String tableName){
+    public static boolean getSyncEs(String keyspaces, String tableName) {
         Keyspace schema1 = Keyspace.open(keyspaces, Schema.instance, false);
         ColumnFamilyStore columnFamilyStore = schema1.getColumnFamilyStore(tableName);
         TableMetadata tableMetadata = columnFamilyStore.metadata.get();
