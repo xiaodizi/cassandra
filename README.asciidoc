@@ -136,23 +136,13 @@ es_node_list:
 ----
 
 ==== 同步es，表属性配置
-去掉了 `sync_keyspace:` 和 `sync_es_table:` 两个配置。
-如果还要同步elasticsearch，除了配置 `es_node_list:` 之外，需要在 cassandra 创建表的时候，增加 表属性 `syncEs=true`。
-举例：
-----
-CREATE TABLE users (
-                 user_id varchar PRIMARY KEY,
-                 first varchar,
-                 last varchar,
-                 age int
-               ) WITH syncEs=true;
-----
+本来是希望把同步配置，保留在元数据里边，但是with配置，集群间不共享，只是在内存里边 存储了一个hashMap。
 
-但是这个属性，没有持久化，如果重启服务，需要重新写入。
+所以只能恢复到 `sync_es_table:` 这个配置。
 
-----
-ALTER TABLE users WITH syncEs=true;
-----
+默认是同步到es的，但是如果配置上表名，就不同步了。
+
+配置例子：keyspace名字.表名
 
 
 
