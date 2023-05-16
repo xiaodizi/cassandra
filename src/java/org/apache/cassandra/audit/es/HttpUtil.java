@@ -409,7 +409,7 @@ public class HttpUtil {
         Unirest.setTimeouts(0, 0);
         try {
 
-            HttpResponse<String> response = Unirest.post(nodeUrl + "/.cassandra_metadata/_doc/"+indexName)
+            HttpResponse<String> response = Unirest.delete(nodeUrl + "/.cassandra_metadata/_doc/"+indexName)
                     .header("Content-Type", "application/json")
                     .asString();
             logger.info("删除元数据索引数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
