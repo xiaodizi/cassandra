@@ -27,12 +27,13 @@ import org.apache.cassandra.schema.TableMetadata;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CassandraUtil {
 
-    public static Map<String, Boolean> syncTablesInfo = new HashMap<>();
+    public static Map<String, Boolean> syncTablesInfo = new ConcurrentHashMap<>();
 
     static {
 
