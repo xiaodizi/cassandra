@@ -199,10 +199,10 @@ public class AuditLogEntry {
             if (type.toString().equals("DROP_TABLE")) {
                 boolean syncEs = HttpUtil.newGetSyncEs(esNodeList,keyspace,scope);
                 logger.info("DROP TABLE 同步es："+syncEs);
+                CassandraUtil.syncTablesInfo.remove(keyspace+"."+scope);
+                HttpUtil.deleteCassandraMetadata(esNodeList,keyspace+"-"+scope);
                 if (syncEs) {
                     HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
-                    CassandraUtil.syncTablesInfo.remove(keyspace+"."+scope);
-                    HttpUtil.deleteCassandraMetadata(esNodeList,keyspace+"-"+scope);
                 }
             }
 
