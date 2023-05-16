@@ -385,7 +385,7 @@ public class HttpUtil {
             Unirest.setTimeouts(0, 0);
             HttpResponse<String> response = Unirest.post(nodeUrl+"/.cassandra_metadata/_search")
                     .header("Content-Type", "application/json")
-                    .body("{\n  \"query\": {\n    \"bool\": {\n      \"filter\": [\n        {\n          \"match\": {\n            \"keyspace.keyword\": \"schema1\"\n          }\n        },\n        {\n          \"match\": {\n            \"table.keyword\": \"users\"\n          }\n        }\n      ]\n    }\n  }\n}")
+                    .body("{\n  \"query\": {\n    \"bool\": {\n      \"filter\": [\n        {\n          \"match\": {\n            \"keyspace.keyword\": \""+keyspace+"\"\n          }\n        },\n        {\n          \"match\": {\n            \"table.keyword\": \""+table+"\"\n          }\n        }\n      ]\n    }\n  }\n}")
                     .asString();
 
             EsResDto esResDto = JSONObject.parseObject(response.getBody(), EsResDto.class);
