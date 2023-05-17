@@ -536,7 +536,7 @@
             description="Define dependencies and dependency versions">
         <!-- The parent pom defines the versions of all dependencies -->
         <artifact:pom id="parent-pom"
-                      groupId="org.apache.cassandra"
+                      groupId="org.xiaodizi.cassandra"
                       artifactId="cassandra-parent"
                       packaging="pom"
                       version="${version}"
