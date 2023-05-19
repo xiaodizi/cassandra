@@ -157,7 +157,7 @@
                 <echo message="gpg signing @{file}" />
                 <exec dir="." executable="sh">
                     <!-- dummy out the deploy parameters, only the signing is required here -->
-                    <arg line="-c 'mvn -q org.apache.maven.plugins:maven-gpg-plugin:1.6:sign-and-deploy-file -Dfile=@{file} -DgroupId=org.apache.cassandra -DartifactId=cassandra-parent -Dversion=${version} -Durl=file:///tmp/ -DrepositoryId=tmp'" />
+                    <arg line="-c 'mvn -q org.apache.maven.plugins:maven-gpg-plugin:1.6:sign-and-deploy-file -Dfile=@{file} -DgroupId=org.xiaodizi.cassandra -DartifactId=cassandra-parent -Dversion=${version} -Durl=file:///tmp/ -DrepositoryId=tmp'" />
                 </exec>
             </sequential>
         </macrodef>
@@ -165,7 +165,12 @@
         <property name="resolver-ant-tasks.initialized" value="true"/>
     </target>
 
+
+
     <target name="resolver-retrieve-build" depends="resolver-init,write-poms">
+        <echo>lei test</echo>
+        <echo>${build.dir}</echo>
+        <echo>--------</echo>
         <resolvepom file="${build.dir}/${final.name}.pom" id="all-pom" />
         <resolvepom file="${build.dir}/tmp-${final.name}-deps.pom" id="pom-deps" />
 
