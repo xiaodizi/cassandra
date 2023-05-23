@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,12 @@ public class HttpUtil {
 
         } catch (UnirestException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.builder()
                 .code(ErrorEnum.SUCCESS.code)
@@ -79,6 +86,12 @@ public class HttpUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.getError200();
     }
@@ -116,6 +129,12 @@ public class HttpUtil {
             }
         } catch (UnirestException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return DataRsp.getError200();
@@ -137,6 +156,12 @@ public class HttpUtil {
             logger.info("Bulk 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.getError200();
     }
@@ -157,6 +182,12 @@ public class HttpUtil {
             logger.info("Bulk 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.getError200();
     }
@@ -198,6 +229,12 @@ public class HttpUtil {
 
         } catch (UnirestException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return DataRsp.builder().code(ErrorEnum.SUCCESS.code)
@@ -234,6 +271,12 @@ public class HttpUtil {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.getError200();
     }
@@ -268,6 +311,12 @@ public class HttpUtil {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.getError200();
     }
@@ -312,6 +361,12 @@ public class HttpUtil {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.getError200();
     }
@@ -350,6 +405,12 @@ public class HttpUtil {
 
         } catch (Exception e) {
             logger.error("异常2",e);
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.getError200();
     }
@@ -370,6 +431,12 @@ public class HttpUtil {
             }
         } catch (UnirestException e) {
             logger.error("异常1",e);
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
@@ -395,6 +462,12 @@ public class HttpUtil {
             }
         } catch (UnirestException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
@@ -421,6 +494,12 @@ public class HttpUtil {
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                Unirest.shutdown();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return DataRsp.getError200();
     }
