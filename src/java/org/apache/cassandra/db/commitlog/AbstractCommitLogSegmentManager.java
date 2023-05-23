@@ -301,11 +301,15 @@ public abstract class AbstractCommitLogSegmentManager
     {
         do
         {
-            WaitQueue.Signal prepared = segmentPrepared.register(commitLog.metrics.waitingOnSegmentAllocation.time(), Context::stop);
-            if (availableSegment == null && allocatingFrom == currentAllocatingFrom)
-                prepared.awaitUninterruptibly();
-            else
-                prepared.cancel();
+            try {
+                WaitQueue.Signal prepared = segmentPrepared.register(commitLog.metrics.waitingOnSegmentAllocation.time(), Context::stop);
+                if (availableSegment == null && allocatingFrom == currentAllocatingFrom)
+                    prepared.awaitUninterruptibly();
+                else
+                    prepared.cancel();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         while (availableSegment == null && allocatingFrom == currentAllocatingFrom);
     }
