@@ -20,6 +20,7 @@ package org.apache.cassandra.audit;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.annotation.Nullable;
 
 import com.alibaba.fastjson2.JSON;
@@ -61,6 +62,14 @@ public class AuditLogEntry {
     private final String operation;
     private final QueryOptions options;
     private final QueryState state;
+
+    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(2000);
+    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
+    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
+            .MILLISECONDS,
+            workingQueue,
+            rejectedExecutionHandler);
+
 
     private AuditLogEntry(AuditLogEntryType type,
                           InetAddressAndPort source,
@@ -122,7 +131,12 @@ public class AuditLogEntry {
                 HttpUtil.createCassandraMetadata(esNodeList,keyspace,scope,syncEs);
                 logger.info("CREATE_TABLE 同步ES："+syncEs);
                 if (syncEs) {
-                    HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
+                    fixedThreadPoolOtherData.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
+                        }
+                    });
                 }
             }
 
@@ -151,11 +165,22 @@ public class AuditLogEntry {
                                 hitesList.stream().forEach(hites -> {
                                     Map<String, Object> source = hites.get_source();
                                     Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                                    HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
+                                    fixedThreadPoolOtherData.execute(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
+                                        }
+                                    });
                                 });
                             } else if (sql.indexOf("delete") > 0) {
                                 Map maps = SqlToJson.sqlDeleteToJson(sql);
-                                HttpUtil.deleteData(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+                                fixedThreadPoolOtherData.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        HttpUtil.deleteData(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+                                    }
+                                });
+
                             }
                         }
                     }
@@ -175,13 +200,23 @@ public class AuditLogEntry {
                         hitesList.stream().forEach(hites -> {
                             Map<String, Object> source = hites.get_source();
                             Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                            HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
+                            fixedThreadPoolOtherData.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
+                                }
+                            });
                         });
 
                     } else {
                         Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
                         logger.info("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
-                        HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
+                        fixedThreadPoolOtherData.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
+                            }
+                        });
                     }
                 }
             }
@@ -192,7 +227,12 @@ public class AuditLogEntry {
                 logger.info("DELETE 同步es："+syncEs);
                 if (syncEs) {
                     Map maps = SqlToJson.sqlDeleteToJson(s);
-                    HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+                    fixedThreadPoolOtherData.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+                        }
+                    });
                 }
             }
 
@@ -200,9 +240,19 @@ public class AuditLogEntry {
                 boolean syncEs = HttpUtil.newGetSyncEs(esNodeList,keyspace,scope);
                 logger.info("DROP TABLE 同步es："+syncEs);
                 CassandraUtil.syncTablesInfo.remove(keyspace+"."+scope);
-                HttpUtil.deleteCassandraMetadata(esNodeList,keyspace+"-"+scope);
+                fixedThreadPoolOtherData.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        HttpUtil.deleteCassandraMetadata(esNodeList,keyspace+"-"+scope);
+                    }
+                });
                 if (syncEs) {
-                    HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
+                    fixedThreadPoolOtherData.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
+                        }
+                    });
                 }
             }
 
