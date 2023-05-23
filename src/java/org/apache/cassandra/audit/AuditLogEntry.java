@@ -122,10 +122,6 @@ public class AuditLogEntry {
             logger.info("LEI TEST [INFO] 打印 sql :" + s);
             logger.info("LEI TEST [INFO] 操作类型:" + type.toString());
 
-            String esNodeList = DatabaseDescriptor.getEsNodeList();
-
-            logger.info("LEI TEST [INFO] 打印节点列表：" + esNodeList);
-
             if (type.toString().equals("CREATE_TABLE")) {
                 boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace+"."+scope);
                 fixedThreadPoolOtherData.execute(new Runnable() {
