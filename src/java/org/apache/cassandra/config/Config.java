@@ -76,13 +76,6 @@ public class Config
     public String role_manager;
     public String network_authorizer;
 
-    public String es_node_list;
-
-    public String sync_es_table;
-
-    public String sync_keyspace;
-
-
 
     @Replaces(oldName = "permissions_validity_in_ms", converter = Converters.MILLIS_DURATION_INT, deprecated = true)
     public volatile DurationSpec.IntMillisecondsBound permissions_validity = new DurationSpec.IntMillisecondsBound("2s");

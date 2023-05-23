@@ -131,7 +131,7 @@ public class AuditLogEntry {
                 fixedThreadPoolOtherData.execute(new Runnable() {
                     @Override
                     public void run() {
-                        HttpUtil.createCassandraMetadata(esNodeList,keyspace,scope,syncEs);
+                        HttpUtil.createCassandraMetadata(keyspace,scope,syncEs);
                     }
                 });
 
@@ -140,7 +140,7 @@ public class AuditLogEntry {
                     fixedThreadPoolOtherData.execute(new Runnable() {
                         @Override
                         public void run() {
-                            HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
+                            HttpUtil.newCreateIndex(keyspace + "-" + scope);
                         }
                     });
                 }
@@ -156,17 +156,17 @@ public class AuditLogEntry {
                         sql = sql + ";";
                         logger.info("BATCH 解析 CQL 语句:"+sql);
                         String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
-                        Boolean aBoolean = HttpUtil.newGetSyncEs(esNodeList,keyspace,matchSqlTableName);
+                        Boolean aBoolean = HttpUtil.newGetSyncEs(keyspace,matchSqlTableName);
                         logger.info("BATCH 同步es："+aBoolean);
                         if (aBoolean) {
                             if (sql.indexOf("insert") > 0) {
                                 Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
-                                HttpUtil.bulkIndex(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+                                HttpUtil.bulkIndex(keyspace + "-" + matchSqlTableName, maps);
                             } else if (sql.indexOf("update") > 0) {
                                 Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
 
                                 Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(sql);
-                                DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                                DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, updateSqlWhere);
                                 List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
                                 hitesList.stream().forEach(hites -> {
                                     Map<String, Object> source = hites.get_source();
@@ -174,7 +174,7 @@ public class AuditLogEntry {
                                     fixedThreadPoolOtherData.execute(new Runnable() {
                                         @Override
                                         public void run() {
-                                            HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
+                                            HttpUtil.bulkUpdate(keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
                                         }
                                     });
                                 });
@@ -183,7 +183,7 @@ public class AuditLogEntry {
                                 fixedThreadPoolOtherData.execute(new Runnable() {
                                     @Override
                                     public void run() {
-                                        HttpUtil.deleteData(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+                                        HttpUtil.deleteData(keyspace + "-" + matchSqlTableName, maps);
                                     }
                                 });
 
@@ -194,14 +194,14 @@ public class AuditLogEntry {
             }
 
             if (type.toString().equals("UPDATE")) {
-                boolean syncEs = HttpUtil.newGetSyncEs(esNodeList,keyspace,scope);
+                boolean syncEs = HttpUtil.newGetSyncEs(keyspace,scope);
                 logger.info("UPDATE 同步es："+syncEs);
                 if (syncEs) {
                     if (s.toLowerCase(Locale.ROOT).contains("update")) {
                         Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
 
                         Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
-                        DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                        DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, updateSqlWhere);
                         List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
                         hitesList.stream().forEach(hites -> {
                             Map<String, Object> source = hites.get_source();
@@ -209,7 +209,7 @@ public class AuditLogEntry {
                             fixedThreadPoolOtherData.execute(new Runnable() {
                                 @Override
                                 public void run() {
-                                    HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
+                                    HttpUtil.bulkUpdate(keyspace + "-" + scope, updateJson, hites.get_id());
                                 }
                             });
                         });
@@ -220,7 +220,7 @@ public class AuditLogEntry {
                         fixedThreadPoolOtherData.execute(new Runnable() {
                             @Override
                             public void run() {
-                                HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
+                                HttpUtil.bulkIndex(keyspace + "-" + scope, maps);
                             }
                         });
                     }
@@ -229,34 +229,34 @@ public class AuditLogEntry {
 
 
             if (type.toString().equals("DELETE")) {
-                boolean syncEs = HttpUtil.newGetSyncEs(esNodeList,keyspace,scope);
+                boolean syncEs = HttpUtil.newGetSyncEs(keyspace,scope);
                 logger.info("DELETE 同步es："+syncEs);
                 if (syncEs) {
                     Map maps = SqlToJson.sqlDeleteToJson(s);
                     fixedThreadPoolOtherData.execute(new Runnable() {
                         @Override
                         public void run() {
-                            HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+                            HttpUtil.deleteData(keyspace + "-" + scope, maps);
                         }
                     });
                 }
             }
 
             if (type.toString().equals("DROP_TABLE")) {
-                boolean syncEs = HttpUtil.newGetSyncEs(esNodeList,keyspace,scope);
+                boolean syncEs = HttpUtil.newGetSyncEs(keyspace,scope);
                 logger.info("DROP TABLE 同步es："+syncEs);
                 CassandraUtil.syncTablesInfo.remove(keyspace+"."+scope);
                 fixedThreadPoolOtherData.execute(new Runnable() {
                     @Override
                     public void run() {
-                        HttpUtil.deleteCassandraMetadata(esNodeList,keyspace+"-"+scope);
+                        HttpUtil.deleteCassandraMetadata(keyspace+"-"+scope);
                     }
                 });
                 if (syncEs) {
                     fixedThreadPoolOtherData.execute(new Runnable() {
                         @Override
                         public void run() {
-                            HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
+                            HttpUtil.dropIndex(keyspace + "-" + scope);
                         }
                     });
                 }
