@@ -1761,21 +1761,6 @@ public class DatabaseDescriptor
         return conf.cluster_name;
     }
 
-
-    public static String getEsNodeList(){
-        return conf.es_node_list;
-    }
-
-
-    public static String getSyncEsTable(){
-        return conf.sync_es_table;
-    }
-
-
-    public static String getSyncKeyspace(){
-        return conf.sync_keyspace;
-    }
-
     public static int getStoragePort()
     {
         return Integer.parseInt(System.getProperty(Config.PROPERTY_PREFIX + "storage_port", Integer.toString(conf.storage_port)));

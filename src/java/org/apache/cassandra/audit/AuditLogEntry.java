@@ -113,16 +113,13 @@ public class AuditLogEntry {
             logger.info("LEI TEST [INFO] 打印 sql :" + s);
             logger.info("LEI TEST [INFO] 操作类型:" + type.toString());
 
-            String esNodeList = DatabaseDescriptor.getEsNodeList();
-
-            logger.info("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
             if (type.toString().equals("CREATE_TABLE")) {
                 boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace+"."+scope);
-                HttpUtil.createCassandraMetadata(esNodeList,keyspace,scope,syncEs);
+                HttpUtil.createCassandraMetadata(keyspace,scope,syncEs);
                 logger.info("CREATE_TABLE 同步ES："+syncEs);
                 if (syncEs) {
-                    HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
+                    HttpUtil.newCreateIndex( keyspace + "-" + scope);
                 }
             }
 
@@ -136,26 +133,26 @@ public class AuditLogEntry {
                         sql = sql + ";";
                         logger.info("BATCH 解析 CQL 语句:"+sql);
                         String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
-                        Boolean aBoolean = HttpUtil.newGetSyncEs(esNodeList,keyspace,matchSqlTableName);
+                        Boolean aBoolean = HttpUtil.newGetSyncEs(keyspace,matchSqlTableName);
                         logger.info("BATCH 同步es："+aBoolean);
                         if (aBoolean) {
                             if (sql.indexOf("insert") > 0) {
                                 Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
-                                HttpUtil.bulkIndex(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+                                HttpUtil.bulkIndex( keyspace + "-" + matchSqlTableName, maps);
                             } else if (sql.indexOf("update") > 0) {
                                 Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
 
                                 Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(sql);
-                                DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                                DataRsp<Object> dataRsp = HttpUtil.getSearch( keyspace + "-" + scope, updateSqlWhere);
                                 List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
                                 hitesList.stream().forEach(hites -> {
                                     Map<String, Object> source = hites.get_source();
                                     Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                                    HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
+                                    HttpUtil.bulkUpdate( keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
                                 });
                             } else if (sql.indexOf("delete") > 0) {
                                 Map maps = SqlToJson.sqlDeleteToJson(sql);
-                                HttpUtil.deleteData(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+                                HttpUtil.deleteData(keyspace + "-" + matchSqlTableName, maps);
                             }
                         }
                     }
@@ -163,46 +160,46 @@ public class AuditLogEntry {
             }
 
             if (type.toString().equals("UPDATE")) {
-                boolean syncEs = HttpUtil.newGetSyncEs(esNodeList,keyspace,scope);
+                boolean syncEs = HttpUtil.newGetSyncEs(keyspace,scope);
                 logger.info("UPDATE 同步es："+syncEs);
                 if (syncEs) {
                     if (s.toLowerCase(Locale.ROOT).contains("update")) {
                         Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
 
                         Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
-                        DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                        DataRsp<Object> dataRsp = HttpUtil.getSearch( keyspace + "-" + scope, updateSqlWhere);
                         List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
                         hitesList.stream().forEach(hites -> {
                             Map<String, Object> source = hites.get_source();
                             Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                            HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
+                            HttpUtil.bulkUpdate( keyspace + "-" + scope, updateJson, hites.get_id());
                         });
 
                     } else {
                         Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
                         logger.info("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
-                        HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
+                        HttpUtil.bulkIndex( keyspace + "-" + scope, maps);
                     }
                 }
             }
 
 
             if (type.toString().equals("DELETE")) {
-                boolean syncEs = HttpUtil.newGetSyncEs(esNodeList,keyspace,scope);
+                boolean syncEs = HttpUtil.newGetSyncEs(keyspace,scope);
                 logger.info("DELETE 同步es："+syncEs);
                 if (syncEs) {
                     Map maps = SqlToJson.sqlDeleteToJson(s);
-                    HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+                    HttpUtil.deleteData( keyspace + "-" + scope, maps);
                 }
             }
 
             if (type.toString().equals("DROP_TABLE")) {
-                boolean syncEs = HttpUtil.newGetSyncEs(esNodeList,keyspace,scope);
+                boolean syncEs = HttpUtil.newGetSyncEs(keyspace,scope);
                 logger.info("DROP TABLE 同步es："+syncEs);
                 CassandraUtil.syncTablesInfo.remove(keyspace+"."+scope);
-                HttpUtil.deleteCassandraMetadata(esNodeList,keyspace+"-"+scope);
+                HttpUtil.deleteCassandraMetadata(keyspace+"-"+scope);
                 if (syncEs) {
-                    HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
+                    HttpUtil.dropIndex( keyspace + "-" + scope);
                 }
             }
 

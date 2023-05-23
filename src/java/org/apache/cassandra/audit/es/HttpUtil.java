@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.cassandra.audit.AuditLogEntry;
 import org.apache.cassandra.audit.es.common.ErrorEnum;
 import org.apache.cassandra.audit.es.dto.EsClusterDto;
 import org.apache.cassandra.audit.es.dto.EsResDto;
@@ -24,12 +23,8 @@ public class HttpUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
-    public static DataRsp getClusterHealth(String url) {
-        String nodeUrl = getRandomNode(url);
-        logger.info("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp getClusterHealth() {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         EsClusterDto esClusterDto = null;
         Unirest.setTimeouts(0, 0);
         try {
@@ -55,13 +50,9 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp newCreateIndex(String url, String indexName) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
-
-        DataRsp clusterHealth = getClusterHealth(url);
+    public static DataRsp newCreateIndex(String indexName) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
+        DataRsp clusterHealth = getClusterHealth();
         int numSharedNodes = Integer.parseInt(clusterHealth.getData().toString());
 
         Unirest.setTimeouts(0, 0);
@@ -92,12 +83,9 @@ public class HttpUtil {
      * @param id
      * @return
      */
-    public static DataRsp createIndex(String url, String indexName, String json, String id) {
-        String nodeUrl = getRandomNode(url);
-        logger.info("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp createIndex(String indexName, String json, String id) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
+
         Unirest.setTimeouts(0, 0);
         try {
             HttpResponse<String> response = Unirest.put(nodeUrl + "/" + indexName + "/_doc/" + id)
@@ -122,11 +110,9 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp bulkIndex(String indexName, Map<String, Object> maps) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
+
         Unirest.setTimeouts(0, 0);
         try {
             String bulkApiJson = EsUtil.getBulkCreateApiJson(maps);
@@ -142,11 +128,8 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp bulkUpdate(String url, String indexName, Map<String, Object> maps, String docId) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp bulkUpdate(String indexName, Map<String, Object> maps, String docId) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         Unirest.setTimeouts(0, 0);
         try {
             String bulkApiJson = EsUtil.getBulkUpdateApiJson(maps, docId);
@@ -169,11 +152,9 @@ public class HttpUtil {
      * @param indexName
      * @return
      */
-    public static DataRsp<Object> getSearch(String url, String indexName, Map<String, Object> maps) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp<Object> getSearch(String indexName, Map<String, Object> maps) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
+
         List<Hites> hitesList = new ArrayList<>();
         Unirest.setTimeouts(0, 0);
         try {
@@ -209,17 +190,10 @@ public class HttpUtil {
     /**
      * 获取索引是否存在
      * 通过ID 查询
-     *
-     * @param url
-     * @param indexName
-     * @param id
-     * @return 非200都是不存在
      */
-    public static DataRsp<Object> getIndex(String url, String indexName, String id) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp<Object> getIndex(String indexName, String id) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
+
         Unirest.setTimeouts(0, 0);
         try {
             HttpResponse<String> response = Unirest.get(nodeUrl + "/" + indexName + "/_doc/" + id)
@@ -240,17 +214,10 @@ public class HttpUtil {
 
     /**
      * 删除数据
-     *
-     * @param url
-     * @param indexName
-     * @param maps
-     * @return
      */
-    public static DataRsp deleteData(String url, String indexName, Map maps) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp deleteData(String indexName, Map maps) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
+
         Unirest.setTimeouts(0, 0);
         try {
             String requestJson = EsUtil.getDslQueryJson(maps);
@@ -273,16 +240,6 @@ public class HttpUtil {
     }
 
 
-    public static String getRandomNode(String esNodeList) {
-        if (StringUtils.isBlank(esNodeList)) {
-            logger.info("LEI TEST WARN :es_node_list 配置为空,");
-            return "";
-        }
-        String[] nodeList = esNodeList.split(",");
-        int index = (int) (Math.random() * nodeList.length);
-        return nodeList[index];
-    }
-
     /**
      * 删除索引
      *
@@ -290,12 +247,9 @@ public class HttpUtil {
      * @param indexName
      * @return
      */
-    public static DataRsp dropIndex(String url, String indexName) {
+    public static DataRsp dropIndex(String indexName) {
 
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         Unirest.setTimeouts(0, 0);
         try {
 
@@ -317,14 +271,11 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp createCassandraMetadata(String url, String keyspace, String table, boolean isSyncEs) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp createCassandraMetadata(String keyspace, String table, boolean isSyncEs) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
 
-        if (!isExitsCassandraMetadata(url)) {
-            newCreateIndex(url, ".cassandra_metadata");
+        if (!isExitsCassandraMetadata()) {
+            newCreateIndex(".cassandra_metadata");
         }
 
         Unirest.setTimeouts(0, 0);
@@ -349,48 +300,41 @@ public class HttpUtil {
             }
 
         } catch (Exception e) {
-            logger.error("异常2",e);
+            logger.error("异常2", e);
         }
         return DataRsp.getError200();
     }
 
 
-    private static boolean isExitsCassandraMetadata(String url) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    private static boolean isExitsCassandraMetadata() {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         Unirest.setTimeouts(0, 0);
         try {
             HttpResponse<String> response = Unirest.head(nodeUrl + "/.cassandra_metadata")
                     .asString();
-            logger.info("判断cassnadra元数据索引是否存在:"+response.getStatus());
+            logger.info("判断cassnadra元数据索引是否存在:" + response.getStatus());
             if (response.getStatus() == 200) {
                 return true;
             }
         } catch (UnirestException e) {
-            logger.error("异常1",e);
+            logger.error("异常1", e);
         }
         return false;
     }
 
-    public static boolean newGetSyncEs(String url, String keyspace, String table) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
-
+    public static boolean newGetSyncEs(String keyspace, String table) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         Unirest.setTimeouts(0, 0);
         try {
             Unirest.setTimeouts(0, 0);
-            HttpResponse<String> response = Unirest.post(nodeUrl+"/.cassandra_metadata/_search")
+            HttpResponse<String> response = Unirest.post(nodeUrl + "/.cassandra_metadata/_search")
                     .header("Content-Type", "application/json")
-                    .body("{\n  \"query\": {\n    \"bool\": {\n      \"filter\": [\n        {\n          \"match\": {\n            \"keyspace.keyword\": \""+keyspace+"\"\n          }\n        },\n        {\n          \"match\": {\n            \"table.keyword\": \""+table+"\"\n          }\n        }\n      ]\n    }\n  }\n}")
+                    .body("{\n  \"query\": {\n    \"bool\": {\n      \"filter\": [\n        {\n          \"match\": {\n            \"keyspace.keyword\": \"" + keyspace + "\"\n          }\n        },\n        {\n          \"match\": {\n            \"table.keyword\": \"" + table + "\"\n          }\n        }\n      ]\n    }\n  }\n}")
                     .asString();
 
             EsResDto esResDto = JSONObject.parseObject(response.getBody(), EsResDto.class);
             List<Hites> hits = esResDto.getHits().getHits();
-            if (hits.size() != 0){
+            if (hits.size() != 0) {
                 return (boolean) hits.get(0).get_source().get("isSyncEs");
             }
         } catch (UnirestException e) {
@@ -400,16 +344,12 @@ public class HttpUtil {
     }
 
 
-
-    public static DataRsp deleteCassandraMetadata(String url, String indexName) {
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
-        }
+    public static DataRsp deleteCassandraMetadata(String indexName) {
+        String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         Unirest.setTimeouts(0, 0);
         try {
 
-            HttpResponse<String> response = Unirest.delete(nodeUrl + "/.cassandra_metadata/_doc/"+indexName)
+            HttpResponse<String> response = Unirest.delete(nodeUrl + "/.cassandra_metadata/_doc/" + indexName)
                     .header("Content-Type", "application/json")
                     .asString();
             logger.info("删除元数据索引数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
