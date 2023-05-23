@@ -128,7 +128,13 @@ public class AuditLogEntry {
 
             if (type.toString().equals("CREATE_TABLE")) {
                 boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace+"."+scope);
-                HttpUtil.createCassandraMetadata(esNodeList,keyspace,scope,syncEs);
+                fixedThreadPoolOtherData.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        HttpUtil.createCassandraMetadata(esNodeList,keyspace,scope,syncEs);
+                    }
+                });
+
                 logger.info("CREATE_TABLE 同步ES："+syncEs);
                 if (syncEs) {
                     fixedThreadPoolOtherData.execute(new Runnable() {
