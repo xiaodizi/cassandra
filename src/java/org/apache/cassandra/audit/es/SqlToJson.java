@@ -18,6 +18,8 @@
 
 package org.apache.cassandra.audit.es;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.*;
 
 public class SqlToJson {
@@ -46,6 +48,9 @@ public class SqlToJson {
             String[] fieldsArr = replacedFields.split(",");
             String[] valuesArr = replacedValues.split(",");
             for (int j = 0; j < fieldsArr.length; j++) {
+                if (StringUtils.isBlank(valuesArr[j])){
+                    valuesArr[j] = "";
+                }
                 maps.put(fieldsArr[j].trim(),valuesArr[j].trim());
             }
         }

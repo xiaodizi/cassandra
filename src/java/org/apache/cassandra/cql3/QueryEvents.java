@@ -148,12 +148,7 @@ public class QueryEvents
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     //String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    if (!StringUtils.isBlank(boundValue) && boundValue!=null && boundValue !="null"){
-                      boundValue=boundValue.replaceAll(",","&&");
-                    }else {
-                        boundValue="\"\"";
-                    }
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
                     if (i != (statement.getBindVariables().size()-1)) {
                         sb.append(boundValue + ",");
                     }
