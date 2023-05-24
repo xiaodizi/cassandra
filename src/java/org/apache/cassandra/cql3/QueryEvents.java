@@ -127,22 +127,34 @@ public class QueryEvents
         try
         {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
+            System.out.println("---------------notifyExecuteSuccess");
             String cql = maybeObfuscatedQuery;
-            logger.info("Cql:"+cql);
+            System.out.println("Cql:"+cql);
+            System.out.println("------------notifyExecuteSuccess 找数据------------");
             if (cql.contains("?")) {
-                logger.info("------------ 找数据------------");
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     //String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    if (boundValue.contains("{")){
-                        boundValue.replace(",","|");
-                    }
                     cql =cql.replaceFirst("\\?",boundValue);
                 }
-                logger.info("------------------------------");
             }
-            logger.info("补全数据后 Cql:"+cql);
+
+            if (cql.contains(":")){
+                StringBuilder sb = new StringBuilder();
+                cql = cql.substring(0,cql.indexOf("VALUES")+7)+"(";
+                sb.append(cql);
+                for (int i = 0; i < statement.getBindVariables().size(); i++) {
+                    ColumnSpecification cs = statement.getBindVariables().get(i);
+                    //String boundName = cs.name.toString();
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    sb.append(boundValue+",");
+                }
+                sb.append(")");
+                cql = sb.toString();
+            }
+            System.out.println("处理后CQL："+cql);
+            System.out.println("------------------------------");
             for (Listener listener : listeners)
                 listener.executeSuccess(statement, cql, options, state, queryTime, response);
         }
