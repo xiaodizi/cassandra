@@ -48,7 +48,7 @@ public class SqlToJson {
             String[] fieldsArr = replacedFields.split(",");
             String[] valuesArr = replacedValues.split(",");
             for (int j = 0; j < fieldsArr.length; j++) {
-                if (StringUtils.isBlank(valuesArr[j])){
+                if (StringUtils.isBlank(valuesArr[j]) || valuesArr[j].equals("null")){
                     valuesArr[j] = "";
                 }
                 maps.put(fieldsArr[j].trim(),valuesArr[j].trim());
