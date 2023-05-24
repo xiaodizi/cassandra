@@ -135,6 +135,9 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     //String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    if (boundValue.contains("{")){
+                        boundValue.replace(",","|");
+                    }
                     cql =cql.replaceFirst("\\?",boundValue);
                 }
                 logger.info("------------------------------");
