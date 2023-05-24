@@ -111,7 +111,7 @@ public class EsUtil {
             if (i > 0){
                 sb.append(",");
             }
-            sb.append("\""+key+"\":\""+value.replaceAll("&&",",").replaceAll("\\{","(").replaceAll("\\)","}")+"\"");
+            sb.append("\""+key+"\":\""+value.replaceAll("&&",",")+"\"");
             i++;
         }
         sb.append("}");
