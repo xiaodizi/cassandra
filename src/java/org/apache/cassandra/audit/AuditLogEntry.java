@@ -27,6 +27,7 @@ import org.apache.cassandra.audit.es.*;
 import org.apache.cassandra.audit.es.dto.Hites;
 import org.apache.cassandra.audit.es.res.DataRsp;
 import org.apache.cassandra.config.DatabaseDescriptor;
+import org.apache.cassandra.cql3.ColumnSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -113,9 +114,9 @@ public class AuditLogEntry {
             System.out.println("LEI TEST [INFO] 打印节点列表：" + esNodeList);
 
             if (type.toString().equals("CREATE_TABLE")) {
-                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+scope)? true:false;
-                logger.info("CREATE_TABLE 同步ES："+syncEs);
-                System.out.println("CREATE_TABLE 同步ES："+syncEs);
+                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
+                logger.info("CREATE_TABLE 同步ES：" + syncEs);
+                System.out.println("CREATE_TABLE 同步ES：" + syncEs);
                 if (syncEs) {
                     HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
                 }
@@ -129,10 +130,10 @@ public class AuditLogEntry {
                     String sql = split[i].toLowerCase();
                     if (!StringUtils.isBlank(sql)) {
                         sql = sql + ";";
-                        logger.info("BATCH 解析 CQL 语句:"+sql);
+                        logger.info("BATCH 解析 CQL 语句:" + sql);
                         String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
-                        Boolean aBoolean = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+matchSqlTableName)? true:false;
-                        logger.info("BATCH 同步es："+aBoolean);
+                        Boolean aBoolean = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + matchSqlTableName) ? true : false;
+                        logger.info("BATCH 同步es：" + aBoolean);
                         if (aBoolean) {
                             if (sql.indexOf("insert") > 0) {
                                 Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
@@ -158,8 +159,8 @@ public class AuditLogEntry {
             }
 
             if (type.toString().equals("UPDATE")) {
-                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+scope)? true:false;
-                logger.info("UPDATE 同步es："+syncEs);
+                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
+                logger.info("UPDATE 同步es：" + syncEs);
                 if (syncEs) {
                     if (s.toLowerCase(Locale.ROOT).contains("update")) {
                         Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
@@ -183,8 +184,8 @@ public class AuditLogEntry {
 
 
             if (type.toString().equals("DELETE")) {
-                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+scope)? true:false;
-                logger.info("DELETE 同步es："+syncEs);
+                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
+                logger.info("DELETE 同步es：" + syncEs);
                 if (syncEs) {
                     Map maps = SqlToJson.sqlDeleteToJson(s);
                     HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
@@ -192,8 +193,8 @@ public class AuditLogEntry {
             }
 
             if (type.toString().equals("DROP_TABLE")) {
-                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace+"."+scope)? true:false;
-                logger.info("DROP TABLE 同步es："+syncEs);
+                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
+                logger.info("DROP TABLE 同步es：" + syncEs);
                 if (syncEs) {
                     HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
                 }
@@ -314,6 +315,7 @@ public class AuditLogEntry {
             return this;
         }
 
+
         public Builder(AuditLogEntryType type) {
             this.type = type;
             operation = DEFAULT_OPERATION;
@@ -374,6 +376,7 @@ public class AuditLogEntry {
             this.options = options;
             return this;
         }
+
 
         public AuditLogEntry build() {
             timestamp = timestamp > 0 ? timestamp : currentTimeMillis();

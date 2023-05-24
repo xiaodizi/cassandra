@@ -20,6 +20,7 @@ package org.apache.cassandra.transport.messages;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.ImmutableMap;
 
 import io.netty.buffer.ByteBuf;
@@ -161,6 +162,7 @@ public class ExecuteMessage extends Message.Request
             // Some custom QueryHandlers are interested by the bound names. We provide them this information
             // by wrapping the QueryOptions.
             QueryOptions queryOptions = QueryOptions.addColumnSpecifications(options, prepared.statement.getBindVariables());
+
 
             long requestStartTime = currentTimeMillis();
 

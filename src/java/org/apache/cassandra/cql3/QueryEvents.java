@@ -113,8 +113,23 @@ public class QueryEvents
         try
         {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
+
+            String cql = maybeObfuscatedQuery;
+            System.out.println("Cql:"+cql);
+            if (cql.contains("?")) {
+                System.out.println("------------ 找数据------------");
+                for (int i = 0; i < statement.getBindVariables().size(); i++) {
+                    ColumnSpecification cs = statement.getBindVariables().get(i);
+                    //String boundName = cs.name.toString();
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    cql =cql.replaceFirst("\\?",boundValue);
+                }
+                System.out.println("------------------------------");
+            }
+
+
             for (Listener listener : listeners)
-                listener.executeSuccess(statement, maybeObfuscatedQuery, options, state, queryTime, response);
+                listener.executeSuccess(statement, cql, options, state, queryTime, response);
         }
         catch (Throwable t)
         {

@@ -27,6 +27,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.management.openmbean.CompositeData;
 
+import com.alibaba.fastjson2.JSON;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
