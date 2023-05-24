@@ -74,8 +74,22 @@ public class QueryEvents
         try
         {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
+
+            String cql = maybeObfuscatedQuery;
+            System.out.println("Cql:"+cql);
+            if (cql.contains("?")) {
+                System.out.println("------------ 找数据------------");
+                for (int i = 0; i < statement.getBindVariables().size(); i++) {
+                    ColumnSpecification cs = statement.getBindVariables().get(i);
+                    //String boundName = cs.name.toString();
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    cql =cql.replaceFirst("\\?",boundValue);
+                }
+                System.out.println("------------------------------");
+            }
+
             for (Listener listener : listeners)
-                listener.querySuccess(statement, maybeObfuscatedQuery, options, state, queryTime, response);
+                listener.querySuccess(statement, cql, options, state, queryTime, response);
         }
         catch (Throwable t)
         {
@@ -113,8 +127,21 @@ public class QueryEvents
         try
         {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
+            String cql = maybeObfuscatedQuery;
+            logger.info("Cql:"+cql);
+            if (cql.contains("?")) {
+                logger.info("------------ 找数据------------");
+                for (int i = 0; i < statement.getBindVariables().size(); i++) {
+                    ColumnSpecification cs = statement.getBindVariables().get(i);
+                    //String boundName = cs.name.toString();
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    cql =cql.replaceFirst("\\?",boundValue);
+                }
+                logger.info("------------------------------");
+            }
+            logger.info("补全数据后 Cql:"+cql);
             for (Listener listener : listeners)
-                listener.executeSuccess(statement, maybeObfuscatedQuery, options, state, queryTime, response);
+                listener.executeSuccess(statement, cql, options, state, queryTime, response);
         }
         catch (Throwable t)
         {
@@ -210,8 +237,22 @@ public class QueryEvents
                 try
                 {
                     final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(prepared.statement, query) : query;
+
+                    String cql = maybeObfuscatedQuery;
+                    System.out.println("Cql:"+cql);
+//                    if (cql.contains("?")) {
+//                        System.out.println("------------ 找数据------------");
+//                        for (int i = 0; i < statement.getBindVariables().size(); i++) {
+//                            ColumnSpecification cs = statement.getBindVariables().get(i);
+//                            //String boundName = cs.name.toString();
+//                            String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+//                            cql =cql.replaceFirst("\\?",boundValue);
+//                        }
+//                        System.out.println("------------------------------");
+//                    }
+
                     for (Listener listener : listeners)
-                        listener.prepareSuccess(prepared.statement, maybeObfuscatedQuery, state, queryTime, response);
+                        listener.prepareSuccess(prepared.statement, cql, state, queryTime, response);
                 }
                 catch (Throwable t)
                 {
