@@ -149,7 +149,7 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     //String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    if (!StringUtils.isBlank(boundValue) && boundValue!=null){
+                    if (!StringUtils.isBlank(boundValue) && boundValue!=null && boundValue !="null"){
                       boundValue=boundValue.replaceAll(",","&&");
                     }else {
                         boundValue="";
