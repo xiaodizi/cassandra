@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,7 +148,12 @@ public class QueryEvents
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     //String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    if (!StringUtils.isBlank(boundValue)){
+                      boundValue=boundValue.replaceAll(",","&&");
+                    }else {
+                        boundValue="";
+                    }
                     sb.append(boundValue+",");
                 }
                 sb.append(")");
