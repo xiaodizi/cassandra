@@ -153,6 +153,8 @@ public class QueryEvents
                     boundValue = boundValue.replaceAll("\\)","}");
                     if (i != (statement.getBindVariables().size()-1)) {
                         sb.append(boundValue + ",");
+                    }else{
+                        sb.append(boundValue);
                     }
                 }
                 sb.append(")");
