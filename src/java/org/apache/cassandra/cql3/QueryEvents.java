@@ -152,9 +152,11 @@ public class QueryEvents
                     if (!StringUtils.isBlank(boundValue) && boundValue!=null && boundValue !="null"){
                       boundValue=boundValue.replaceAll(",","&&");
                     }else {
-                        boundValue="";
+                        boundValue="\"\"";
                     }
-                    sb.append(boundValue+",");
+                    if (i != (statement.getBindVariables().size()-1)) {
+                        sb.append(boundValue + ",");
+                    }
                 }
                 sb.append(")");
                 cql = sb.toString();
