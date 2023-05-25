@@ -115,7 +115,7 @@ public class AuditLogEntry {
         if (StringUtils.isNotBlank(scope)) {
             builder.append("|scope:").append(scope);
         }
-        if (StringUtils.isNotBlank(operation)) {
+        if (StringUtils.isNotBlank(operation) && !operation.contains(":") && !operation.contains("?")) {
             String s = operation.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}+", " ");
             builder.append("|operation:").append(s);
 
