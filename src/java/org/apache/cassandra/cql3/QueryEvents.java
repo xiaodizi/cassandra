@@ -142,8 +142,8 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    boundName= EsUtil.escapeQueryChars(boundName);
-                    boundValue = EsUtil.escapeQueryChars(boundValue);
+                    boundName= EsUtil.escapeExprSpecialWord(boundName);
+                    boundValue = EsUtil.escapeExprSpecialWord(boundValue);
                     maps.put(boundName,boundValue);
 
                 }
@@ -158,8 +158,8 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    boundName= EsUtil.escapeQueryChars(boundName);
-                    boundValue = EsUtil.escapeQueryChars(boundValue);
+                    boundName= EsUtil.escapeExprSpecialWord(boundName);
+                    boundValue = EsUtil.escapeExprSpecialWord(boundValue);
                     maps.put(boundName,boundValue);
 
                 }
