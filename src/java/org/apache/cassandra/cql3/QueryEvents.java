@@ -130,68 +130,31 @@ public class QueryEvents
         try
         {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
-//            System.out.println("---------------notifyExecuteSuccess");
-//            String cql = maybeObfuscatedQuery;
-//            System.out.println("Cql:"+cql);
-//            System.out.println("------------notifyExecuteSuccess 找数据------------");
-//            if (cql.contains("?")) {
-//                for (int i = 0; i < statement.getBindVariables().size(); i++) {
-//                    ColumnSpecification cs = statement.getBindVariables().get(i);
-//                    //String boundName = cs.name.toString();
-//                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
-//                    boundValue = boundValue.replaceAll("\\(","<");
-//                    boundValue = boundValue.replaceAll("\\)",">");
-//                    cql =cql.replaceFirst("\\?",boundValue);
-//                }
-//            }
-//
-//            if (cql.contains(":")){
-//                StringBuilder sb = new StringBuilder();
-//                cql = cql.substring(0,cql.indexOf("VALUES")+7)+"(";
-//                sb.append(cql);
-//                for (int i = 0; i < statement.getBindVariables().size(); i++) {
-//                    ColumnSpecification cs = statement.getBindVariables().get(i);
-//                    //String boundName = cs.name.toString();
-//                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
-//                    boundValue = boundValue.replaceAll("\\(","<");
-//                    boundValue = boundValue.replaceAll("\\)",">");
-//                    if (i != (statement.getBindVariables().size()-1)) {
-//                        sb.append(boundValue + ",");
-//                    }else{
-//                        sb.append(boundValue);
-//                    }
-//                }
-//                sb.append(")");
-//                cql = sb.toString();
-//            }
-//            System.out.println("处理后CQL："+cql);
-//            System.out.println("------------------------------");
-
             logger.info("---------------notifyExecuteSuccess");
             String cql = maybeObfuscatedQuery;
             logger.info("Cql:"+cql);
             logger.info("------------notifyExecuteSuccess 找数据------------");
             if (cql.contains("?")) {
+                HashMap<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
-                    HashMap<String, Object> maps = new HashMap<>();
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
                     maps.put(boundName,boundValue);
-                    HttpUtil.bulkIndex(cs.ksName + "-"+cs.cfName , maps);
                 }
+                HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
 
             }
 
             if (cql.contains(":")){
+                HashMap<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
-                    HashMap<String, Object> maps = new HashMap<>();
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
                     maps.put(boundName,boundValue);
-                    HttpUtil.bulkIndex( cs.ksName + "-"+cs.cfName , maps);
                 }
+                HttpUtil.bulkIndex( statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
             }
             logger.info("处理后CQL："+cql);
             logger.info("------------------------------");
