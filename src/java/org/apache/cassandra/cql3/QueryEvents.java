@@ -19,10 +19,7 @@
 package org.apache.cassandra.cql3;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -136,30 +133,48 @@ public class QueryEvents
             System.out.println("Cql:"+cql);
             System.out.println("------------notifyExecuteSuccess 找数据------------");
             if (cql.contains("?")) {
-                HashMap<String, Object> maps = new HashMap<>();
+                Map<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
 
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    maps.put(boundName,boundValue);
-
-                }
-                HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
-
-            }
-
-            if (cql.contains(":")){
-                HashMap<String, Object> maps = new HashMap<>();
-                for (int i = 0; i < statement.getBindVariables().size(); i++) {
-
-                    ColumnSpecification cs = statement.getBindVariables().get(i);
-                    String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    System.out.println("字段名字:"+boundName+";类型:"+cs.type.asCQL3Type());
+                    System.out.println("key:"+boundName);
+                    System.out.println("value:"+boundValue);
+                    // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                    boundValue = boundValue.replace("\\","");
+                    boundValue = boundValue.replace("\"","");
+//                    if (cs.type.asCQL3Type().toString().equals("text")){
+//                        boundValue = BinaryStringConverteUtil.toBinaryString(boundValue);
+//                    }
                     maps.put(boundName,boundValue);
 
                 }
                 HttpUtil.bulkIndex( statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
+
+            }
+
+            if (cql.contains(":")){
+                Map<String, Object> maps = new HashMap<>();
+                for (int i = 0; i < statement.getBindVariables().size(); i++) {
+
+                    ColumnSpecification cs = statement.getBindVariables().get(i);
+                    String boundName = cs.name.toString();
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    System.out.println("字段名字:"+boundName+";类型:"+cs.type.asCQL3Type());
+                    System.out.println("key:"+boundName);
+                    System.out.println("value:"+boundValue);
+                    // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                    boundValue = boundValue.replace("\\","");
+                    boundValue = boundValue.replace("\"","");
+//                    if (cs.type.asCQL3Type().toString().equals("text")){
+//                        boundValue = BinaryStringConverteUtil.toBinaryString(boundValue);
+//                    }
+                    maps.put(boundName,boundValue);
+
+                }
+                HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
             }
             System.out.println("------------------------------");
 

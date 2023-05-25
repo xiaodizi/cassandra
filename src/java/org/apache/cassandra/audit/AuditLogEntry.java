@@ -118,6 +118,8 @@ public class AuditLogEntry {
         if (StringUtils.isNotBlank(operation)) {
             String s = operation.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}+", " ");
             builder.append("|operation:").append(s);
+            System.out.println("操作类型:"+type);
+            System.out.println("Audit LOG CQL:"+operation);
 
             if (!operation.contains(":") && !operation.contains("?")) {
 
