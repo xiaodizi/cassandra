@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.cassandra.audit.es.EsUtil;
 import org.apache.cassandra.audit.es.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -141,15 +142,8 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    // 在 " 前边增加 \ 做转义
-                    boundName=boundName.replace("\"","\\\"");
-                    boundValue=boundValue.replace("\"","\\\"");
-                    // 在 \ 前边增加 \ 做转义
-                    boundName=boundName.replace("\\","\\\\");
-                    boundValue=boundValue.replace("\\","\\\\");
-                    // 在 , 前边增减 \ 做转义
-                    boundName=boundName.replace(",","\\,");
-                    boundValue=boundValue.replace(",","\\,");
+                    boundName= EsUtil.escapeQueryChars(boundName);
+                    boundValue = EsUtil.escapeQueryChars(boundValue);
                     maps.put(boundName,boundValue);
 
                 }
@@ -164,15 +158,8 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    // 在 " 前边增加 \ 做转义
-                    boundName=boundName.replace("\"","\\\"");
-                    boundValue=boundValue.replace("\"","\\\"");
-                    // 在 \ 前边增加 \ 做转义
-                    boundName=boundName.replace("\\","\\\\");
-                    boundValue=boundValue.replace("\\","\\\\");
-                    // 在 , 前边增减 \ 做转义
-                    boundName=boundName.replace(",","\\,");
-                    boundValue=boundValue.replace(",","\\,");
+                    boundName= EsUtil.escapeQueryChars(boundName);
+                    boundValue = EsUtil.escapeQueryChars(boundValue);
                     maps.put(boundName,boundValue);
 
                 }
