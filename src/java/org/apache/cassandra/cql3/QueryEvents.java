@@ -130,18 +130,23 @@ public class QueryEvents
         try
         {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
-            logger.info("---------------notifyExecuteSuccess");
+            System.out.println("---------------notifyExecuteSuccess");
             String cql = maybeObfuscatedQuery;
-            logger.info("Cql:"+cql);
-            logger.info("------------notifyExecuteSuccess 找数据------------");
+            System.out.println("Cql:"+cql);
+            System.out.println("------------notifyExecuteSuccess 找数据------------");
             if (cql.contains("?")) {
                 HashMap<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
+
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
                     maps.put(boundName,boundValue);
+
                 }
+                System.out.println("-------------数据------------");
+                System.out.println(maps);
+                System.out.println("-----------------------------");
                 HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
 
             }
@@ -149,15 +154,19 @@ public class QueryEvents
             if (cql.contains(":")){
                 HashMap<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
+
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
                     maps.put(boundName,boundValue);
+
                 }
+                System.out.println("-------------数据------------");
+                System.out.println(maps);
+                System.out.println("-----------------------------");
                 HttpUtil.bulkIndex( statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
             }
-            logger.info("处理后CQL："+cql);
-            logger.info("------------------------------");
+            System.out.println("------------------------------");
 
             for (Listener listener : listeners)
                 listener.executeSuccess(statement, maybeObfuscatedQuery, options, state, queryTime, response);
