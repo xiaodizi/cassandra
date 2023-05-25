@@ -147,6 +147,9 @@ public class QueryEvents
                     // 在 \ 前边增加 \ 做转义
                     boundName=boundName.replace("\\","\\\\");
                     boundValue=boundValue.replace("\\","\\\\");
+                    // 在 , 前边增减 \ 做转义
+                    boundName=boundName.replace(",","\\,");
+                    boundValue=boundValue.replace(",","\\,");
                     maps.put(boundName,boundValue);
 
                 }
@@ -167,6 +170,9 @@ public class QueryEvents
                     // 在 \ 前边增加 \ 做转义
                     boundName=boundName.replace("\\","\\\\");
                     boundValue=boundValue.replace("\\","\\\\");
+                    // 在 , 前边增减 \ 做转义
+                    boundName=boundName.replace(",","\\,");
+                    boundValue=boundValue.replace(",","\\,");
                     maps.put(boundName,boundValue);
 
                 }
