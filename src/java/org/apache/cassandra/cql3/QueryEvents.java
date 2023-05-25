@@ -129,13 +129,10 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    System.out.println("类型:");
+                    System.out.println("字段名字:"+boundName+";类型:"+cs.type.asCQL3Type());
                     maps.put(boundName,boundValue);
 
                 }
-                System.out.println("-------------数据------------");
-                System.out.println(maps);
-                System.out.println("-----------------------------");
                 HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
 
             }
@@ -147,12 +144,10 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    System.out.println("字段名字:"+boundName+";类型:"+cs.type.asCQL3Type());
                     maps.put(boundName,boundValue);
 
                 }
-                System.out.println("-------------数据------------");
-                System.out.println(maps);
-                System.out.println("-----------------------------");
                 HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
             }
             System.out.println("------------------------------");
