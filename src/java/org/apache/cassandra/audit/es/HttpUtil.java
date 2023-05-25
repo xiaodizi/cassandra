@@ -124,15 +124,13 @@ public class HttpUtil {
     public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps) {
         String nodeUrl = getRandomNode(url);
         System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-//        if (StringUtils.isBlank(nodeUrl)) {
-//            // es_node_list 配置为空 返回 406
-//            return DataRsp.getError406();
-//        }
+        if (StringUtils.isBlank(nodeUrl)) {
+            // es_node_list 配置为空 返回 406
+            return DataRsp.getError406();
+        }
         Unirest.setTimeouts(0, 0);
         try {
             String bulkApiJson = EsUtil.getBulkCreateApiJson(maps);
-
-            System.out.println("BulkApiJson:"+bulkApiJson);
             HttpResponse<String> response = Unirest.post(nodeUrl+"/"+indexName+"/_bulk")
                     .header("Content-Type", "application/x-ndjson")
                     .body(bulkApiJson)

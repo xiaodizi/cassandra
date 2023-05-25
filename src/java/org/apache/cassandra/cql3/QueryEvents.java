@@ -129,6 +129,7 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    System.out.println("类型:");
                     maps.put(boundName,boundValue);
 
                 }
