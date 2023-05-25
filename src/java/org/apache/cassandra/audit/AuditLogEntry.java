@@ -106,6 +106,8 @@ public class AuditLogEntry {
             String s = operation.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}+", " ");
             builder.append("|operation:").append(s);
 
+            System.out.println("操作CQL："+operation);
+
             String esNodeList = DatabaseDescriptor.getEsNodeList();
 
             if (!operation.contains("?") && !operation.contains(":")) {

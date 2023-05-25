@@ -19,10 +19,7 @@
 package org.apache.cassandra.cql3;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -30,6 +27,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.cassandra.audit.es.BinaryStringConverteUtil;
 import org.apache.cassandra.audit.es.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +121,7 @@ public class QueryEvents
             System.out.println("Cql:"+cql);
             System.out.println("------------notifyExecuteSuccess 找数据------------");
             if (cql.contains("?")) {
-                HashMap<String, Object> maps = new HashMap<>();
+                Map<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
 
                     ColumnSpecification cs = statement.getBindVariables().get(i);
@@ -132,15 +130,21 @@ public class QueryEvents
                     System.out.println("字段名字:"+boundName+";类型:"+cs.type.asCQL3Type());
                     System.out.println("key:"+boundName);
                     System.out.println("value:"+boundValue);
+                    // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                    boundValue = boundValue.replace("\\","");
+                    boundValue = boundValue.replace("\"","");
+//                    if (cs.type.asCQL3Type().toString().equals("text")){
+//                        boundValue = BinaryStringConverteUtil.toBinaryString(boundValue);
+//                    }
                     maps.put(boundName,boundValue);
 
                 }
-                //HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
+                HttpUtil.bulkIndex("http://127.0.0.1:9200", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
 
             }
 
             if (cql.contains(":")){
-                HashMap<String, Object> maps = new HashMap<>();
+                Map<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
 
                     ColumnSpecification cs = statement.getBindVariables().get(i);
@@ -149,10 +153,16 @@ public class QueryEvents
                     System.out.println("字段名字:"+boundName+";类型:"+cs.type.asCQL3Type());
                     System.out.println("key:"+boundName);
                     System.out.println("value:"+boundValue);
+                    // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                    boundValue = boundValue.replace("\\","");
+                    boundValue = boundValue.replace("\"","");
+//                    if (cs.type.asCQL3Type().toString().equals("text")){
+//                        boundValue = BinaryStringConverteUtil.toBinaryString(boundValue);
+//                    }
                     maps.put(boundName,boundValue);
 
                 }
-                //HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
+                HttpUtil.bulkIndex("http://127.0.0.1:9200", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
             }
             System.out.println("------------------------------");
 
@@ -254,8 +264,8 @@ public class QueryEvents
             {
                 try
                 {
-                    System.out.println("----------------notifyPrepareSuccess");
                     final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(prepared.statement, query) : query;
+
                     for (Listener listener : listeners)
                         listener.prepareSuccess(prepared.statement, maybeObfuscatedQuery, state, queryTime, response);
                 }

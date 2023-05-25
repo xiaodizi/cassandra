@@ -213,5 +213,13 @@ public class EsUtil {
         return false;
     }
 
+    public static String toBinary(String str){
+        char[] strChar=str.toCharArray();
+        String result="";
+        for(int i=0;i<strChar.length;i++){
+            result +=Integer.toBinaryString(strChar[i])+ " ";
+        }
+        return result;
+    }
 
 }
