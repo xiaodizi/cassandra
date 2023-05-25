@@ -110,6 +110,7 @@ public class HttpUtil {
         String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         try {
             String bulkApiJson = EsUtil.getBulkCreateApiJson(maps);
+            logger.warn("bulkApiJson:"+bulkApiJson);
             HttpResponse<String> response = Unirest.post(nodeUrl + "/" + indexName + "/_bulk")
                     .header("Content-Type", "application/x-ndjson")
                     .body(bulkApiJson)
