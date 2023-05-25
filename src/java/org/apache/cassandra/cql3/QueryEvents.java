@@ -20,6 +20,7 @@ package org.apache.cassandra.cql3;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -29,6 +30,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.cassandra.audit.es.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,40 +124,32 @@ public class QueryEvents
             System.out.println("------------notifyExecuteSuccess 找数据------------");
             if (cql.contains("?")) {
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
+                    HashMap<String, Object> maps = new HashMap<>();
                     ColumnSpecification cs = statement.getBindVariables().get(i);
-                    //String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
-                    boundValue = boundValue.replaceAll("\\(","<");
-                    boundValue = boundValue.replaceAll("\\)",">");
-                    cql =cql.replaceFirst("\\?",boundValue);
+                    String boundName = cs.name.toString();
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    maps.put(boundName,boundValue);
+                    HttpUtil.bulkIndex("", cs.ksName + "-"+cs.cfName , maps);
                 }
+
             }
 
             if (cql.contains(":")){
-                StringBuilder sb = new StringBuilder();
-                cql = cql.substring(0,cql.indexOf("VALUES")+7)+"(";
-                sb.append(cql);
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
+                    HashMap<String, Object> maps = new HashMap<>();
                     ColumnSpecification cs = statement.getBindVariables().get(i);
-                    //String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
-                    boundValue = boundValue.replaceAll("\\(","<");
-                    boundValue = boundValue.replaceAll("\\)",">");
-                    if (i != (statement.getBindVariables().size()-1)) {
-                        sb.append(boundValue + ",");
-                    }else{
-                        sb.append(boundValue);
-                    }
+                    String boundName = cs.name.toString();
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    maps.put(boundName,boundValue);
+                    HttpUtil.bulkIndex("", cs.ksName + "-"+cs.cfName , maps);
                 }
-                sb.append(")");
-                cql = sb.toString();
             }
             System.out.println("处理后CQL："+cql);
             System.out.println("------------------------------");
 
 
             for (Listener listener : listeners)
-                listener.executeSuccess(statement, cql, options, state, queryTime, response);
+                listener.executeSuccess(statement, maybeObfuscatedQuery, options, state, queryTime, response);
         }
         catch (Throwable t)
         {
