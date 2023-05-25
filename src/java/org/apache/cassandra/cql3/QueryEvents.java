@@ -149,8 +149,8 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     //String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
-                    boundValue = boundValue.replaceAll("\\(","{");
-                    boundValue = boundValue.replaceAll("\\)","}");
+                    boundValue = boundValue.replaceAll("\\(","<");
+                    boundValue = boundValue.replaceAll("\\)",">");
                     if (i != (statement.getBindVariables().size()-1)) {
                         sb.append(boundValue + ",");
                     }else{
