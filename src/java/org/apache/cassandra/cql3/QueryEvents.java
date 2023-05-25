@@ -130,10 +130,12 @@ public class QueryEvents
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
                     System.out.println("字段名字:"+boundName+";类型:"+cs.type.asCQL3Type());
+                    System.out.println("key:"+boundName);
+                    System.out.println("value:"+boundValue);
                     maps.put(boundName,boundValue);
 
                 }
-                HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
+                //HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
 
             }
 
@@ -145,10 +147,12 @@ public class QueryEvents
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
                     System.out.println("字段名字:"+boundName+";类型:"+cs.type.asCQL3Type());
+                    System.out.println("key:"+boundName);
+                    System.out.println("value:"+boundValue);
                     maps.put(boundName,boundValue);
 
                 }
-                HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
+                //HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
             }
             System.out.println("------------------------------");
 
