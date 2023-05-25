@@ -123,28 +123,37 @@ public class QueryEvents
             System.out.println("Cql:"+cql);
             System.out.println("------------notifyExecuteSuccess 找数据------------");
             if (cql.contains("?")) {
+                HashMap<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
-                    HashMap<String, Object> maps = new HashMap<>();
+
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
                     maps.put(boundName,boundValue);
-                    HttpUtil.bulkIndex("", cs.ksName + "-"+cs.cfName , maps);
+
                 }
+                System.out.println("-------------数据------------");
+                System.out.println(maps);
+                System.out.println("-----------------------------");
+                HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
 
             }
 
             if (cql.contains(":")){
+                HashMap<String, Object> maps = new HashMap<>();
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
-                    HashMap<String, Object> maps = new HashMap<>();
+
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
                     maps.put(boundName,boundValue);
-                    HttpUtil.bulkIndex("", cs.ksName + "-"+cs.cfName , maps);
+
                 }
+                System.out.println("-------------数据------------");
+                System.out.println(maps);
+                System.out.println("-----------------------------");
+                HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
             }
-            System.out.println("处理后CQL："+cql);
             System.out.println("------------------------------");
 
 
