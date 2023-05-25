@@ -124,7 +124,9 @@ public class QueryEvents
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     //String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
+                    boundValue = boundValue.replaceAll("\\(","<");
+                    boundValue = boundValue.replaceAll("\\)",">");
                     cql =cql.replaceFirst("\\?",boundValue);
                 }
             }
@@ -136,8 +138,14 @@ public class QueryEvents
                 for (int i = 0; i < statement.getBindVariables().size(); i++) {
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     //String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    sb.append(boundValue+",");
+                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion()).replaceAll(",","&&");
+                    boundValue = boundValue.replaceAll("\\(","<");
+                    boundValue = boundValue.replaceAll("\\)",">");
+                    if (i != (statement.getBindVariables().size()-1)) {
+                        sb.append(boundValue + ",");
+                    }else{
+                        sb.append(boundValue);
+                    }
                 }
                 sb.append(")");
                 cql = sb.toString();
