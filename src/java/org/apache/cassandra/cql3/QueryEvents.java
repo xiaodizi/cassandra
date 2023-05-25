@@ -141,9 +141,13 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-
-                    logger.warn("数据:"+boundValue);
-                    maps.put(boundName.replace("\"","\\"),boundValue.replace("\"","\\"));
+                    // 在 " 前边增加 \ 做转义
+                    boundName=boundName.replace("\"","\\\"");
+                    boundValue=boundValue.replace("\"","\\\"");
+                    // 在 \ 前边增加 \ 做转义
+                    boundName=boundName.replace("\\","\\\\");
+                    boundValue=boundValue.replace("\\","\\\\");
+                    maps.put(boundName,boundValue);
 
                 }
                 HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
@@ -157,8 +161,13 @@ public class QueryEvents
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    logger.warn("数据:"+boundValue);
-                    maps.put(boundName.replace("\"","\\"),boundValue.replace("\"","\\"));
+                    // 在 " 前边增加 \ 做转义
+                    boundName=boundName.replace("\"","\\\"");
+                    boundValue=boundValue.replace("\"","\\\"");
+                    // 在 \ 前边增加 \ 做转义
+                    boundName=boundName.replace("\\","\\\\");
+                    boundValue=boundValue.replace("\\","\\\\");
+                    maps.put(boundName,boundValue);
 
                 }
                 HttpUtil.bulkIndex( statement.getAuditLogContext().keyspace + "-"+statement.getAuditLogContext().scope , maps);
