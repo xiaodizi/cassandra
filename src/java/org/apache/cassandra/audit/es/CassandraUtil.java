@@ -22,10 +22,13 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
+import org.apache.cassandra.schema.ColumnMetadata;
 import org.apache.cassandra.schema.Schema;
 import org.apache.cassandra.schema.TableMetadata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -85,5 +88,19 @@ public class CassandraUtil {
         TableMetadata tableMetadata = columnFamilyStore.metadata.get();
         boolean syncEs = tableMetadata.params.syncEs;
         return syncEs;
+    }
+
+
+    public static String getPrimaryKeyValue(String keyspace,String table,Map maps){
+        ColumnFamilyStore cfs = Keyspace.open(keyspace).getColumnFamilyStore(table);
+        Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+        List<Object> objects = new ArrayList<>();
+        columnMetadata.forEach(objects::add);
+        String keyValue="";
+        if (objects.size() > 0) {
+            String key = objects.get(0).toString();
+            return maps.get(key).toString();
+        }
+        return null;
     }
 }

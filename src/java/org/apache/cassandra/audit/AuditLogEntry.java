@@ -158,7 +158,8 @@ public class AuditLogEntry {
                             if (aBoolean) {
                                 if (sql.indexOf("insert") > 0) {
                                     Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
-                                    HttpUtil.bulkIndex(keyspace + "-" + matchSqlTableName, maps);
+                                    String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, matchSqlTableName, maps);
+                                    HttpUtil.bulkIndex(keyspace + "-" + matchSqlTableName, maps,primaryKeyValue);
                                 } else if (sql.indexOf("update") > 0) {
                                     Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
 
@@ -217,7 +218,8 @@ public class AuditLogEntry {
                             fixedThreadPoolOtherData.execute(new Runnable() {
                                 @Override
                                 public void run() {
-                                    HttpUtil.bulkIndex(keyspace + "-" + scope, maps);
+                                    String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, scope, maps);
+                                    HttpUtil.bulkIndex(keyspace + "-" + scope, maps,primaryKeyValue);
                                 }
                             });
                         }

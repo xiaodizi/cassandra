@@ -105,10 +105,10 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp bulkIndex(String indexName, Map<String, Object> maps) {
+    public static DataRsp bulkIndex(String indexName, Map<String, Object> maps,String keyValue) {
         String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         try {
-            String bulkApiJson = EsUtil.getBulkCreateApiJson(maps);
+            String bulkApiJson = EsUtil.getBulkCreateApiJson(maps,keyValue);
             System.out.println("bulkApiJson:"+bulkApiJson);
             HttpResponse<String> response = Unirest.post(nodeUrl + "/" + indexName + "/_bulk")
                     .header("Content-Type", "application/x-ndjson")

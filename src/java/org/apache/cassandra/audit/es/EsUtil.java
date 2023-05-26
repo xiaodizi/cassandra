@@ -102,9 +102,12 @@ public class EsUtil {
 
 
 
-    public static String getBulkCreateApiJson(Map<String,Object> maps){
+    public static String getBulkCreateApiJson(Map<String,Object> maps,String keyValue){
+        if (StringUtils.isBlank(keyValue)){
+            keyValue = String.valueOf(maps.hashCode());
+        }
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"index\":{\"_id\" : \""+maps.hashCode()+"\" }}\n");
+        sb.append("{\"index\":{\"_id\" : \""+keyValue+"\" }}\n");
         sb.append("{");
         int i=0;
         for (String key:maps.keySet()){

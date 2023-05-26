@@ -26,8 +26,12 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.cassandra.audit.es.CassandraUtil;
 import org.apache.cassandra.audit.es.EsUtil;
 import org.apache.cassandra.audit.es.HttpUtil;
+import org.apache.cassandra.db.ColumnFamilyStore;
+import org.apache.cassandra.db.Keyspace;
+import org.apache.cassandra.schema.ColumnMetadata;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +145,16 @@ public class QueryEvents {
                     fixedThreadPoolOtherData.execute(new Runnable() {
                         @Override
                         public void run() {
-                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps);
+                            ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
+                            Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+                            List<Object> objects = new ArrayList<>();
+                            columnMetadata.forEach(objects::add);
+                            String keyValue="";
+                            if (objects.size() > 0) {
+                                String key = objects.get(0).toString();
+                                keyValue = maps.get(key).toString();
+                            }
+                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
                         }
                     });
 
@@ -167,7 +180,8 @@ public class QueryEvents {
                     fixedThreadPoolOtherData.execute(new Runnable() {
                         @Override
                         public void run() {
-                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps);
+                            String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope, maps);
+                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,primaryKeyValue);
                         }
                     });
                 }
