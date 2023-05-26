@@ -79,7 +79,11 @@ public abstract class SSTable
 
     public static final int TOMBSTONE_HISTOGRAM_BIN_SIZE = 100;
     public static final int TOMBSTONE_HISTOGRAM_SPOOL_SIZE = 100000;
+<<<<<<< HEAD
     public static final int TOMBSTONE_HISTOGRAM_TTL_ROUND_SECONDS = Integer.valueOf(System.getProperty("cassandra.streaminghistogram.roundseconds", "60"));
+=======
+    public static final int TOMBSTONE_HISTOGRAM_TTL_ROUND_SECONDS = CassandraRelevantProperties.STREAMING_HISTOGRAM_ROUND_SECONDS.getInt();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
     public final Descriptor descriptor;
     protected final Set<Component> components;
@@ -312,6 +316,7 @@ public abstract class SSTable
     @Override
     public String toString()
     {
+<<<<<<< HEAD
         return getClass().getSimpleName() + "(" +
                "path='" + getFilename() + '\'' +
                ')';
@@ -383,6 +388,9 @@ public abstract class SSTable
     public AbstractBounds<Token> getBounds()
     {
         return AbstractBounds.bounds(first.getToken(), true, last.getToken(), true);
+=======
+        return String.format("%s:%s(path='%s')", getClass().getSimpleName(), descriptor.version.format.name(), getFilename());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     public static void validateRepairedMetadata(long repairedAt, TimeUUID pendingRepair, boolean isTransient)
@@ -392,5 +400,119 @@ public abstract class SSTable
         Preconditions.checkArgument(!isTransient || (pendingRepair != NO_PENDING_REPAIR),
                                     "isTransient can only be true for sstables pending repair");
 
+<<<<<<< HEAD
+=======
+    /**
+     * Registers new custom components. Used by custom compaction strategies.
+     * Adding a component for the second time is a no-op.
+     * Don't remove this - this method is a part of the public API, intended for use by custom compaction strategies.
+     *
+     * @param newComponents collection of components to be added
+     */
+    public synchronized void addComponents(Collection<Component> newComponents)
+    {
+        Collection<Component> componentsToAdd = Collections2.filter(newComponents, Predicates.not(Predicates.in(components)));
+        TOCComponent.appendTOC(descriptor, componentsToAdd);
+        components.addAll(componentsToAdd);
+    }
+
+    public interface Owner
+    {
+        Double getCrcCheckChance();
+
+        OpOrder.Barrier newReadOrderingBarrier();
+
+        TableMetrics getMetrics();
+    }
+
+    /**
+     * A builder of this sstable representation. It should be extended for each implementation with the specific fields.
+     *
+     * @param <S> type of the sstable representation to be build with this builder
+     * @param <B> type of this builder
+     */
+    public static class Builder<S extends SSTable, B extends Builder<S, B>>
+    {
+        public final Descriptor descriptor;
+
+        private Set<Component> components;
+        private TableMetadataRef tableMetadataRef;
+        private ChunkCache chunkCache = ChunkCache.instance;
+        private IOOptions ioOptions = IOOptions.fromDatabaseDescriptor();
+
+        public Builder(Descriptor descriptor)
+        {
+            checkNotNull(descriptor);
+            this.descriptor = descriptor;
+        }
+
+        public B setComponents(Collection<Component> components)
+        {
+            if (components != null)
+            {
+                components.forEach(c -> Preconditions.checkState(c.isValidFor(descriptor), "Invalid component type for sstable format " + descriptor.version.format.name()));
+                this.components = ImmutableSet.copyOf(components);
+            }
+            else
+            {
+                this.components = null;
+            }
+            return (B) this;
+        }
+
+        public B addComponents(Collection<Component> components)
+        {
+            if (components == null || components.isEmpty())
+                return (B) this;
+
+            if (this.components == null)
+                return setComponents(components);
+
+            return setComponents(Sets.union(this.components, ImmutableSet.copyOf(components)));
+        }
+
+        public B setTableMetadataRef(TableMetadataRef ref)
+        {
+            this.tableMetadataRef = ref;
+            return (B) this;
+        }
+
+        public B setChunkCache(ChunkCache chunkCache)
+        {
+            this.chunkCache = chunkCache;
+            return (B) this;
+        }
+
+        public B setIOOptions(IOOptions ioOptions)
+        {
+            this.ioOptions = ioOptions;
+            return (B) this;
+        }
+
+        public Descriptor getDescriptor()
+        {
+            return descriptor;
+        }
+
+        public Set<Component> getComponents()
+        {
+            return components;
+        }
+
+        public TableMetadataRef getTableMetadataRef()
+        {
+            return tableMetadataRef;
+        }
+
+        public ChunkCache getChunkCache()
+        {
+            return chunkCache;
+        }
+
+        public IOOptions getIOOptions()
+        {
+            return ioOptions;
+        }
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 }

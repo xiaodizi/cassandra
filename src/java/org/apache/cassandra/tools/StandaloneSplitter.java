@@ -37,6 +37,7 @@ import org.apache.cassandra.db.lifecycle.LifecycleTransaction;
 import org.apache.cassandra.io.sstable.*;
 import org.apache.cassandra.utils.JVMStabilityInspector;
 
+import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_UTIL_ALLOW_TOOL_REINIT_FOR_TEST;
 import static org.apache.cassandra.tools.BulkLoader.CmdLineOptions;
 import static org.apache.cassandra.utils.Clock.Global.currentTimeMillis;
 
@@ -53,7 +54,7 @@ public class StandaloneSplitter
     public static void main(String args[])
     {
         Options options = Options.parseArgs(args);
-        if (Boolean.getBoolean(Util.ALLOW_TOOL_REINIT_FOR_TEST))
+        if (TEST_UTIL_ALLOW_TOOL_REINIT_FOR_TEST.getBoolean())
             DatabaseDescriptor.toolInitialization(false); //Necessary for testing
         else
             Util.initDatabaseDescriptor();

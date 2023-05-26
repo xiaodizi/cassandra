@@ -99,6 +99,23 @@ public final class PEMBasedSslContextFactory extends FileBasedSslContextFactory
     {
     }
 
+<<<<<<< HEAD
+=======
+    private void validatePasswords()
+    {
+        boolean shouldThrow = !keystoreContext.passwordMatchesIfPresent(pemEncodedKeyContext.password)
+                              || !outboundKeystoreContext.passwordMatchesIfPresent(pemEncodedOutboundKeyContext.password);
+        boolean outboundPasswordMismatch = !outboundKeystoreContext.passwordMatchesIfPresent(pemEncodedOutboundKeyContext.password);
+        String keyName = outboundPasswordMismatch ? "outbound_" : "";
+
+        if (shouldThrow)
+        {
+            final String msg = String.format("'%skeystore_password' and '%skey_password' both configurations are given and the values do not match", keyName, keyName);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public PEMBasedSslContextFactory(Map<String, Object> parameters)
     {
         super(parameters);

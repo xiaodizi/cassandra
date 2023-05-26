@@ -119,15 +119,36 @@ abstract public class FileBasedSslContextFactory extends AbstractSslContextFacto
     }
 
     /**
+     * Validates the given keystore password.
+     *
+     * @param isOutboundKeystore {@code true} for the {@code outbound_keystore_password};{@code false} otherwise
+     * @param password           value
+     * @throws IllegalArgumentException if the {@code password} is empty as per the definition of {@link StringUtils#isEmpty(CharSequence)}
+     */
+    protected void validatePassword(boolean isOutboundKeystore, String password)
+    {
+        boolean keystorePasswordEmpty = StringUtils.isEmpty(password);
+        if (keystorePasswordEmpty)
+        {
+            String keyName = isOutboundKeystore ? "outbound_" : "";
+            final String msg = String.format("'%skeystore_password' must be specified", keyName);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
      * Builds required KeyManagerFactory from the file based keystore. It also checks for the PrivateKey's certificate's
      * expiry and logs {@code warning} for each expired PrivateKey's certitificate.
      *
      * @return KeyManagerFactory built from the file based keystore.
      * @throws SSLException if any issues encountered during the build process
+     * @throws IllegalArgumentException if the validation for the {@code keystore_password} fails
+     * @see #validatePassword(boolean, String)
      */
     @Override
     protected KeyManagerFactory buildKeyManagerFactory() throws SSLException
     {
+<<<<<<< HEAD
 
         try (InputStream ksf = Files.newInputStream(File.getPath(keystore)))
         {
@@ -147,6 +168,25 @@ abstract public class FileBasedSslContextFactory extends AbstractSslContextFacto
         {
             throw new SSLException("failed to build key manager store for secure connections", e);
         }
+=======
+        /*
+         * Validation of the password is delayed until this point to allow nullable keystore passwords
+         * for other use-cases (CASSANDRA-18124).
+         */
+        validatePassword(false, keystoreContext.password);
+        return getKeyManagerFactory(keystoreContext);
+    }
+
+    @Override
+    protected KeyManagerFactory buildOutboundKeyManagerFactory() throws SSLException
+    {
+        /*
+         * Validation of the password is delayed until this point to allow nullable keystore passwords
+         * for other use-cases (CASSANDRA-18124).
+         */
+        validatePassword(true, outboundKeystoreContext.password);
+        return getKeyManagerFactory(outboundKeystoreContext);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     /**
@@ -158,12 +198,22 @@ abstract public class FileBasedSslContextFactory extends AbstractSslContextFacto
     @Override
     protected TrustManagerFactory buildTrustManagerFactory() throws SSLException
     {
+<<<<<<< HEAD
         try (InputStream tsf = Files.newInputStream(File.getPath(truststore)))
+=======
+        try (InputStream tsf = Files.newInputStream(File.getPath(trustStoreContext.filePath)))
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         {
             final String algorithm = this.algorithm == null ? TrustManagerFactory.getDefaultAlgorithm() : this.algorithm;
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
             KeyStore ts = KeyStore.getInstance(store_type);
+<<<<<<< HEAD
             ts.load(tsf, truststore_password.toCharArray());
+=======
+
+            final char[] truststorePassword = StringUtils.isEmpty(trustStoreContext.password) ? null : trustStoreContext.password.toCharArray();
+            ts.load(tsf, truststorePassword);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             tmf.init(ts);
             return tmf;
         }
@@ -173,6 +223,32 @@ abstract public class FileBasedSslContextFactory extends AbstractSslContextFacto
         }
     }
 
+<<<<<<< HEAD
+=======
+    private KeyManagerFactory getKeyManagerFactory(final FileBasedStoreContext context) throws SSLException
+    {
+        try (InputStream ksf = Files.newInputStream(File.getPath(context.filePath)))
+        {
+            final String algorithm = this.algorithm == null ? KeyManagerFactory.getDefaultAlgorithm() : this.algorithm;
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
+            KeyStore ks = KeyStore.getInstance(store_type);
+            ks.load(ksf, context.password.toCharArray());
+
+            if (!context.checkedExpiry)
+            {
+                checkExpiredCerts(ks);
+                context.checkedExpiry = true;
+            }
+            kmf.init(ks, context.password.toCharArray());
+            return kmf;
+        }
+        catch (Exception e)
+        {
+            throw new SSLException("failed to build key manager store for secure connections", e);
+        }
+    }
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     protected boolean checkExpiredCerts(KeyStore ks) throws KeyStoreException
     {
         boolean hasExpiredCerts = false;

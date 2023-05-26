@@ -50,6 +50,16 @@ import org.apache.cassandra.io.FSDiskFullWriteError;
 import org.apache.cassandra.io.FSError;
 import org.apache.cassandra.io.FSNoDiskAvailableForWriteError;
 import org.apache.cassandra.io.FSWriteError;
+<<<<<<< HEAD
+=======
+import org.apache.cassandra.io.sstable.Component;
+import org.apache.cassandra.io.sstable.Descriptor;
+import org.apache.cassandra.io.sstable.SSTable;
+import org.apache.cassandra.io.sstable.SSTableId;
+import org.apache.cassandra.io.sstable.SSTableIdFactory;
+import org.apache.cassandra.io.util.File;
+import org.apache.cassandra.io.util.FileStoreUtils;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.util.FileUtils;
 import org.apache.cassandra.io.sstable.*;
 import org.apache.cassandra.schema.SchemaConstants;
@@ -488,13 +498,29 @@ public class Directories
         Collections.sort(candidates);
     }
 
+<<<<<<< HEAD
     public boolean hasAvailableDiskSpace(long estimatedSSTables, long expectedTotalWriteSize)
+=======
+    /**
+     * Sums up the space required for ongoing streams + compactions + expected new write size per FileStore and checks
+     * if there is enough space available.
+     *
+     * @param expectedNewWriteSizes where we expect to write the new compactions
+     * @param totalCompactionWriteRemaining approximate amount of data current compactions are writing - keyed by
+     *                                      the file store they are writing to (or, reading from actually, but since
+     *                                      CASSANDRA-6696 we expect compactions to read and written from the same dir)
+     * @return true if we expect to be able to write expectedNewWriteSizes to the available file stores
+     */
+    public boolean hasDiskSpaceForCompactionsAndStreams(Map<File, Long> expectedNewWriteSizes,
+                                                        Map<File, Long> totalCompactionWriteRemaining)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         long writeSize = expectedTotalWriteSize / estimatedSSTables;
         long totalAvailable = 0L;
 
         for (DataDirectory dataDir : paths)
         {
+<<<<<<< HEAD
             if (DisallowedDirectories.isUnwritable(getLocationForDisk(dataDir)))
                   continue;
             DataDirectoryCandidate candidate = new DataDirectoryCandidate(dataDir);
@@ -502,6 +528,75 @@ public class Directories
             if (candidate.availableSpace < writeSize)
                 continue;
             totalAvailable += candidate.availableSpace;
+=======
+            long addedForFilestore = entry.getValue() + compactionsRemainingPerFileStore.getOrDefault(entry.getKey(), 0L);
+            totalPerFileStore.merge(entry.getKey(), addedForFilestore, Long::sum);
+        }
+        return hasDiskSpaceForCompactionsAndStreams(totalPerFileStore);
+    }
+
+    /**
+     * Checks if there is enough space on all file stores to write the given amount of data.
+     * The data to write should be the total amount, ongoing writes + new writes.
+     */
+    public static boolean hasDiskSpaceForCompactionsAndStreams(Map<FileStore, Long> totalToWrite)
+    {
+        boolean hasSpace = true;
+        for (Map.Entry<FileStore, Long> toWrite : totalToWrite.entrySet())
+        {
+            long availableForCompaction = getAvailableSpaceForCompactions(toWrite.getKey());
+            logger.debug("FileStore {} has {} bytes available, checking if we can write {} bytes", toWrite.getKey(), availableForCompaction, toWrite.getValue());
+            if (availableForCompaction < toWrite.getValue())
+            {
+                logger.warn("FileStore {} has only {} available, but {} is needed",
+                            toWrite.getKey(),
+                            FileUtils.stringifyFileSize(availableForCompaction),
+                            FileUtils.stringifyFileSize((long) toWrite.getValue()));
+                hasSpace = false;
+            }
+        }
+        return hasSpace;
+    }
+
+    public static long getAvailableSpaceForCompactions(FileStore fileStore)
+    {
+        long availableSpace = 0;
+        availableSpace = FileStoreUtils.tryGetSpace(fileStore, FileStore::getUsableSpace, e -> { throw new FSReadError(e, fileStore.name()); })
+                         - DatabaseDescriptor.getMinFreeSpacePerDriveInBytes();
+        return Math.max(0L, Math.round(availableSpace * DatabaseDescriptor.getMaxSpaceForCompactionsPerDrive()));
+    }
+
+    public static Map<FileStore, Long> perFileStore(Map<File, Long> perDirectory, Function<File, FileStore> filestoreMapper)
+    {
+        return perDirectory.entrySet()
+                           .stream()
+                           .collect(Collectors.toMap(entry -> filestoreMapper.apply(entry.getKey()),
+                                                     Map.Entry::getValue,
+                                                     Long::sum));
+    }
+
+    public Set<FileStore> allFileStores(Function<File, FileStore> filestoreMapper)
+    {
+        return Arrays.stream(getWriteableLocations())
+                     .map(this::getLocationForDisk)
+                     .map(filestoreMapper)
+                     .collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets the filestore for the actual directory where the sstables are stored.
+     * Handles the fact that an operator can symlink a table directory to a different filestore.
+     */
+    public static FileStore getFileStore(File directory)
+    {
+        try
+        {
+            return Files.getFileStore(directory.toPath());
+        }
+        catch (IOException e)
+        {
+            throw new FSReadError(e, directory);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         }
         return totalAvailable > expectedTotalWriteSize;
     }

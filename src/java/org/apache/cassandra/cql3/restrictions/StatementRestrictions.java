@@ -276,6 +276,19 @@ public final class StatementRestrictions
             validateSecondaryIndexSelections();
     }
 
+<<<<<<< HEAD
+=======
+    public boolean requiresAllowFilteringIfNotSpecified()
+    {
+        if (!table.isVirtual())
+            return true;
+
+        VirtualTable tableNullable = VirtualKeyspaceRegistry.instance.getTableNullable(table.id);
+        assert tableNullable != null;
+        return !tableNullable.allowFilteringImplicitly();
+    }
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private void addRestriction(Restriction restriction)
     {
         ColumnMetadata def = restriction.getFirstColumn();

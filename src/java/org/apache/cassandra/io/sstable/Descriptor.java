@@ -24,6 +24,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.Directories;
 import org.apache.cassandra.io.sstable.format.SSTableFormat;
 import org.apache.cassandra.io.sstable.format.Version;
@@ -32,6 +33,10 @@ import org.apache.cassandra.io.sstable.metadata.MetadataSerializer;
 import org.apache.cassandra.io.util.File;
 import org.apache.cassandra.utils.Pair;
 
+<<<<<<< HEAD
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import static org.apache.cassandra.io.sstable.Component.separator;
 import static org.apache.cassandra.utils.TimeUUID.Generator.nextTimeUUID;
 
@@ -60,7 +65,6 @@ public class Descriptor
     public final String ksname;
     public final String cfname;
     public final SSTableId id;
-    public final SSTableFormat.Type formatType;
     private final int hashCode;
 
     /**
@@ -69,35 +73,42 @@ public class Descriptor
     @VisibleForTesting
     public Descriptor(File directory, String ksname, String cfname, SSTableId id)
     {
-        this(SSTableFormat.Type.current().info.getLatestVersion(), directory, ksname, cfname, id, SSTableFormat.Type.current());
+        this(DatabaseDescriptor.getSelectedSSTableFormat().getLatestVersion(), directory, ksname, cfname, id);
     }
 
     /**
      * Constructor for sstable writers only.
      */
-    public Descriptor(File directory, String ksname, String cfname, SSTableId id, SSTableFormat.Type formatType)
+    public Descriptor(File directory, String ksname, String cfname, SSTableId id, SSTableFormat<?, ?> format)
     {
-        this(formatType.info.getLatestVersion(), directory, ksname, cfname, id, formatType);
+        this(format.getLatestVersion(), directory, ksname, cfname, id);
     }
 
     @VisibleForTesting
-    public Descriptor(String version, File directory, String ksname, String cfname, SSTableId id, SSTableFormat.Type formatType)
+    public Descriptor(String version, File directory, String ksname, String cfname, SSTableId id, SSTableFormat<?, ?> format)
     {
-        this(formatType.info.getVersion(version), directory, ksname, cfname, id, formatType);
+        this(format.getVersion(version), directory, ksname, cfname, id);
     }
 
-    public Descriptor(Version version, File directory, String ksname, String cfname, SSTableId id, SSTableFormat.Type formatType)
+    public Descriptor(Version version, File directory, String ksname, String cfname, SSTableId id)
     {
+<<<<<<< HEAD
         assert version != null && directory != null && ksname != null && cfname != null && formatType.info.getLatestVersion().getClass().equals(version.getClass());
+=======
+        checkNotNull(version);
+        checkNotNull(directory);
+        checkNotNull(ksname);
+        checkNotNull(cfname);
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         this.version = version;
         this.directory = directory.toCanonical();
         this.ksname = ksname;
         this.cfname = cfname;
         this.id = id;
-        this.formatType = formatType;
 
         // directory is unnecessary for hashCode, and for simulator consistency we do not include it
-        hashCode = Objects.hashCode(version, id, ksname, cfname, formatType);
+        hashCode = Objects.hashCode(version, id, ksname, cfname);
     }
 
     public String tmpFilenameFor(Component component)
@@ -137,7 +148,7 @@ public class Descriptor
     {
         buff.append(version).append(separator);
         buff.append(id.toString());
-        buff.append(separator).append(formatType.name);
+        buff.append(separator).append(version.format.name());
     }
 
     public String relativeFilenameFor(Component component)
@@ -155,7 +166,7 @@ public class Descriptor
 
     public SSTableFormat getFormat()
     {
-        return formatType.info;
+        return version.format;
     }
 
     /** Return any temporary files found in the directory */
@@ -216,6 +227,23 @@ public class Descriptor
         return fromFilenameWithComponent(file).left;
     }
 
+    public static Component componentFromFile(File file)
+    {
+        String name = file.name();
+        List<String> tokens = filenameTokens(name);
+
+        return Component.parse(tokens.get(3), formatFromName(name, tokens));
+    }
+
+    private static SSTableFormat<?, ?> formatFromName(String fileName, List<String> tokens)
+    {
+        String formatString = tokens.get(2);
+        SSTableFormat<?, ?> format = DatabaseDescriptor.getSSTableFormats().get(formatString);
+        if (format == null)
+            throw invalidSSTable(fileName, "unknown 'format' part (%s)", formatString);
+        return format;
+    }
+
     /**
      * Parse a sstable filename, extracting both the {@code Descriptor} and {@code Component} part.
      *
@@ -233,7 +261,69 @@ public class Descriptor
         if (!file.isAbsolute())
             file = file.toAbsolute();
 
+<<<<<<< HEAD
         String name = file.name();
+=======
+        SSTableInfo info = validateAndExtractInfo(file);
+        String name = file.name();
+
+        String keyspaceName = "";
+        String tableName = "";
+
+        Matcher sstableDirMatcher = SSTABLE_DIR_PATTERN.matcher(file.toString());
+
+        // Use pre-2.1 SSTable format if current one does not match it
+        if (!sstableDirMatcher.find(0))
+        {
+            sstableDirMatcher = LEGACY_SSTABLE_DIR_PATTERN.matcher(file.toString());
+        }
+
+        if (sstableDirMatcher.find(0))
+        {
+            keyspaceName = sstableDirMatcher.group("keyspace");
+            tableName = sstableDirMatcher.group("tableName");
+            String indexName = sstableDirMatcher.group("indexName");
+            if (indexName != null)
+            {
+                tableName = String.format("%s.%s", tableName, indexName);
+            }
+        }
+        else if (validateDirs)
+        {
+            logger.debug("Could not extract keyspace/table info from sstable directory {}", file.toString());
+            throw invalidSSTable(name, String.format("cannot extract keyspace and table name from %s; make sure the sstable is in the proper sub-directories", file));
+        }
+
+        return Pair.create(new Descriptor(info.version, parentOf(name, file), keyspaceName, tableName, info.id), info.component);
+    }
+
+    /**
+     * Parse a sstable filename, extracting both the {@code Descriptor} and {@code Component} part.
+     *
+     * @param file     the {@code File} object for the filename to parse.
+     * @param keyspace The keyspace name of the file. If <code>null</code>, then the keyspace name will be extracted
+     *                 from the directory path.
+     * @param table    The table name of the file. If <code>null</code>, then the table name will be extracted from the
+     *                 directory path.
+     * @return a pair of the descriptor and component corresponding to the provided {@code file}.
+     * @throws IllegalArgumentException if the provided {@code file} does point to a valid sstable filename. This could
+     *                                  mean either that the filename doesn't look like a sstable file, or that it is for an old and unsupported
+     *                                  versions.
+     */
+    public static Pair<Descriptor, Component> fromFileWithComponent(File file, String keyspace, String table)
+    {
+        if (null == keyspace || null == table)
+        {
+            return fromFileWithComponent(file);
+        }
+
+        SSTableInfo info = validateAndExtractInfo(file);
+        return Pair.create(new Descriptor(info.version, parentOf(file.name(), file), keyspace, table, info.id), info.component);
+    }
+
+    private static List<String> filenameTokens(String name)
+    {
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         List<String> tokens = filenameSplitter.splitToList(name);
         int size = tokens.size();
 
@@ -250,6 +340,13 @@ public class Descriptor
                                                                  tokens.get(size - 3)));
             throw new IllegalArgumentException(String.format("Invalid sstable file %s: the name doesn't look like a supported sstable file name", name));
         }
+        return tokens;
+    }
+
+    private static SSTableInfo validateAndExtractInfo(File file)
+    {
+        String name = file.name();
+        List<String> tokens = filenameTokens(name);
 
         String versionString = tokens.get(0);
         if (!Version.validate(versionString))
@@ -265,6 +362,7 @@ public class Descriptor
             throw invalidSSTable(name, "the 'id' part (%s) of the name doesn't parse as a valid unique identifier", tokens.get(1));
         }
 
+<<<<<<< HEAD
         String formatString = tokens.get(2);
         SSTableFormat.Type format;
         try
@@ -277,11 +375,16 @@ public class Descriptor
         }
 
         Component component = Component.parse(tokens.get(3));
+=======
+        SSTableFormat<?, ?> format = formatFromName(name, tokens);
+        Component component = Component.parse(tokens.get(3), format);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
-        Version version = format.info.getVersion(versionString);
+        Version version = format.getVersion(versionString);
         if (!version.isCompatible())
             throw invalidSSTable(name, "incompatible sstable version (%s); you should have run upgradesstables before upgrading", versionString);
 
+<<<<<<< HEAD
         File directory = parentOf(name, file);
         File tableDir = directory;
 
@@ -291,6 +394,22 @@ public class Descriptor
         {
             indexName = tableDir.name();
             tableDir = parentOf(name, tableDir);
+=======
+        return new SSTableInfo(version, id, component);
+    }
+
+    private static class SSTableInfo
+    {
+        final Version version;
+        final SSTableId id;
+        final Component component;
+
+        SSTableInfo(Version version, SSTableId id, Component component)
+        {
+            this.version = version;
+            this.id = id;
+            this.component = component;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         }
 
         // Then it can be a backup or a snapshot
@@ -336,6 +455,20 @@ public class Descriptor
         return version.isCompatible();
     }
 
+<<<<<<< HEAD
+=======
+    public Set<Component> discoverComponents()
+    {
+        Set<Component> components = Sets.newHashSetWithExpectedSize(Component.Type.all.size());
+        for (Component component : Component.getSingletonsFor(version.format))
+        {
+            if (fileFor(component).exists())
+                components.add(component);
+        }
+        return components;
+    }
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     @Override
     public String toString()
     {
@@ -354,8 +487,7 @@ public class Descriptor
                        && that.id.equals(this.id)
                        && that.ksname.equals(this.ksname)
                        && that.cfname.equals(this.cfname)
-                       && that.version.equals(this.version)
-                       && that.formatType == this.formatType;
+                       && that.version.equals(this.version);
     }
 
     @Override

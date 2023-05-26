@@ -72,14 +72,66 @@ public class Component
         }
 
         @VisibleForTesting
+<<<<<<< HEAD
         public static Type fromRepresentation(String repr)
+=======
+        public static Type fromRepresentation(String repr, SSTableFormat<?, ?> format)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         {
             for (Type type : TYPES)
             {
+<<<<<<< HEAD
                 if (type.repr != null && Pattern.matches(type.repr, repr))
                     return type;
             }
             return CUSTOM;
+=======
+                if (type.repr != null && Pattern.matches(type.repr, repr) && type.formatClass.isAssignableFrom(format.getClass()))
+                    return type;
+            }
+            return Types.CUSTOM;
+        }
+
+        public static Component createComponent(String repr, SSTableFormat<?, ?> format)
+        {
+            Type type = fromRepresentation(repr, format);
+            if (type.singleton != null)
+                return type.singleton;
+            else
+                return new Component(type, repr);
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Type type = (Type) o;
+            return id == type.id;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return id;
+        }
+
+        @Override
+        public String toString()
+        {
+            return name;
+        }
+
+        public Component getSingleton()
+        {
+            return Objects.requireNonNull(singleton);
+        }
+
+        public Component createComponent(String repr)
+        {
+            Preconditions.checkArgument(singleton == null);
+            return new Component(this, repr);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         }
     }
 
@@ -127,6 +179,7 @@ public class Component
      * @return the component corresponding to {@code name}. Note that this always return a component as an unrecognized
      * name is parsed into a CUSTOM component.
      */
+<<<<<<< HEAD
     public static Component parse(String name)
     {
         Type type = Type.fromRepresentation(name);
@@ -147,6 +200,26 @@ public class Component
             case CUSTOM:           return new Component(Type.CUSTOM, name);
             default:               throw new AssertionError();
         }
+=======
+    public static Component parse(String name, SSTableFormat<?, ?> format)
+    {
+        return Type.createComponent(name, format);
+    }
+
+    public static Iterable<Component> getSingletonsFor(SSTableFormat<?, ?> format)
+    {
+        return Iterables.transform(Iterables.filter(Type.all, t -> t.singleton != null && t.formatClass.isAssignableFrom(format.getClass())), t -> t.singleton);
+    }
+
+    public static Iterable<Component> getSingletonsFor(Class<? extends SSTableFormat<?, ?>> formatClass)
+    {
+        return Iterables.transform(Iterables.filter(Type.all, t -> t.singleton != null && t.formatClass.isAssignableFrom(formatClass)), t -> t.singleton);
+    }
+
+    public boolean isValidFor(Descriptor descriptor)
+    {
+        return type.formatClass.isAssignableFrom(descriptor.version.format.getClass());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     @Override

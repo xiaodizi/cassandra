@@ -35,8 +35,14 @@ public abstract class Version
 {
     private static final Pattern VALIDATION = Pattern.compile("[a-z]+");
 
+<<<<<<< HEAD
     protected final String version;
     protected final SSTableFormat format;
+=======
+    public final String version;
+    public final SSTableFormat<?, ?> format;
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     protected Version(SSTableFormat format, String version)
     {
         this.format = format;
@@ -68,6 +74,7 @@ public abstract class Version
 
     public abstract boolean hasAccurateMinMax();
 
+<<<<<<< HEAD
     public String getVersion()
     {
         return version;
@@ -77,6 +84,21 @@ public abstract class Version
     {
         return format;
     }
+=======
+    /**
+     * @deprecated it is replaced by {@link #hasImprovedMinMax()} since 'nc' and to be completetly removed since 'oa'
+     */
+    @Deprecated
+    public abstract boolean hasLegacyMinMax();
+
+    public abstract boolean hasOriginatingHostId();
+
+    public abstract boolean hasImprovedMinMax();
+
+    public abstract boolean hasPartitionLevelDeletionsPresenceMarker();
+
+    public abstract boolean hasKeyRange();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
     /**
      * @param ver SSTable version
@@ -97,23 +119,33 @@ public abstract class Version
         return version;
     }
 
+    public String toFormatAndVersionString()
+    {
+        return format.name() + '-' + version;
+    }
+
     @Override
     public boolean equals(Object o)
     {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
+<<<<<<< HEAD
         Version version1 = (Version) o;
 
         if (version != null ? !version.equals(version1.version) : version1.version != null) return false;
 
         return true;
+=======
+        Version otherVersion = (Version) other;
+        return Objects.equals(version, otherVersion.version) && Objects.equals(format.name(), otherVersion.format.name());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     @Override
     public int hashCode()
     {
-        return version != null ? version.hashCode() : 0;
+        return Objects.hash(version, format.name());
     }
 
     public abstract boolean hasOriginatingHostId();

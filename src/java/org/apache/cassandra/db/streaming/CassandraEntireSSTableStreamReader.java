@@ -174,7 +174,7 @@ public class CassandraEntireSSTableStreamReader implements IStreamReader
 
         LifecycleNewTracker lifecycleNewTracker = CassandraStreamReceiver.fromReceiver(session.getAggregator(tableId)).createLifecycleNewTracker();
 
-        Descriptor desc = cfs.newSSTableDescriptor(dataDir, header.version, header.format);
+        Descriptor desc = cfs.newSSTableDescriptor(dataDir, header.version);
 
         logger.debug("[Table #{}] {} Components to write: {}", cfs.metadata(), desc.filenameFor(Component.DATA), components);
 

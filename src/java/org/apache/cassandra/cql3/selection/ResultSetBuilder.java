@@ -44,6 +44,11 @@ public final class ResultSetBuilder
      */
     private final GroupMaker groupMaker;
 
+    /**
+     * Whether masked columns should be unmasked.
+     */
+    private final boolean unmask;
+
     /*
      * We'll build CQL3 row one by one.
      */
@@ -52,16 +57,17 @@ public final class ResultSetBuilder
     private long size = 0;
     private boolean sizeWarningEmitted = false;
 
-    public ResultSetBuilder(ResultMetadata metadata, Selectors selectors)
+    public ResultSetBuilder(ResultMetadata metadata, Selectors selectors, boolean unmask)
     {
-        this(metadata, selectors, null);
+        this(metadata, selectors, unmask, null);
     }
 
-    public ResultSetBuilder(ResultMetadata metadata, Selectors selectors, GroupMaker groupMaker)
+    public ResultSetBuilder(ResultMetadata metadata, Selectors selectors, boolean unmask, GroupMaker groupMaker)
     {
-        this.resultSet = new ResultSet(metadata.copy(), new ArrayList<List<ByteBuffer>>());
+        this.resultSet = new ResultSet(metadata.copy(), new ArrayList<>());
         this.selectors = selectors;
         this.groupMaker = groupMaker;
+        this.unmask = unmask;
     }
 
     private void addSize(List<ByteBuffer> row)
@@ -129,7 +135,15 @@ public final class ResultSetBuilder
         }
         else
         {
+<<<<<<< HEAD
             inputRow = new Selector.InputRow(selectors.numberOfFetchedColumns(), selectors.collectTimestamps(), selectors.collectTTLs());
+=======
+            inputRow = new Selector.InputRow(protocolVersion,
+                                             columns,
+                                             unmask,
+                                             selectors.collectWritetimes(),
+                                             selectors.collectTTLs());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         }
     }
 

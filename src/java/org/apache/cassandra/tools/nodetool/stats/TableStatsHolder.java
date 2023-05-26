@@ -119,6 +119,8 @@ public class TableStatsHolder implements StatsHolder
     private Map<String, Object> convertStatsTableToMap(StatsTable table)
     {
         Map<String, Object> mpTable = new HashMap<>();
+        mpTable.put("sstable_count", table.sstableCount);
+        mpTable.put("old_sstable_count", table.oldSSTableCount);
         mpTable.put("sstables_in_each_level", table.sstablesInEachLevel);
         mpTable.put("sstable_bytes_in_each_level", table.sstableBytesInEachLevel);
         mpTable.put("space_used_live", table.spaceUsedLive);
@@ -398,6 +400,14 @@ public class TableStatsHolder implements StatsHolder
         return df.format(new Date(millis));
     }
 
+<<<<<<< HEAD
+=======
+    private String millisToDuration(long millis)
+    {
+        return DurationFormatUtils.formatDurationWords(millis, true, true);
+    }
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /**
      * Sort and filter this TableStatHolder's tables as specified by its sortKey and top attributes.
      */

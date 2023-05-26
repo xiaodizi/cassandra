@@ -25,6 +25,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.metrics.CassandraMetricsRegistry.MetricName;
@@ -168,6 +169,11 @@ public class KeyspaceMetrics
     public final Meter rowIndexSizeAborts;
     public final Histogram rowIndexSize;
 
+<<<<<<< HEAD
+=======
+    public final ImmutableMap<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> formatSpecificGauges;
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public final MetricNameFactory factory;
     private Keyspace keyspace;
 
@@ -278,6 +284,27 @@ public class KeyspaceMetrics
         }
     }
 
+<<<<<<< HEAD
+=======
+    private ImmutableMap<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> createFormatSpecificGauges(Keyspace keyspace)
+    {
+        ImmutableMap.Builder<SSTableFormat<? ,?>, ImmutableMap<String, Gauge<? extends Number>>> builder = ImmutableMap.builder();
+        for (SSTableFormat<?, ?> format : DatabaseDescriptor.getSSTableFormats().values())
+        {
+            ImmutableMap.Builder<String, Gauge<? extends Number>> gauges = ImmutableMap.builder();
+            for (GaugeProvider<?> gaugeProvider : format.getFormatSpecificMetricsProviders().getGaugeProviders())
+            {
+                String finalName = gaugeProvider.name;
+                allMetrics.add(() -> releaseMetric(finalName));
+                Gauge<? extends Number> gauge = Metrics.register(factory.createMetricName(finalName), gaugeProvider.getKeyspaceGauge(keyspace));
+                gauges.put(gaugeProvider.name, gauge);
+            }
+            builder.put(format, gauges.build());
+        }
+        return builder.build();
+    }
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /**
      * Creates a gauge that will sum the current value of a metric for all column families in this keyspace
      * @param name

@@ -69,9 +69,9 @@ VALUES (3, -2147483648, '''''''', -9223372036854775808, 0x80, false,
 INSERT INTO has_all_types (num, intcol, asciicol, bigintcol, blobcol, booleancol,
                            decimalcol, doublecol, floatcol, smallintcol, textcol,
                            timestampcol, tinyintcol, uuidcol, varcharcol, varintcol)
-VALUES (4, blobAsInt(0x), '', blobAsBigint(0x), 0x, blobAsBoolean(0x),
-	blobAsDecimal(0x), blobAsDouble(0x), blobAsFloat(0x), blobAsSmallInt(0x0000), '',
-	blobAsTimestamp(0x), blobAsTinyInt(0x00), blobAsUuid(0x), '', blobAsVarint(0x));
+VALUES (4, blob_as_int(0x), '', blob_as_bigint(0x), 0x, blob_as_boolean(0x),
+	blob_as_decimal(0x), blob_as_double(0x), blob_as_float(0x), blob_as_smallInt(0x0000), '',
+	blob_as_timestamp(0x), blob_as_tinyint(0x00), blob_as_uuid(0x), '', blob_as_varint(0x));
 
 
 
@@ -141,13 +141,13 @@ CREATE TABLE ascii_with_special_chars (
 );
 
 -- "newline:\n"
-INSERT INTO ascii_with_special_chars (k, val) VALUES (0, blobAsAscii(0x6e65776c696e653a0a));
+INSERT INTO ascii_with_special_chars (k, val) VALUES (0, blob_as_ascii(0x6e65776c696e653a0a));
 -- "return\rand null\0!"
-INSERT INTO ascii_with_special_chars (k, val) VALUES (1, blobAsAscii(0x72657475726e0d616e64206e756c6c0021));
+INSERT INTO ascii_with_special_chars (k, val) VALUES (1, blob_as_ascii(0x72657475726e0d616e64206e756c6c0021));
 -- "\x00\x01\x02\x03\x04\x05control chars\x06\x07"
-INSERT INTO ascii_with_special_chars (k, val) VALUES (2, blobAsAscii(0x000102030405636f6e74726f6c2063686172730607));
+INSERT INTO ascii_with_special_chars (k, val) VALUES (2, blob_as_ascii(0x000102030405636f6e74726f6c2063686172730607));
 -- "fake special chars\\x00\\n"
-INSERT INTO ascii_with_special_chars (k, val) VALUES (3, blobAsAscii(0x66616b65207370656369616c2063686172735c7830305c6e));
+INSERT INTO ascii_with_special_chars (k, val) VALUES (3, blob_as_ascii(0x66616b65207370656369616c2063686172735c7830305c6e));
 
 
 
@@ -312,3 +312,21 @@ CREATE AGGREGATE aggMin(int)
     STYPE int
     INITCOND null;
 
+<<<<<<< HEAD
+=======
+CREATE TYPE quote_udt (
+    data text
+);
+
+CREATE TABLE escape_quotes (
+    id int PRIMARY KEY,
+    text_data text,
+    map_data map<int, text>,
+    set_data set<text>,
+    list_data list<text>,
+    tuple_data tuple<int, text>,
+    udt_data frozen<quote_udt>
+);
+
+INSERT INTO escape_quotes (id, text_data, map_data, set_data, list_data, tuple_data, udt_data) values(1, 'I''m newb', {1:'I''m newb'}, {'I''m newb'}, ['I''m newb'], (1, 'I''m newb'), {data: 'I''m newb'});
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

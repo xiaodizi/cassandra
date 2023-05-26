@@ -21,6 +21,7 @@ import org.apache.cassandra.utils.concurrent.Ref;
 
 public class AlwaysPresentFilter implements IFilter
 {
+<<<<<<< HEAD:src/java/org/apache/cassandra/utils/AlwaysPresentFilter.java
     public boolean isPresent(FilterKey key)
     {
         return true;
@@ -52,5 +53,14 @@ public class AlwaysPresentFilter implements IFilter
     public long offHeapSize()
     {
         return 0;
+=======
+    IndexSummary getIndexSummary();
+
+    T cloneWithNewSummarySamplingLevel(ColumnFamilyStore cfs, int newSamplingLevel) throws IOException;
+
+    static boolean isSupportedBy(SSTableFormat<?, ?> format)
+    {
+        return IndexSummarySupport.class.isAssignableFrom(format.getReaderFactory().getReaderClass());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:src/java/org/apache/cassandra/io/sstable/indexsummary/IndexSummarySupport.java
     }
 }

@@ -88,13 +88,14 @@ public class CompactionTask extends AbstractCompactionTask
         if (partialCompactionsAcceptable() && transaction.originals().size() > 1)
         {
             // Try again w/o the largest one.
-            logger.warn("insufficient space to compact all requested files. {}MiB required, {} for compaction {}",
+            SSTableReader removedSSTable = cfs.getMaxSizeFile(nonExpiredSSTables);
+            logger.warn("insufficient space to compact all requested files. {}MiB required, {} for compaction {} - removing largest SSTable: {}",
                         (float) expectedSize / 1024 / 1024,
                         StringUtils.join(transaction.originals(), ", "),
-                        transaction.opId());
+                        transaction.opId(),
+                        removedSSTable);
             // Note that we have removed files that are still marked as compacting.
             // This suboptimal but ok since the caller will unmark all the sstables at the end.
-            SSTableReader removedSSTable = cfs.getMaxSizeFile(nonExpiredSSTables);
             transaction.cancel(removedSSTable);
             return true;
         }
@@ -131,7 +132,16 @@ public class CompactionTask extends AbstractCompactionTask
             final Set<SSTableReader> fullyExpiredSSTables = controller.getFullyExpiredSSTables();
 
             // select SSTables to compact based on available disk space.
+<<<<<<< HEAD
             buildCompactionCandidatesForAvailableDiskSpace(fullyExpiredSSTables);
+=======
+            if (!buildCompactionCandidatesForAvailableDiskSpace(fullyExpiredSSTables, taskId))
+            {
+                // The set of sstables has changed (one or more were excluded due to limited available disk space).
+                // We need to recompute the overlaps between sstables.
+                controller.refreshOverlaps();
+            }
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
             // sanity check: all sstables must belong to the same cfs
             assert !Iterables.any(transaction.originals(), new Predicate<SSTableReader>()
@@ -350,15 +360,23 @@ public class CompactionTask extends AbstractCompactionTask
 
     /*
      * Checks if we have enough disk space to execute the compaction.  Drops the largest sstable out of the Task until
+<<<<<<< HEAD
      * there's enough space (in theory) to handle the compaction.  Does not take into account space that will be taken by
      * other compactions.
      */
     protected void buildCompactionCandidatesForAvailableDiskSpace(final Set<SSTableReader> fullyExpiredSSTables)
+=======
+     * there's enough space (in theory) to handle the compaction.
+     *
+     * @return true if there is enough disk space to execute the complete compaction, false if some sstables are excluded.
+     */
+    protected boolean buildCompactionCandidatesForAvailableDiskSpace(final Set<SSTableReader> fullyExpiredSSTables, TimeUUID taskId)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         if(!cfs.isCompactionDiskSpaceCheckEnabled() && compactionType == OperationType.COMPACTION)
         {
-            logger.info("Compaction space check is disabled");
-            return; // try to compact all SSTables
+            logger.info("Compaction space check is disabled - trying to compact all sstables");
+            return true;
         }
 
         final Set<SSTableReader> nonExpiredSSTables = Sets.difference(transaction.originals(), fullyExpiredSSTables);
@@ -371,7 +389,19 @@ public class CompactionTask extends AbstractCompactionTask
             long expectedWriteSize = cfs.getExpectedCompactedFileSize(nonExpiredSSTables, compactionType);
             long estimatedSSTables = Math.max(1, expectedWriteSize / strategy.getMaxSSTableBytes());
 
+<<<<<<< HEAD
             if(cfs.getDirectories().hasAvailableDiskSpace(estimatedSSTables, expectedWriteSize))
+=======
+                Map<File, Long> expectedWriteSize = CompactionManager.instance.active.estimatedRemainingWriteBytes();
+
+                // todo: abort streams if they block compactions
+                if (cfs.getDirectories().hasDiskSpaceForCompactionsAndStreams(expectedNewWriteSize, expectedWriteSize))
+                    break;
+            }
+            catch (Exception e)
+            {
+                logger.error("Could not check if there is enough disk space for compaction {}", taskId, e);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 break;
 
             if (!reduceScopeForLimitedSpace(nonExpiredSSTables, expectedWriteSize))
@@ -402,8 +432,13 @@ public class CompactionTask extends AbstractCompactionTask
         {
             CompactionManager.instance.incrementCompactionsReduced();
             CompactionManager.instance.incrementSstablesDropppedFromCompactions(sstablesRemoved);
+            return false;
         }
+<<<<<<< HEAD
 
+=======
+        return true;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     protected int getLevel()
