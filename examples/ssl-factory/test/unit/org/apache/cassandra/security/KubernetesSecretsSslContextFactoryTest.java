@@ -39,7 +39,10 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.cassandra.config.EncryptionOptions;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.apache.cassandra.io.util.File;
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
@@ -67,8 +70,12 @@ public class KubernetesSecretsSslContextFactoryTest
     private static void deleteFileIfExists(String file)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         Path filePath = Paths.get(file);
         boolean deleted = new File(filePath).toJavaIOFile().delete();
+=======
+        boolean deleted = new File(file).delete();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
         boolean deleted = new File(file).delete();
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

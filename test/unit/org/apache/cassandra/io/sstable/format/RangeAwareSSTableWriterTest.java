@@ -78,7 +78,11 @@ public class RangeAwareSSTableWriterTest
                                                                      0,
                                                                      null,
                                                                      false,
+<<<<<<< HEAD:test/unit/org/apache/cassandra/io/sstable/format/RangeAwareSSTableWriterTest.java
                                                                      SSTableFormat.Type.BIG,
+=======
+                                                                     DatabaseDescriptor.getSelectedSSTableFormat(),
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/RangeAwareSSTableWriterTest.java
                                                                      0,
                                                                      0,
                                                                      txn,

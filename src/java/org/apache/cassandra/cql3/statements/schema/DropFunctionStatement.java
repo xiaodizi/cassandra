@@ -119,8 +119,11 @@ public final class DropFunctionStatement extends AlterSchemaStatement
             throw ire("Function '%s' is still referenced by aggregates %s", name, dependentAggregates);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         return schema.withAddedOrUpdated(keyspace.withSwapped(keyspace.functions.without(function)));
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         String dependentTables = keyspace.tablesUsingFunction(function)
                                          .map(table -> table.name)
                                          .collect(joining(", "));

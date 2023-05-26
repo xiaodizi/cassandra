@@ -951,10 +951,13 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean, Memtable.Owner
                                                   keyspace.getName(),
                                                   name,
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                   sstableIdGenerator.get(),
                                                   format);
         assert !newDescriptor.fileFor(Component.DATA).exists();
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                                                   sstableIdGenerator.get());
         assert !newDescriptor.fileFor(Components.DATA).exists();
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

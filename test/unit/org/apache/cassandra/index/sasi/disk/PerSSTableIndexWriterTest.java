@@ -49,11 +49,15 @@ import org.apache.cassandra.schema.TableMetadata;
 import org.apache.cassandra.schema.Tables;
 import org.apache.cassandra.utils.ByteBufferUtil;
 
+<<<<<<< HEAD
 import com.google.common.util.concurrent.Futures;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+=======
+import static org.apache.cassandra.config.CassandraRelevantProperties.CASSANDRA_CONFIG;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
 public class PerSSTableIndexWriterTest extends SchemaLoader
 {
@@ -63,7 +67,7 @@ public class PerSSTableIndexWriterTest extends SchemaLoader
     @BeforeClass
     public static void loadSchema() throws ConfigurationException
     {
-        System.setProperty("cassandra.config", "cassandra-murmur.yaml");
+        CASSANDRA_CONFIG.setString("cassandra-murmur.yaml");
         SchemaLoader.loadSchema();
         SchemaTestUtil.announceNewKeyspace(KeyspaceMetadata.create(KS_NAME,
                                                                    KeyspaceParams.simpleTransient(1),

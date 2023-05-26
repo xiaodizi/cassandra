@@ -180,7 +180,11 @@ public class CassandraStreamHeader
             if (header.isEntireSSTable)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 ComponentManifest.serializer.serialize(header.componentManifest, out, version);
+=======
+                ComponentManifest.serializers.get(header.version.format.name()).serialize(header.componentManifest, out, version);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
                 ComponentManifest.serializers.get(header.version.format.name()).serialize(header.componentManifest, out, version);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -211,6 +215,9 @@ public class CassandraStreamHeader
             SSTableFormat<?, ?> format = Objects.requireNonNull(DatabaseDescriptor.getSSTableFormats().get(formatName),
                                                                 String.format("Unknown SSTable format '%s'", formatName));
             Version sstableVersion = format.getVersion(sstableVersionString);
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
             long estimatedKeys = in.readLong();
@@ -231,7 +238,11 @@ public class CassandraStreamHeader
             if (isEntireSSTable)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 manifest = ComponentManifest.serializer.deserialize(in, version);
+=======
+                manifest = ComponentManifest.serializers.get(format.name()).deserialize(in, version);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
                 manifest = ComponentManifest.serializers.get(format.name()).deserialize(in, version);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -280,7 +291,11 @@ public class CassandraStreamHeader
             if (header.isEntireSSTable)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 size += ComponentManifest.serializer.serializedSize(header.componentManifest, version);
+=======
+                size += ComponentManifest.serializers.get(header.version.format.name()).serializedSize(header.componentManifest, version);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
                 size += ComponentManifest.serializers.get(header.version.format.name()).serializedSize(header.componentManifest, version);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

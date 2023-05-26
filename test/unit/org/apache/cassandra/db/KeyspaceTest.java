@@ -54,7 +54,7 @@ public class KeyspaceTest extends CQLTester
     }
 
     @Override
-    protected UntypedResultSet execute(String query, Object... values) throws Throwable
+    protected UntypedResultSet execute(String query, Object... values)
     {
         return executeFormattedQuery(formatQuery(KEYSPACE_PER_TEST, query), values);
     }

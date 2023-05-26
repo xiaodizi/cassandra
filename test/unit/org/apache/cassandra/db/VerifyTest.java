@@ -50,8 +50,11 @@ import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.WriteTimeoutException;
 import org.apache.cassandra.io.FSWriteError;
+<<<<<<< HEAD:test/unit/org/apache/cassandra/db/VerifyTest.java
 import org.apache.cassandra.io.sstable.Component;
 import org.apache.cassandra.io.sstable.CorruptSSTableException;
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/VerifyTest.java
 import org.apache.cassandra.io.sstable.format.SSTableReader;
 import org.apache.cassandra.io.util.File;
 import org.apache.cassandra.io.util.FileInputStreamPlus;
@@ -532,7 +535,12 @@ public class VerifyTest
     @Test
     public void testVerifyBf() throws IOException
     {
+<<<<<<< HEAD:test/unit/org/apache/cassandra/db/VerifyTest.java
         testBrokenComponentHelper(Component.FILTER);
+=======
+        Assume.assumeTrue(SSTableReaderWithFilter.class.isAssignableFrom(DatabaseDescriptor.getSelectedSSTableFormat().getReaderFactory().getReaderClass()));
+        testBrokenComponentHelper(Components.FILTER);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/VerifyTest.java
     }
 
     @Test

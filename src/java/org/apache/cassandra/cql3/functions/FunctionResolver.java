@@ -97,6 +97,34 @@ public final class FunctionResolver
                                UserFunctions functions)
     throws InvalidRequestException
     {
+<<<<<<< HEAD
+        Collection<Function> candidates = collectCandidates(keyspace, name, receiverKeyspace, receiverTable, providedArgs, receiverType, functions);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
+        return get(keyspace, name, providedArgs, receiverKeyspace, receiverTable, receiverType, UserFunctions.none());
+    }
+
+    /**
+     * @param keyspace the current keyspace
+     * @param name the name of the function
+     * @param providedArgs the arguments provided for the function call
+     * @param receiverKeyspace the receiver's keyspace
+     * @param receiverTable the receiver's table
+     * @param receiverType if the receiver type is known (during inserts, for example), this should be the type of
+     *                     the receiver
+     * @param functions a set of user functions that is not yet available in the schema, used during startup when those
+     *                  functions might not be yet available
+     */
+    @Nullable
+    public static Function get(String keyspace,
+                               FunctionName name,
+                               List<? extends AssignmentTestable> providedArgs,
+                               String receiverKeyspace,
+                               String receiverTable,
+                               AbstractType<?> receiverType,
+                               UserFunctions functions)
+    throws InvalidRequestException
+    {
         Collection<Function> candidates = collectCandidates(keyspace, name, receiverKeyspace, receiverTable, providedArgs, receiverType, functions);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
@@ -126,6 +154,9 @@ public final class FunctionResolver
                                                           List<? extends AssignmentTestable> providedArgs,
                                                           AbstractType<?> receiverType,
                                                           UserFunctions functions)
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         Collection<Function> candidates = new ArrayList<>();
@@ -159,9 +190,12 @@ public final class FunctionResolver
         else
         {
             // function name is fully qualified (keyspace + name)
+<<<<<<< HEAD
             candidates.addAll(Schema.instance.getFunctions(name));
 =======
             // function name is fully qualified (keyspace + name)
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             candidates.addAll(functions.get(name));
             candidates.addAll(Schema.instance.getUserFunctions(name));
             candidates.addAll(NativeFunctions.instance.getFunctions(name));

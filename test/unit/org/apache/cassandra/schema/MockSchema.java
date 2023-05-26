@@ -143,12 +143,23 @@ public class MockSchema
 
     public static SSTableReader sstable(int generation, int size, boolean keepRef, long firstToken, long lastToken, int level, int minLocalDeletionTime, long timestamp, ColumnFamilyStore cfs)
     {
+<<<<<<< HEAD
         Descriptor descriptor = new Descriptor(cfs.getDirectories().getDirectoryForNewSSTables(),
                                                cfs.keyspace.getName(),
                                                cfs.getTableName(),
                                                sstableId(generation), SSTableFormat.Type.BIG);
         Set<Component> components = ImmutableSet.of(Component.DATA, Component.PRIMARY_INDEX, Component.FILTER, Component.TOC);
         for (Component component : components)
+=======
+        SSTableFormat<?, ?> format = DatabaseDescriptor.getSelectedSSTableFormat();
+        Descriptor descriptor = new Descriptor(cfs.getDirectories().getDirectoryForNewSSTables(),
+                                               cfs.keyspace.getName(),
+                                               cfs.getTableName(),
+                                               sstableId(generation),
+                                               format);
+
+        if (BigFormat.is(format))
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         {
             File file = new File(descriptor.filenameFor(component));
             file.createFileIfNotExists();

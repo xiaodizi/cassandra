@@ -68,6 +68,10 @@ public class SerializationHeaderTest
     @Test
     public void testWrittenAsDifferentKind() throws Exception
     {
+<<<<<<< HEAD
+=======
+        SSTableFormat<?, ?> format = DatabaseDescriptor.getSelectedSSTableFormat();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         final String tableName = "testWrittenAsDifferentKind";
 //        final String schemaCqlWithStatic = String.format("CREATE TABLE %s (k int, c int, v int static, PRIMARY KEY(k, c))", tableName);
 //        final String schemaCqlWithRegular = String.format("CREATE TABLE %s (k int, c int, v int, PRIMARY KEY(k, c))", tableName);
@@ -92,7 +96,11 @@ public class SerializationHeaderTest
         try
         {
             BiFunction<TableMetadata, Function<ByteBuffer, Clustering<?>>, Callable<Descriptor>> writer = (schema, clusteringFunction) -> () -> {
+<<<<<<< HEAD
                 Descriptor descriptor = new Descriptor(BigFormat.latestVersion, dir, schema.keyspace, schema.name, id.get(), SSTableFormat.Type.BIG);
+=======
+                Descriptor descriptor = new Descriptor(format.getLatestVersion(), dir, schema.keyspace, schema.name, id.get());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
                 SerializationHeader header = SerializationHeader.makeWithoutStats(schema);
                 try (LifecycleTransaction txn = LifecycleTransaction.offline(OperationType.WRITE);

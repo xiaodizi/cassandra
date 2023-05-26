@@ -49,6 +49,7 @@ import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.CassandraVersion;
 import org.apache.cassandra.utils.FBUtilities;
 
+import static org.apache.cassandra.config.CassandraRelevantProperties.GOSSIP_DISABLE_THREAD_VALIDATION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -59,7 +60,7 @@ public class GossiperTest
 {
     static
     {
-        System.setProperty(Gossiper.Props.DISABLE_THREAD_VALIDATION, "true");
+        GOSSIP_DISABLE_THREAD_VALIDATION.setBoolean(true);
         DatabaseDescriptor.daemonInitialization();
         CommitLog.instance.start();
     }

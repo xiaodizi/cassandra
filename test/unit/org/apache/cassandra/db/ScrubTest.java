@@ -90,6 +90,8 @@ import static org.apache.cassandra.SchemaLoader.createKeyspace;
 import static org.apache.cassandra.SchemaLoader.getCompressionParameters;
 import static org.apache.cassandra.SchemaLoader.loadSchema;
 import static org.apache.cassandra.SchemaLoader.standardCFMD;
+import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_INVALID_LEGACY_SSTABLE_ROOT;
+import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_UTIL_ALLOW_TOOL_REINIT_FOR_TEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -99,7 +101,11 @@ import static org.junit.Assume.assumeTrue;
 
 public class ScrubTest
 {
+<<<<<<< HEAD:test/unit/org/apache/cassandra/db/ScrubTest.java
     public static final String INVALID_LEGACY_SSTABLE_ROOT_PROP = "invalid-legacy-sstable-root";
+=======
+    private final static Logger logger = LoggerFactory.getLogger(ScrubTest.class);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/ScrubTest.java
 
     public static final String CF = "Standard1";
     public static final String COUNTER_CF = "Counter1";
@@ -140,13 +146,13 @@ public class ScrubTest
         keyspace = Keyspace.open(ksName);
 
         CompactionManager.instance.disableAutoCompaction();
-        System.setProperty(org.apache.cassandra.tools.Util.ALLOW_TOOL_REINIT_FOR_TEST, "true"); // Necessary for testing
+        TEST_UTIL_ALLOW_TOOL_REINIT_FOR_TEST.setBoolean(true);
     }
 
     @AfterClass
     public static void clearClassEnv()
     {
-        System.clearProperty(org.apache.cassandra.tools.Util.ALLOW_TOOL_REINIT_FOR_TEST);
+        TEST_UTIL_ALLOW_TOOL_REINIT_FOR_TEST.clearValue();
     }
 
     @Test
@@ -734,7 +740,7 @@ public class ScrubTest
 
             ColumnFamilyStore cfs = keyspace.getColumnFamilyStore("cf_with_duplicates_3_0");
 
-            Path legacySSTableRoot = Paths.get(System.getProperty(INVALID_LEGACY_SSTABLE_ROOT_PROP),
+            Path legacySSTableRoot = Paths.get(TEST_INVALID_LEGACY_SSTABLE_ROOT.getString(),
                                                "Keyspace1",
                                                "cf_with_duplicates_3_0");
 

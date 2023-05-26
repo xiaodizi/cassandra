@@ -46,6 +46,9 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.Timer;
 import org.apache.cassandra.config.DatabaseDescriptor;
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
@@ -287,7 +290,10 @@ public class TableMetrics
     public final TableHistogram rowIndexSize;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public final ImmutableMap<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> formatSpecificGauges;
 
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -1019,7 +1025,10 @@ public class TableMetrics
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private ImmutableMap<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> createFormatSpecificGauges(ColumnFamilyStore cfs)
     {
         ImmutableMap.Builder<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> builder = ImmutableMap.builder();

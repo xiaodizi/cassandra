@@ -49,7 +49,10 @@ import org.apache.cassandra.security.SSLFactory;
 import org.apache.cassandra.transport.messages.StartupMessage;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_UNSAFE_VERBOSE_DEBUG_CLIENT_PROTOCOL;
 import static org.apache.cassandra.net.SocketFactory.newSslHandler;
 

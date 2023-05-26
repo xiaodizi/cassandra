@@ -49,6 +49,10 @@ import org.apache.cassandra.dht.Range;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.index.Index;
 import org.apache.cassandra.io.FSReadError;
+<<<<<<< HEAD
+=======
+import org.apache.cassandra.io.sstable.format.CompressionInfoComponent;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.sstable.format.SSTableReader;
 import org.apache.cassandra.io.util.FileDataInput;
 import org.apache.cassandra.io.util.MmappedRegions;
@@ -307,6 +311,10 @@ public class SSTableReaderTest
     @Test
     public void testGetPositionsKeyCacheStats()
     {
+<<<<<<< HEAD
+=======
+        Assume.assumeTrue(KeyCacheSupport.isSupportedBy(DatabaseDescriptor.getSelectedSSTableFormat()));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         ColumnFamilyStore store = discardSSTables(KEYSPACE1, CF_STANDARD2);
         partitioner = store.getPartitioner();
         CacheService.instance.keyCache.setCapacity(1000);
@@ -608,6 +616,10 @@ public class SSTableReaderTest
     @Test
     public void testIndexSummaryReplacement() throws IOException, ExecutionException, InterruptedException
     {
+<<<<<<< HEAD
+=======
+        assumeTrue(IndexSummarySupport.isSupportedBy(DatabaseDescriptor.getSelectedSSTableFormat()));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         ColumnFamilyStore store = discardSSTables(KEYSPACE1, CF_STANDARD_LOW_INDEX_INTERVAL); // index interval of 8, no key caching
 
         final int NUM_PARTITIONS = 512;
@@ -670,6 +682,10 @@ public class SSTableReaderTest
     @Test
     public void testIndexSummaryUpsampleAndReload() throws Exception
     {
+<<<<<<< HEAD
+=======
+        assumeTrue(IndexSummarySupport.isSupportedBy(DatabaseDescriptor.getSelectedSSTableFormat()));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         int originalMaxSegmentSize = MmappedRegions.MAX_SEGMENT_SIZE;
         MmappedRegions.MAX_SEGMENT_SIZE = 40; // each index entry is ~11 bytes, so this will generate lots of segments
 

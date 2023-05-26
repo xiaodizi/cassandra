@@ -57,6 +57,13 @@ import org.apache.commons.lang3.StringUtils;
 public final class CastFcts
 {
     private static final String FUNCTION_NAME_PREFIX = "cast_as_";
+<<<<<<< HEAD
+=======
+
+    // Until 5.0 we have used camel cased names for cast functions. That changed with CASSANDRA-18037, where we decided
+    // to adopt snake case for all native function names. However, we should still support the old came case names.
+    private static final String LEGACY_FUNCTION_NAME_PREFIX = "castAs";
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
     // Until 5.0 we have used camel cased names for cast functions. That changed with CASSANDRA-18037, where we decided
     // to adopt snake case for all native function names. However, we should still support the old came case names.
@@ -189,9 +196,15 @@ public final class CastFcts
 
     @SuppressWarnings("unchecked")
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static <O, I> Function wrapJavaFunction(AbstractType<I> inputType,
                                                     AbstractType<O> outputType,
                                                     java.util.function.Function<I, O> converter)
+=======
+    private static <O, I> CastFunction<?, O> wrapJavaFunction(AbstractType<I> inputType,
+                                                              AbstractType<O> outputType,
+                                                              java.util.function.Function<I, O> converter)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
     private static <O, I> CastFunction<?, O> wrapJavaFunction(AbstractType<I> inputType,
                                                               AbstractType<O> outputType,

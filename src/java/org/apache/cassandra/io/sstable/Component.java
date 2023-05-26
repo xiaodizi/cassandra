@@ -73,7 +73,11 @@ public class Component
 
         @VisibleForTesting
 <<<<<<< HEAD
+<<<<<<< HEAD
         public static Type fromRepresentation(String repr)
+=======
+        public static Type fromRepresentation(String repr, SSTableFormat<?, ?> format)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
         public static Type fromRepresentation(String repr, SSTableFormat<?, ?> format)
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -81,11 +85,14 @@ public class Component
             for (Type type : TYPES)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 if (type.repr != null && Pattern.matches(type.repr, repr))
                     return type;
             }
             return CUSTOM;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 if (type.repr != null && Pattern.matches(type.repr, repr) && type.formatClass.isAssignableFrom(format.getClass()))
                     return type;
             }
@@ -180,6 +187,7 @@ public class Component
      * name is parsed into a CUSTOM component.
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     public static Component parse(String name)
     {
         Type type = Type.fromRepresentation(name);
@@ -203,6 +211,10 @@ public class Component
 =======
     public static Component parse(String name, SSTableFormat<?, ?> format)
     {
+=======
+    public static Component parse(String name, SSTableFormat<?, ?> format)
+    {
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         return Type.createComponent(name, format);
     }
 
@@ -219,6 +231,9 @@ public class Component
     public boolean isValidFor(Descriptor descriptor)
     {
         return type.formatClass.isAssignableFrom(descriptor.version.format.getClass());
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 

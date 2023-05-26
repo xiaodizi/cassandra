@@ -206,6 +206,9 @@ Deprecation
     - The config property `compaction_large_partition_warning_threshold` has been deprecated in favour of the new
       guardrail for partition size. That guardrail is based on the properties `partition_size_warn_threshold` and
       `partition_size_fail_threshold`. The warn threshold has a very similar behaviour to the old config property.
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
 4.1

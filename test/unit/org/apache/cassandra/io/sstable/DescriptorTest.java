@@ -28,7 +28,12 @@ import org.junit.Test;
 
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.Directories;
+<<<<<<< HEAD
 import org.apache.cassandra.io.sstable.format.SSTableFormat;
+=======
+import org.apache.cassandra.io.sstable.format.SSTableFormat.Components;
+import org.apache.cassandra.io.util.File;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.util.FileUtils;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.Pair;
@@ -84,12 +89,20 @@ public class DescriptorTest
 
     private void testFromFilenameFor(File dir)
     {
+<<<<<<< HEAD
         checkFromFilename(new Descriptor(dir, ksname, cfname, new SequenceBasedSSTableId(1), SSTableFormat.Type.BIG));
+=======
+        checkFromFilename(new Descriptor(dir, ksname, cfname, new SequenceBasedSSTableId(1), DatabaseDescriptor.getSelectedSSTableFormat()));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         // secondary index
         String idxName = "myidx";
         File idxDir = new File(dir.absolutePath() + File.pathSeparator() + Directories.SECONDARY_INDEX_NAME_SEPARATOR + idxName);
+<<<<<<< HEAD
         checkFromFilename(new Descriptor(idxDir, ksname, cfname + Directories.SECONDARY_INDEX_NAME_SEPARATOR + idxName, new SequenceBasedSSTableId(4), SSTableFormat.Type.BIG));
+=======
+        checkFromFilename(new Descriptor(idxDir, ksname, cfname + Directories.SECONDARY_INDEX_NAME_SEPARATOR + idxName, new SequenceBasedSSTableId(4), DatabaseDescriptor.getSelectedSSTableFormat()));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     private void checkFromFilename(Descriptor original)
@@ -112,8 +125,13 @@ public class DescriptorTest
     {
         // Descriptor should be equal when parent directory points to the same directory
         File dir = new File(".");
+<<<<<<< HEAD
         Descriptor desc1 = new Descriptor(dir, "ks", "cf", new SequenceBasedSSTableId(1), SSTableFormat.Type.BIG);
         Descriptor desc2 = new Descriptor(dir.toAbsolute(), "ks", "cf", new SequenceBasedSSTableId(1), SSTableFormat.Type.BIG);
+=======
+        Descriptor desc1 = new Descriptor(dir, "ks", "cf", new SequenceBasedSSTableId(1), DatabaseDescriptor.getSelectedSSTableFormat());
+        Descriptor desc2 = new Descriptor(dir.toAbsolute(), "ks", "cf", new SequenceBasedSSTableId(1), DatabaseDescriptor.getSelectedSSTableFormat());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         assertEquals(desc1, desc2);
         assertEquals(desc1.hashCode(), desc2.hashCode());
     }
@@ -121,11 +139,19 @@ public class DescriptorTest
     @Test
     public void validateNames()
     {
+<<<<<<< HEAD
         String[] names = {
              "ma-1-big-Data.db",
              // 2ndary index
              ".idx1" + File.pathSeparator() + "ma-1-big-Data.db",
         };
+=======
+        String name = DatabaseDescriptor.getSelectedSSTableFormat().name();
+        String[] fileNames = { "ma-1-" + name + "-Data.db",
+                               // 2ndary index
+                               ".idx1" + File.pathSeparator() + "ma-1-" + name + "-Data.db",
+                               };
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         for (String name : names)
         {

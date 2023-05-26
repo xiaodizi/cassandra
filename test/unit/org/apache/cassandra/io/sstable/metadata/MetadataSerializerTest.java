@@ -52,6 +52,10 @@ public class MetadataSerializerTest
     public static void initDD()
     {
         DatabaseDescriptor.daemonInitialization();
+<<<<<<< HEAD
+=======
+        format = DatabaseDescriptor.getSelectedSSTableFormat();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     @Test
@@ -60,9 +64,15 @@ public class MetadataSerializerTest
         Map<MetadataType, MetadataComponent> originalMetadata = constructMetadata();
 
         MetadataSerializer serializer = new MetadataSerializer();
+<<<<<<< HEAD
         File statsFile = serialize(originalMetadata, serializer, BigFormat.latestVersion);
 
         Descriptor desc = new Descriptor(statsFile.parent(), "", "", new SequenceBasedSSTableId(0), SSTableFormat.Type.BIG);
+=======
+        File statsFile = serialize(originalMetadata, serializer, DatabaseDescriptor.getSelectedSSTableFormat().getLatestVersion());
+
+        Descriptor desc = new Descriptor(statsFile.parent(), "", "", new SequenceBasedSSTableId(0), DatabaseDescriptor.getSelectedSSTableFormat());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         try (RandomAccessReader in = RandomAccessReader.open(statsFile))
         {
             Map<MetadataType, MetadataComponent> deserialized = serializer.deserialize(desc, in, EnumSet.allOf(MetadataType.class));
@@ -88,8 +98,13 @@ public class MetadataSerializerTest
 
         // Serialize w/ overflowed histograms:
         MetadataSerializer serializer = new MetadataSerializer();
+<<<<<<< HEAD
         File statsFile = serialize(originalMetadata, serializer, BigFormat.latestVersion);
         Descriptor desc = new Descriptor(statsFile.parent(), "", "", new SequenceBasedSSTableId(0), SSTableFormat.Type.BIG);
+=======
+        File statsFile = serialize(originalMetadata, serializer, format.getLatestVersion());
+        Descriptor desc = new Descriptor(statsFile.parent(), "", "", new SequenceBasedSSTableId(0), format);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         try (RandomAccessReader in = RandomAccessReader.open(statsFile))
         {
@@ -153,8 +168,19 @@ public class MetadataSerializerTest
     @Test
     public void testMVersions() throws Throwable
     {
+<<<<<<< HEAD
         testVersions("ma", "mb", "mc", "md", "me");
     }
+=======
+        Map<Character, List<String>> supportedVersions = new LinkedHashMap<>();
+        for (char major = 'a'; major <= 'z'; major++){
+            for (char minor = 'a'; minor <= 'z'; minor++){
+                Version version = format.getVersion(String.format("%s%s", major, minor));
+                if (version.isCompatible())
+                    supportedVersions.computeIfAbsent(major, ignored -> new ArrayList<>()).add(version.version);
+            }
+        }
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
     @Test
     public void testNVersions() throws Throwable
@@ -171,8 +197,12 @@ public class MetadataSerializerTest
         File statsFileLb = serialize(originalMetadata, serializer, BigFormat.instance.getVersion(newV));
         File statsFileLa = serialize(originalMetadata, serializer, BigFormat.instance.getVersion(oldV));
         // Reading both as earlier version should yield identical results.
+<<<<<<< HEAD
         SSTableFormat.Type stype = SSTableFormat.Type.current();
         Descriptor desc = new Descriptor(stype.info.getVersion(oldV), statsFileLb.parent(), "", "", new SequenceBasedSSTableId(0), stype);
+=======
+        Descriptor desc = new Descriptor(format.getVersion(oldV), statsFileLb.parent(), "", "", new SequenceBasedSSTableId(0));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         try (RandomAccessReader inLb = RandomAccessReader.open(statsFileLb);
              RandomAccessReader inLa = RandomAccessReader.open(statsFileLa))
         {
@@ -192,14 +222,80 @@ public class MetadataSerializerTest
     @Test
     public void pendingRepairCompatibility()
     {
+<<<<<<< HEAD
         Arrays.asList("ma", "mb", "mc", "md", "me").forEach(v -> assertFalse(BigFormat.instance.getVersion(v).hasPendingRepair()));
         Arrays.asList("na", "nb").forEach(v -> assertTrue(BigFormat.instance.getVersion(v).hasPendingRepair()));
+=======
+        if (BigFormat.is(format))
+        {
+            Arrays.asList("ma", "mb", "mc", "md", "me").forEach(v -> assertFalse(format.getVersion(v).hasPendingRepair()));
+            Arrays.asList("na", "nb", "nc").forEach(v -> assertTrue(format.getVersion(v).hasPendingRepair()));
+        }
+        else
+        {
+            throw Util.testMustBeImplementedForSSTableFormat();
+        }
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     @Test
     public void originatingHostCompatibility()
     {
+<<<<<<< HEAD
         Arrays.asList("ma", "mb", "mc", "md", "na").forEach(v -> assertFalse(BigFormat.instance.getVersion(v).hasOriginatingHostId()));
         Arrays.asList("me", "nb").forEach(v -> assertTrue(BigFormat.instance.getVersion(v).hasOriginatingHostId()));
+=======
+        if (BigFormat.is(format))
+        {
+            Arrays.asList("ma", "mb", "mc", "md", "na").forEach(v -> assertFalse(format.getVersion(v).hasOriginatingHostId()));
+            Arrays.asList("me", "nb").forEach(v -> assertTrue(format.getVersion(v).hasOriginatingHostId()));
+        }
+        else
+        {
+            throw Util.testMustBeImplementedForSSTableFormat();
+        }
+    }
+
+    @Test
+    public void improvedMinMaxCompatibility()
+    {
+        if (BigFormat.is(format))
+        {
+            Arrays.asList("ma", "mb", "mc", "md", "me", "na", "nb").forEach(v -> assertFalse(BigFormat.getInstance().getVersion(v).hasImprovedMinMax()));
+            Arrays.asList("nc", "oa").forEach(v -> assertTrue(BigFormat.getInstance().getVersion(v).hasImprovedMinMax()));
+        }
+        else
+        {
+            throw Util.testMustBeImplementedForSSTableFormat();
+        }
+    }
+
+    @Test
+    public void legacyMinMaxCompatiblity()
+    {
+        if (BigFormat.is(format))
+        {
+            Arrays.asList("oa").forEach(v -> assertFalse(BigFormat.getInstance().getVersion(v).hasLegacyMinMax()));
+            Arrays.asList("ma", "mb", "mc", "md", "me", "na", "nb", "nc").forEach(v -> assertTrue(BigFormat.getInstance().getVersion(v).hasLegacyMinMax()));
+        }
+        else
+        {
+            throw Util.testMustBeImplementedForSSTableFormat();
+        }
+    }
+
+    @Test
+    public void partitionLevelDeletionPresenceMarkerCompatibility()
+    {
+        if (BigFormat.is(format))
+        {
+            Arrays.asList("ma", "mb", "mc", "md", "me", "na", "nb").forEach(v -> assertFalse(BigFormat.getInstance().getVersion(v).hasPartitionLevelDeletionsPresenceMarker()));
+            Arrays.asList("nc", "oa").forEach(v -> assertTrue(BigFormat.getInstance().getVersion(v).hasPartitionLevelDeletionsPresenceMarker()));
+        }
+        else
+        {
+            throw Util.testMustBeImplementedForSSTableFormat();
+        }
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 }

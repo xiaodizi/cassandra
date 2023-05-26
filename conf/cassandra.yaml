@@ -1330,8 +1330,11 @@ server_encryption_options:
   # Set to a valid keystore if internode_encryption is dc, rack or all
   keystore: conf/.keystore
 <<<<<<< HEAD
+<<<<<<< HEAD
   keystore_password: cassandra
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
   #keystore_password: cassandra
   # Configure the way Cassandra creates SSL contexts.
   # To use PEM-based key material, see org.apache.cassandra.security.PEMBasedSslContextFactory
@@ -1746,6 +1749,9 @@ drop_compact_storage_enabled: false
 # minimum_timestamp_warn_threshold:
 # minimum_timestamp_fail_threshold:
 #
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 # Guardrail to allow/disallow GROUP BY functionality.
 # group_by_enabled: true
@@ -1775,6 +1781,15 @@ drop_compact_storage_enabled: false
 # write_consistency_levels_disallowed: []
 <<<<<<< HEAD
 =======
+#
+# Guardrail to warn or fail when writing partitions larger than threshold, expressed as 100MiB, 1GiB, etc.
+# The guardrail is only checked when writing sstables (flush and compaction), and exceeding the fail threshold on that
+# moment will only log an error message, without interrupting the operation.
+# This operates on a per-sstable basis, so it won't detect a large partition if it is spread across multiple sstables.
+# The warning threshold replaces the deprecated config property compaction_large_partition_warning_threshold.
+# The two thresholds default to null to disable.
+# partition_size_warn_threshold:
+# partition_size_fail_threshold:
 #
 # Guardrail to warn or fail when writing partitions larger than threshold, expressed as 100MiB, 1GiB, etc.
 # The guardrail is only checked when writing sstables (flush and compaction), and exceeding the fail threshold on that
@@ -1880,6 +1895,7 @@ drop_compact_storage_enabled: false
 #    excluded_tables: # comma separated list of keyspace.table pairs to exclude from the check
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 # es 节点 列表
 # es_node_list: http://ip1:9200,http://ip2:9200,http://ip3:9200
@@ -1889,6 +1905,8 @@ es_node_list:
 # 配置例子：keyspace名字.表名
 sync_es_table:
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 # The sstable formats configuration. SSTable formats implementations are loaded using the service loader mechanism.
 # In this section, one can select the format for created sstables and pass additional parameters for the formats
 # available on the classpath.
@@ -1898,4 +1916,7 @@ sync_es_table:
 #    big:
 #      param1: value1
 #      ...
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

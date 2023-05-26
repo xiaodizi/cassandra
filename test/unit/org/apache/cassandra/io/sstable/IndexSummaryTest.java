@@ -39,8 +39,12 @@ import org.apache.cassandra.io.util.FileUtils;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.Pair;
 
+<<<<<<< HEAD:test/unit/org/apache/cassandra/io/sstable/IndexSummaryTest.java
 import static org.apache.cassandra.io.sstable.IndexSummaryBuilder.downsample;
 import static org.apache.cassandra.io.sstable.IndexSummaryBuilder.entriesAtSamplingLevel;
+=======
+import static org.apache.cassandra.config.CassandraRelevantEnv.CIRCLECI;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/indexsummary/IndexSummaryTest.java
 import static org.apache.cassandra.io.sstable.Downsampling.BASE_SAMPLING_LEVEL;
 import static org.apache.cassandra.utils.Clock.Global.nanoTime;
 import static org.junit.Assert.*;
@@ -73,7 +77,7 @@ public class IndexSummaryTest
     public void testIndexSummaryKeySizes() throws IOException
     {
         // On Circle CI we normally don't have enough off-heap memory for this test so ignore it
-        Assume.assumeTrue(System.getenv("CIRCLECI") == null);
+        Assume.assumeTrue(CIRCLECI.getString() == null);
 
         testIndexSummaryProperties(32, 100);
         testIndexSummaryProperties(64, 100);
@@ -120,7 +124,7 @@ public class IndexSummaryTest
     public void testLargeIndexSummary() throws IOException
     {
         // On Circle CI we normally don't have enough off-heap memory for this test so ignore it
-        Assume.assumeTrue(System.getenv("CIRCLECI") == null);
+        Assume.assumeTrue(CIRCLECI.getString() == null);
 
         final int numKeys = 1000000;
         final int keySize = 3000;
@@ -154,7 +158,7 @@ public class IndexSummaryTest
     public void testLargeIndexSummaryWithExpectedSizeMatching() throws IOException
     {
         // On Circle CI we normally don't have enough off-heap memory for this test so ignore it
-        Assume.assumeTrue(System.getenv("CIRCLECI") == null);
+        Assume.assumeTrue(CIRCLECI.getString() == null);
 
         final int numKeys = 1000000;
         final int keySize = 3000;

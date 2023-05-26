@@ -92,7 +92,11 @@ public class LeveledCompactionStrategyTest
     public static void defineSchema() throws ConfigurationException
     {
         // Disable tombstone histogram rounding for tests
+<<<<<<< HEAD
         System.setProperty("cassandra.streaminghistogram.roundseconds", "1");
+=======
+        CassandraRelevantProperties.STREAMING_HISTOGRAM_ROUND_SECONDS.setInt(1);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         SchemaLoader.prepareServer();
 

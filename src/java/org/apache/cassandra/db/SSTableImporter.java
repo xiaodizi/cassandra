@@ -41,7 +41,10 @@ import org.apache.cassandra.io.sstable.format.SSTableReader;
 import org.apache.cassandra.io.sstable.format.SSTableWriter;
 import org.apache.cassandra.service.ActiveRepairService;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.OutputHandler;
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -106,7 +109,11 @@ public class SSTableImporter
                             if (dir != null)
                             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 logger.error("Failed verifying sstable {} in directory {}", descriptor, dir, t);
+=======
+                                logger.error("[{}] Failed verifying SSTable {} in directory {}", importID, descriptor, dir, t);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
                                 logger.error("[{}] Failed verifying SSTable {} in directory {}", importID, descriptor, dir, t);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -115,8 +122,13 @@ public class SSTableImporter
                             else
                             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 logger.error("Failed verifying sstable {}", descriptor, t);
                                 throw new RuntimeException("Failed verifying sstable "+descriptor, t);
+=======
+                                logger.error("[{}] Failed verifying SSTable {}", importID, descriptor, t);
+                                throw new RuntimeException("Failed verifying SSTable " + descriptor, t);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
                                 logger.error("[{}] Failed verifying SSTable {}", importID, descriptor, t);
                                 throw new RuntimeException("Failed verifying SSTable " + descriptor, t);
@@ -177,8 +189,13 @@ public class SSTableImporter
                     else
                     {
 <<<<<<< HEAD
+<<<<<<< HEAD
                         logger.error("Failed importing sstables from data directory - renamed sstables are: {}", movedSSTables);
                         throw new RuntimeException("Failed importing sstables", t);
+=======
+                        logger.error("[{}] Failed importing sstables from data directory - renamed SSTables are: {}", importID, movedSSTables, t);
+                        throw new RuntimeException("Failed importing SSTables", t);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
                         logger.error("[{}] Failed importing sstables from data directory - renamed SSTables are: {}", importID, movedSSTables, t);
                         throw new RuntimeException("Failed importing SSTables", t);
@@ -218,7 +235,10 @@ public class SSTableImporter
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /**
      * Check the state of this node and throws an {@link InterruptedException} if it is currently draining
      *

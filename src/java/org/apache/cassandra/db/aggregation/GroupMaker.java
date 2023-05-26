@@ -168,6 +168,10 @@ public abstract class GroupMaker
             super(comparator, clusteringPrefixSize, state);
             this.selector = selector;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            this.input = new Selector.InputRow(ProtocolVersion.CURRENT, columns, false);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
             this.input = new Selector.InputRow(ProtocolVersion.CURRENT, columns, false);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -182,6 +186,10 @@ public abstract class GroupMaker
             super(comparator, clusteringPrefixSize);
             this.selector = selector;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            this.input = new Selector.InputRow(ProtocolVersion.CURRENT, columns, false);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
             this.input = new Selector.InputRow(ProtocolVersion.CURRENT, columns, false);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

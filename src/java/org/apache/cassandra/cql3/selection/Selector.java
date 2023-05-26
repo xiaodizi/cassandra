@@ -303,6 +303,7 @@ public abstract class Selector
         private int index;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         public InputRow(int size, boolean collectTimestamps, boolean collectTTLs)
         {
             this.values = new ByteBuffer[size];
@@ -320,6 +321,10 @@ public abstract class Selector
 =======
         public InputRow(ProtocolVersion protocolVersion, List<ColumnMetadata> columns, boolean unmask)
         {
+=======
+        public InputRow(ProtocolVersion protocolVersion, List<ColumnMetadata> columns, boolean unmask)
+        {
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             this(protocolVersion, columns, unmask, false, false);
         }
 
@@ -346,6 +351,11 @@ public abstract class Selector
             {
                 ttls = null;
             }
+        }
+
+        public boolean unmask()
+        {
+            return unmask;
         }
 
         public boolean unmask()

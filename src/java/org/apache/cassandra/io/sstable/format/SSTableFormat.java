@@ -18,6 +18,7 @@
 package org.apache.cassandra.io.sstable.format;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.google.common.base.CharMatcher;
 
 import org.apache.cassandra.schema.TableMetadata;
@@ -25,6 +26,8 @@ import org.apache.cassandra.db.RowIndexEntry;
 import org.apache.cassandra.db.SerializationHeader;
 import org.apache.cassandra.io.sstable.format.big.BigFormat;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -54,9 +57,12 @@ import org.apache.cassandra.utils.Pair;
 public interface SSTableFormat
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     static boolean enableSSTableDevelopmentTestMode = Boolean.getBoolean("cassandra.test.sstableformatdevelopment");
 
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     String name();
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
@@ -264,6 +270,9 @@ public interface SSTableFormat
          * @param options    overrides for the default options, can be empty, cannot be null
          */
         SSTableFormat<?, ?> getInstance(@Nonnull Map<String, String> options);
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 }

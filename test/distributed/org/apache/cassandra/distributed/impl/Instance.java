@@ -25,6 +25,7 @@ import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +45,11 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 
 import com.google.common.annotations.VisibleForTesting;
+<<<<<<< HEAD
 
+=======
+import com.google.common.util.concurrent.Uninterruptibles;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +156,11 @@ import org.apache.cassandra.utils.progress.jmx.JMXBroadcastExecutor;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.apache.cassandra.concurrent.ExecutorFactory.Global.executorFactory;
+import static org.apache.cassandra.config.CassandraRelevantProperties.CONSISTENT_RANGE_MOVEMENT;
+import static org.apache.cassandra.config.CassandraRelevantProperties.CONSISTENT_SIMULTANEOUS_MOVES_ALLOW;
+import static org.apache.cassandra.config.CassandraRelevantProperties.RING_DELAY;
+import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_CASSANDRA_SUITENAME;
+import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_CASSANDRA_TESTTAG;
 import static org.apache.cassandra.distributed.api.Feature.BLANK_GOSSIP;
 import static org.apache.cassandra.distributed.api.Feature.GOSSIP;
 import static org.apache.cassandra.distributed.api.Feature.NATIVE_PROTOCOL;
@@ -216,14 +226,14 @@ public class Instance extends IsolatedExecutor implements IInvokableInstance
     {
         // the path used is defined by test/conf/logback-dtest.xml and looks like the following
         // ./build/test/logs/${cassandra.testtag}/${suitename}/${cluster_id}/${instance_id}/system.log
-        String tag = System.getProperty("cassandra.testtag", "cassandra.testtag_IS_UNDEFINED");
-        String suite = System.getProperty("suitename", "suitename_IS_UNDEFINED");
+        String tag = TEST_CASSANDRA_TESTTAG.getString();
+        String suite = TEST_CASSANDRA_SUITENAME.getString();
         String clusterId = ClusterIDDefiner.getId();
         String instanceId = InstanceIDDefiner.getInstanceId();
-        File f = new File(String.format("build/test/logs/%s/%s/%s/%s/system.log", tag, suite, clusterId, instanceId));
+        File f = new File(FileSystems.getDefault(), String.format("build/test/logs/%s/%s/%s/%s/system.log", tag, suite, clusterId, instanceId));
         // when creating a cluster globally in a test class we get the logs without the suite, try finding those logs:
         if (!f.exists())
-            f = new File(String.format("build/test/logs/%s/%s/%s/system.log", tag, clusterId, instanceId));
+            f = new File(FileSystems.getDefault(), String.format("build/test/logs/%s/%s/%s/system.log", tag, clusterId, instanceId));
         if (!f.exists())
             throw new AssertionError("Unable to locate system.log under " + new File("build/test/logs").absolutePath() + "; make sure ICluster.setup() is called or extend TestBaseImpl and do not define a static beforeClass function with @BeforeClass");
         return new FileLogAction(f);
@@ -508,7 +518,14 @@ public class Instance extends IsolatedExecutor implements IInvokableInstance
             }
             else
             {
-                header.verb.stage.executor().execute(ExecutorLocals.create(state), () -> MessagingService.instance().inboundSink.accept(messageIn));
+                ExecutorPlus executor = header.verb.stage.executor();
+                if (executor.isShutdown())
+                {
+                    MessagingService.instance().metrics.recordDroppedMessage(messageIn, messageIn.elapsedSinceCreated(TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
+                    inInstancelogger.warn("Dropping message {} due to stage {} being shutdown", messageIn, header.verb.stage);
+                    return;
+                }
+                executor.execute(ExecutorLocals.create(state), () -> MessagingService.instance().inboundSink.accept(messageIn));
             }
         };
     }
@@ -578,9 +595,9 @@ public class Instance extends IsolatedExecutor implements IInvokableInstance
                 if (config.has(GOSSIP))
                 {
                     // TODO: hacky
-                    System.setProperty("cassandra.ring_delay_ms", "15000");
-                    System.setProperty("cassandra.consistent.rangemovement", "false");
-                    System.setProperty("cassandra.consistent.simultaneousmoves.allow", "true");
+                    RING_DELAY.setLong(15000);
+                    CONSISTENT_RANGE_MOVEMENT.setBoolean(false);
+                    CONSISTENT_SIMULTANEOUS_MOVES_ALLOW.setBoolean(true);
                 }
 
                 mkdirs();
@@ -599,7 +616,7 @@ public class Instance extends IsolatedExecutor implements IInvokableInstance
 
                 // We need to persist this as soon as possible after startup checks.
                 // This should be the first write to SystemKeyspace (CASSANDRA-11742)
-                SystemKeyspace.persistLocalMetadata();
+                SystemKeyspace.persistLocalMetadata(config::hostId);
                 SystemKeyspaceMigrator41.migrate();
 
                 // Same order to populate tokenMetadata for the first time,
@@ -797,6 +814,7 @@ public class Instance extends IsolatedExecutor implements IInvokableInstance
     @Override
     public Future<Void> shutdown(boolean graceful)
     {
+        inInstancelogger.info("Shutting down instance {} / {}", config.num(), config.broadcastAddress().getHostString());
         Future<?> future = async((ExecutorService executor) -> {
             Throwable error = null;
 
@@ -810,6 +828,11 @@ public class Instance extends IsolatedExecutor implements IInvokableInstance
             }
 
             error = parallelRun(error, executor, StorageService.instance::disableAutoCompaction);
+            while (CompactionManager.instance.hasOngoingOrPendingTasks() && !Thread.currentThread().isInterrupted())
+            {
+                inInstancelogger.info("Waiting for compactions to finish");
+                Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+            }
 
             // trigger init early or else it could try to init and touch a thread pool that got shutdown
             HintsService hints = HintsService.instance;

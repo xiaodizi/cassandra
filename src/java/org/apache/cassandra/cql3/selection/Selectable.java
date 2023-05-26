@@ -282,7 +282,11 @@ public interface Selectable extends AssignmentTestable
             public WritetimeOrTTL prepare(TableMetadata table)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 return new WritetimeOrTTL(id.prepare(table), isWritetime);
+=======
+                return new WritetimeOrTTL((ColumnMetadata) column.prepare(table), selected.prepare(table), kind);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
                 return new WritetimeOrTTL((ColumnMetadata) column.prepare(table), selected.prepare(table), kind);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

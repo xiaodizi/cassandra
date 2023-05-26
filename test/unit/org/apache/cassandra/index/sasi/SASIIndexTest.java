@@ -101,6 +101,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import org.junit.*;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.cassandra.config.CassandraRelevantProperties.CASSANDRA_CONFIG;
 import static org.apache.cassandra.db.ColumnFamilyStoreTest.getSnapshotManifestAndSchemaFileSizes;
 
 public class SASIIndexTest
@@ -108,7 +109,7 @@ public class SASIIndexTest
     private static final IPartitioner PARTITIONER;
 
     static {
-        System.setProperty("cassandra.config", "cassandra-murmur.yaml");
+        CASSANDRA_CONFIG.setString("cassandra-murmur.yaml");
         PARTITIONER = Murmur3Partitioner.instance;
     }
 
@@ -192,7 +193,7 @@ public class SASIIndexTest
                                                             sstable.getKeyspaceName(),
                                                             sstable.getColumnFamilyName(),
                                                             sstable.descriptor.id,
-                                                            sstable.descriptor.formatType);
+                                                            sstable.descriptor.version.format);
 
                 Set<Component> components = snapshotSSTables.get(snapshotSSTable);
 
@@ -201,8 +202,13 @@ public class SASIIndexTest
 
                 for (Component c : components)
                 {
+<<<<<<< HEAD
                     long componentSize = Files.size(Paths.get(snapshotSSTable.filenameFor(c)));
                     if (Component.Type.fromRepresentation(c.name) == Component.Type.SECONDARY_INDEX)
+=======
+                    long componentSize = snapshotSSTable.fileFor(c).length();
+                    if (Component.Type.fromRepresentation(c.name, sstable.descriptor.version.format) == Components.Types.SECONDARY_INDEX)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                         indexSize += componentSize;
                     else
                         tableSize += componentSize;

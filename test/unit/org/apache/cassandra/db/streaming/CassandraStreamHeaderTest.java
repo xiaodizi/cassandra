@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import org.apache.cassandra.SchemaLoader;
 import org.apache.cassandra.Util;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.cql3.statements.schema.CreateTableStatement;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.DecoratedKey;
@@ -39,7 +40,11 @@ import org.apache.cassandra.dht.Murmur3Partitioner;
 import org.apache.cassandra.dht.Range;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.io.sstable.Component;
+<<<<<<< HEAD
 import org.apache.cassandra.io.sstable.format.SSTableFormat;
+=======
+import org.apache.cassandra.io.sstable.format.SSTableFormat.Components;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.sstable.format.SSTableReader;
 import org.apache.cassandra.io.sstable.format.big.BigFormat;
 import org.apache.cassandra.io.util.DataInputPlus;
@@ -145,8 +150,12 @@ public class CassandraStreamHeaderTest
         ComponentManifest componentManifest = entireSSTable ? ComponentManifest.create(sstable.descriptor) : null;
         DecoratedKey firstKey = entireSSTable ? sstable.first : null;
         return CassandraStreamHeader.builder()
+<<<<<<< HEAD
                                     .withSSTableFormat(SSTableFormat.Type.BIG)
                                     .withSSTableVersion(BigFormat.latestVersion)
+=======
+                                    .withSSTableVersion(sstable.descriptor.version)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                                     .withSSTableLevel(0)
                                     .withEstimatedKeys(10)
                                     .withCompressionInfo(compressionInfo)
@@ -166,8 +175,12 @@ public class CassandraStreamHeaderTest
         TableMetadata metadata = CreateTableStatement.parse(ddl, "ks").build();
         CassandraStreamHeader header =
             CassandraStreamHeader.builder()
+<<<<<<< HEAD
                                  .withSSTableFormat(SSTableFormat.Type.BIG)
                                  .withSSTableVersion(BigFormat.latestVersion)
+=======
+                                 .withSSTableVersion(DatabaseDescriptor.getSelectedSSTableFormat().getLatestVersion())
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                                  .withSSTableLevel(0)
                                  .withEstimatedKeys(0)
                                  .withSections(Collections.emptyList())
@@ -188,8 +201,12 @@ public class CassandraStreamHeaderTest
 
         CassandraStreamHeader header =
             CassandraStreamHeader.builder()
+<<<<<<< HEAD
                                  .withSSTableFormat(SSTableFormat.Type.BIG)
                                  .withSSTableVersion(BigFormat.latestVersion)
+=======
+                                 .withSSTableVersion(DatabaseDescriptor.getSelectedSSTableFormat().getLatestVersion())
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                                  .withSSTableLevel(0)
                                  .withEstimatedKeys(0)
                                  .withSections(Collections.emptyList())

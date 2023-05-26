@@ -33,6 +33,11 @@ import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.index.Index;
+<<<<<<< HEAD
+=======
+import org.apache.cassandra.io.sstable.filter.BloomFilterMetrics;
+import org.apache.cassandra.io.sstable.keycache.KeyCacheSupport;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.metrics.CacheMetrics;
 import org.apache.cassandra.metrics.CassandraMetricsRegistry;
 import org.apache.cassandra.schema.CachingParams;
@@ -98,6 +103,10 @@ public class KeyCacheCqlTest extends CQLTester
     {
         CachingParams.DEFAULT = CachingParams.CACHE_NOTHING;
         CQLTester.setUpClass();
+<<<<<<< HEAD
+=======
+        sstableImplCachesKeys = KeyCacheSupport.isSupportedBy(DatabaseDescriptor.getSelectedSSTableFormat());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     /**
@@ -115,7 +124,7 @@ public class KeyCacheCqlTest extends CQLTester
     }
 
     @Override
-    protected UntypedResultSet execute(String query, Object... values) throws Throwable
+    protected UntypedResultSet execute(String query, Object... values)
     {
         return executeFormattedQuery(formatQuery(KEYSPACE_PER_TEST, query), values);
     }
@@ -614,6 +623,13 @@ public class KeyCacheCqlTest extends CQLTester
 
     private long recentBloomFilterFalsePositives()
     {
+<<<<<<< HEAD
         return getCurrentColumnFamilyStore(KEYSPACE_PER_TEST).metric.recentBloomFilterFalsePositives.getValue();
+=======
+        return getCurrentColumnFamilyStore(KEYSPACE_PER_TEST).metric.formatSpecificGauges.get(DatabaseDescriptor.getSelectedSSTableFormat())
+                                                                                         .get(BloomFilterMetrics.instance.recentBloomFilterFalsePositives.name)
+                                                                                         .getValue()
+                                                                                         .longValue();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 }

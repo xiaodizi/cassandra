@@ -24,9 +24,19 @@ import org.junit.Test;
 
 public class StreamFailureLogsFailureDueToSessionFailedTest extends AbstractStreamFailureLogs
 {
+<<<<<<<< HEAD:test/distributed/org/apache/cassandra/distributed/test/streaming/StreamFailureLogsFailureDueToSessionFailedTest.java
     @Test
     public void failureDueToSessionFailed() throws IOException
     {
         streamTest(true,"Remote peer /127.0.0.2:7012 failed stream session", 1);
+========
+    IndexSummary getIndexSummary();
+
+    T cloneWithNewSummarySamplingLevel(ColumnFamilyStore cfs, int newSamplingLevel) throws IOException;
+
+    static boolean isSupportedBy(SSTableFormat<?, ?> format)
+    {
+        return IndexSummarySupport.class.isAssignableFrom(format.getReaderFactory().getReaderClass());
+>>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:src/java/org/apache/cassandra/io/sstable/indexsummary/IndexSummarySupport.java
     }
 }

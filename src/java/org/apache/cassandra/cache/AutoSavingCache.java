@@ -229,9 +229,12 @@ public class AutoSavingCache<K extends CacheKey, V> extends InstrumentingCache<K
             try
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 logger.info("reading saved cache {}", dataPath);
                 in = new DataInputStreamPlus(new LengthAvailableInputStream(new BufferedInputStream(streamFactory.getInputStream(dataPath, crcPath)), dataPath.length()));
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 logger.info("Reading saved cache: {}, {}, {}", dataPath, crcPath, metadataPath);
                 try (FileInputStreamPlus metadataIn = metadataPath.newInputStream())
                 {

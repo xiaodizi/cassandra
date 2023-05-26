@@ -107,9 +107,12 @@ import org.apache.cassandra.gms.*;
 import org.apache.cassandra.hints.HintsService;
 import org.apache.cassandra.io.sstable.SSTableLoader;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.apache.cassandra.io.sstable.format.SSTableFormat;
 import org.apache.cassandra.io.sstable.format.VersionAndType;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.sstable.format.Version;
 import org.apache.cassandra.io.util.File;
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -1323,6 +1326,9 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
     public void rebuild(String sourceDc, String keyspace, String tokens, String specificSources, boolean excludeLocalDatacenterNodes)
     {
         try
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         {
             // check ongoing rebuild
@@ -1332,7 +1338,10 @@ public class StorageService extends NotificationBroadcasterSupport implements IE
             }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             // fail if source DC is local and --exclude-local-dc is set
             if (sourceDc != null && sourceDc.equals(DatabaseDescriptor.getLocalDataCenter()) && excludeLocalDatacenterNodes)
             {

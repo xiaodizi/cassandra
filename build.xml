@@ -1947,6 +1947,7 @@
         </java>
     </target>
 
+<<<<<<< HEAD
     <target name="init-checkstyle" depends="resolver-retrieve-build,build-project" unless="no-checkstyle">
         <echo message="checkstyle.version=${checkstyle.version}"/>
         <!-- Sevntu custom checks are retrieved by Ivy into lib folder
@@ -1959,6 +1960,20 @@
         <property name="checkstyle.log.dir" value="${build.dir}/checkstyle" />
         <property name="checkstyle.report.file" value="${checkstyle.log.dir}/checkstyle_report.xml"/>
         <mkdir  dir="${checkstyle.log.dir}" />
+=======
+  <target name="init-checkstyle" depends="resolver-retrieve-build,build-project" unless="no-checkstyle">
+      <echo message="checkstyle.version=${checkstyle.version}"/>
+      <!-- Sevntu custom checks are retrieved by Ivy into lib folder
+         and will be accessible to checkstyle-->
+      <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+               classpathref="checkstyle.classpath"/>
+  </target>
+
+  <target name="checkstyle" depends="init-checkstyle,build-project" description="Run custom checkstyle code analysis" unless="no-checkstyle">
+      <property name="checkstyle.log.dir" value="${build.dir}/checkstyle" />
+      <property name="checkstyle.report.file" value="${checkstyle.log.dir}/checkstyle_report.xml"/>
+      <mkdir  dir="${checkstyle.log.dir}" />
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         <property name="checkstyle.properties" value="${basedir}/checkstyle.xml" />
         <property name="checkstyle.suppressions" value="${basedir}/checkstyle_suppressions.xml" />
@@ -1971,10 +1986,17 @@
         </checkstyle>
     </target>
 
+<<<<<<< HEAD
     <target name="checkstyle-test" depends="init-checkstyle,resolver-retrieve-build,build-project" description="Run custom checkstyle code analysis on tests" unless="no-checkstyle">
         <property name="checkstyle.log.dir" value="${build.dir}/checkstyle" />
         <property name="checkstyle_test.report.file" value="${checkstyle.log.dir}/checkstyle_report_test.xml"/>
         <mkdir  dir="${checkstyle.log.dir}" />
+=======
+  <target name="checkstyle-test" depends="init-checkstyle,resolver-retrieve-build,build-project" description="Run custom checkstyle code analysis on tests" unless="no-checkstyle">
+      <property name="checkstyle.log.dir" value="${build.dir}/checkstyle" />
+      <property name="checkstyle_test.report.file" value="${checkstyle.log.dir}/checkstyle_report_test.xml"/>
+      <mkdir  dir="${checkstyle.log.dir}" />
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         <property name="checkstyle_test.properties" value="${basedir}/checkstyle_test.xml" />
         <property name="checkstyle.suppressions" value="${basedir}/checkstyle_suppressions.xml" />

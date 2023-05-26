@@ -141,8 +141,11 @@ public final class SimpleSelector extends Selector
         {
             isSet = true;
 <<<<<<< HEAD
+<<<<<<< HEAD
             current = input.getValue(idx);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             writetimes = input.getWritetimes(idx);
             ttls = input.getTtls(idx);
 
@@ -155,6 +158,9 @@ public final class SimpleSelector extends Selector
             ColumnMask mask = useForPostOrdering || input.unmask() ? null : column.getMask();
             ByteBuffer value = input.getValue(idx);
             current = mask == null ? value : mask.mask(input.getProtocolVersion(), value);
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         }
     }

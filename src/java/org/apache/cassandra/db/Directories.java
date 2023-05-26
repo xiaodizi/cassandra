@@ -513,6 +513,9 @@ public class Directories
      */
     public boolean hasDiskSpaceForCompactionsAndStreams(Map<File, Long> expectedNewWriteSizes,
                                                         Map<File, Long> totalCompactionWriteRemaining)
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         long writeSize = expectedTotalWriteSize / estimatedSSTables;

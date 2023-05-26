@@ -22,7 +22,11 @@ import java.util.Collection;
 import java.util.List;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.google.common.collect.ImmutableList;
+=======
+import org.apache.commons.lang3.StringUtils;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 import org.apache.commons.lang3.StringUtils;
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -44,6 +48,7 @@ public abstract class TimeFcts
 
     public static Collection<Function> all()
     {
+<<<<<<< HEAD
 <<<<<<< HEAD
         return ImmutableList.of(now("now", TimeUUIDType.instance),
                                 now("currenttimeuuid", TimeUUIDType.instance),
@@ -72,6 +77,8 @@ public abstract class TimeFcts
 
     public static final Function now(final String name, final TemporalType<?> type)
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         functions.addAll(new NowFunction("now", TimeUUIDType.instance),
                          new NowFunction("current_timeuuid", TimeUUIDType.instance),
                          new NowFunction("current_timestamp", TimestampType.instance),
@@ -96,6 +103,9 @@ public abstract class TimeFcts
     }
 
     private static class NowFunction extends NativeScalarFunction
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         private final TemporalType<?> type;
@@ -113,8 +123,11 @@ public abstract class TimeFcts
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public static final Function minTimeuuidFct = new NativeScalarFunction("mintimeuuid", TimeUUIDType.instance, TimestampType.instance)
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         @Override
         public boolean isPure()
         {
@@ -132,6 +145,9 @@ public abstract class TimeFcts
     public static final NativeFunction minTimeuuidFct = new MinTimeuuidFunction(false);
 
     private static final class MinTimeuuidFunction extends NativeScalarFunction
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         public MinTimeuuidFunction(boolean legacy)
@@ -150,8 +166,11 @@ public abstract class TimeFcts
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public static final Function maxTimeuuidFct = new NativeScalarFunction("maxtimeuuid", TimeUUIDType.instance, TimestampType.instance)
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         @Override
         public NativeFunction withLegacyName()
         {
@@ -162,6 +181,9 @@ public abstract class TimeFcts
     public static final NativeFunction maxTimeuuidFct = new MaxTimeuuidFunction(false);
 
     private static final class MaxTimeuuidFunction extends NativeScalarFunction
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         public MaxTimeuuidFunction(boolean legacy)
@@ -180,6 +202,7 @@ public abstract class TimeFcts
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     /**
      * Function that convert a value of <code>TIMEUUID</code> into a value of type <code>TIMESTAMP</code>.
      * @deprecated Replaced by the {@link #toTimestamp} function
@@ -194,12 +217,17 @@ public abstract class TimeFcts
         @Override
         public NativeFunction withLegacyName()
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
+        @Override
+        public NativeFunction withLegacyName()
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         {
             return new MaxTimeuuidFunction(true);
         }
     }
 
     /**
+<<<<<<< HEAD
 <<<<<<< HEAD
      * Function that convert a value of type <code>TIMEUUID</code> into an UNIX timestamp.
      * @deprecated Replaced by the {@link #toUnixTimestamp} function
@@ -282,6 +310,10 @@ public abstract class TimeFcts
 
     /**
      * Creates a function that convert a value of the specified type into an UNIX timestamp.
+=======
+     * Creates a function that converts a value of the specified type into a {@code DATE}.
+     *
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
      * Creates a function that converts a value of the specified type into a {@code DATE}.
      *

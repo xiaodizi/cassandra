@@ -99,6 +99,10 @@ import static org.apache.cassandra.net.Verb.GOSSIP_DIGEST_SYN;
 import static org.apache.cassandra.utils.Clock.Global.currentTimeMillis;
 import static org.apache.cassandra.utils.Clock.Global.nanoTime;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import static org.apache.cassandra.utils.FBUtilities.getBroadcastAddressAndPort;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 import static org.apache.cassandra.utils.FBUtilities.getBroadcastAddressAndPort;
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

@@ -170,7 +170,10 @@ public class KeyspaceMetrics
     public final Histogram rowIndexSize;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public final ImmutableMap<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> formatSpecificGauges;
 
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -285,7 +288,10 @@ public class KeyspaceMetrics
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private ImmutableMap<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> createFormatSpecificGauges(Keyspace keyspace)
     {
         ImmutableMap.Builder<SSTableFormat<? ,?>, ImmutableMap<String, Gauge<? extends Number>>> builder = ImmutableMap.builder();

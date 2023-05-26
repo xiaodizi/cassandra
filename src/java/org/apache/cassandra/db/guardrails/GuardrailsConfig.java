@@ -219,7 +219,10 @@ public interface GuardrailsConfig
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
      * @return The threshold to warn when writing partitions larger than threshold.
      */
     @Nullable
@@ -393,5 +396,8 @@ public interface GuardrailsConfig
      */
     void setMinimumTimestampThreshold(@Nullable DurationSpec.LongMicrosecondsBound warn,
                                       @Nullable DurationSpec.LongMicrosecondsBound fail);
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 }

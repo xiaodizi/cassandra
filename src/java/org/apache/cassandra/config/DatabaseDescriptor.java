@@ -28,6 +28,9 @@ import java.nio.file.FileStore;
 <<<<<<< HEAD
 =======
 import java.nio.file.Path;
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +48,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.ServiceLoader;
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import java.util.Set;
 import java.util.UUID;
@@ -57,12 +63,18 @@ import javax.annotation.Nullable;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.google.common.collect.ImmutableSet;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -98,6 +110,9 @@ import org.apache.cassandra.io.FSWriteError;
 =======
 import org.apache.cassandra.io.sstable.format.SSTableFormat;
 import org.apache.cassandra.io.sstable.format.big.BigFormat;
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.util.DiskOptimizationStrategy;
 import org.apache.cassandra.io.util.File;
@@ -229,7 +244,10 @@ public class DatabaseDescriptor
     private static StartupChecksOptions startupChecksOptions;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static ImmutableMap<String, SSTableFormat<?, ?>> sstableFormats;
     private static SSTableFormat<?, ?> selectedSSTableFormat;
 
@@ -1373,7 +1391,10 @@ public class DatabaseDescriptor
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static void validateSSTableFormatFactories(Iterable<SSTableFormat.Factory> factories)
     {
         Map<String, SSTableFormat.Factory> factoryByName = new HashMap<>();
@@ -1430,6 +1451,36 @@ public class DatabaseDescriptor
         if (factories.isEmpty())
             factories = ImmutableList.of(new BigFormat.BigFormatFactory());
         applySSTableFormats(factories, conf.sstable);
+<<<<<<< HEAD
+=======
+    }
+
+    private static void applySSTableFormats(Iterable<SSTableFormat.Factory> factories, Config.SSTableConfig sstableFormatsConfig)
+    {
+        if (sstableFormats != null)
+            return;
+
+        validateSSTableFormatFactories(factories);
+        ImmutableMap<String, Supplier<SSTableFormat<?, ?>>> providers = validateAndMatchSSTableFormatOptions(factories, sstableFormatsConfig.format);
+
+        ImmutableMap.Builder<String, SSTableFormat<?, ?>> sstableFormatsBuilder = ImmutableMap.builder();
+        providers.forEach((name, provider) -> {
+            try
+            {
+                sstableFormatsBuilder.put(name, provider.get());
+            }
+            catch (RuntimeException | Error ex)
+            {
+                throw new ConfigurationException(String.format("Failed to instantiate sstable format '%s'", name), ex);
+            }
+        });
+        sstableFormats = sstableFormatsBuilder.build();
+
+        selectedSSTableFormat = getAndValidateWriteFormat(sstableFormats, sstableFormatsConfig.selected_format);
+
+        sstableFormats.values().forEach(SSTableFormat::allComponents); // make sure to reach all supported components for a type so that we know all of them are registered
+        logger.info("Supported sstable formats are: {}", sstableFormats.values().stream().map(f -> f.name() + " -> " + f.getClass().getName() + " with singleton components: " + f.allComponents()).collect(Collectors.joining(", ")));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     private static void applySSTableFormats(Iterable<SSTableFormat.Factory> factories, Config.SSTableConfig sstableFormatsConfig)
@@ -3511,7 +3562,10 @@ public class DatabaseDescriptor
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public static DurationSpec.LongMillisecondsBound getStreamTransferTaskTimeout()
     {
         return conf.stream_transfer_task_timeout;
@@ -4683,6 +4737,40 @@ public class DatabaseDescriptor
         sstableFormats = null;
         selectedSSTableFormat = null;
         applySSTableFormats(factories, config);
+<<<<<<< HEAD
+=======
+    }
+
+    public static ImmutableMap<String, SSTableFormat<?, ?>> getSSTableFormats()
+    {
+        return Objects.requireNonNull(sstableFormats, "Forgot to initialize DatabaseDescriptor?");
+    }
+
+    public static SSTableFormat<?, ?> getSelectedSSTableFormat()
+    {
+        return Objects.requireNonNull(selectedSSTableFormat, "Forgot to initialize DatabaseDescriptor?");
+    }
+
+    public static boolean getDynamicDataMaskingEnabled()
+    {
+        return conf.dynamic_data_masking_enabled;
+    }
+
+    public static void setDynamicDataMaskingEnabled(boolean enabled)
+    {
+        if (enabled != conf.dynamic_data_masking_enabled)
+        {
+            logger.info("Setting dynamic_data_masking_enabled to {}", enabled);
+            conf.dynamic_data_masking_enabled = enabled;
+        }
+    }
+
+    public static OptionalDouble getSeverityDuringDecommission()
+    {
+        return conf.severity_during_decommission > 0 ?
+               OptionalDouble.of(conf.severity_during_decommission) :
+               OptionalDouble.empty();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     public static ImmutableMap<String, SSTableFormat<?, ?>> getSSTableFormats()

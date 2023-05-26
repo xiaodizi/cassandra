@@ -38,8 +38,13 @@ public class ComponentManifestTest
     @Test
     public void testSerialization()
     {
+<<<<<<< HEAD
         ComponentManifest expected = new ComponentManifest(new LinkedHashMap<Component, Long>() {{ put(Component.DATA, 100L); }});
         SerializationUtils.assertSerializationCycle(expected, ComponentManifest.serializer);
+=======
+        ComponentManifest expected = new ComponentManifest(new LinkedHashMap<Component, Long>() {{ put(Components.DATA, 100L); }});
+        SerializationUtils.assertSerializationCycle(expected, ComponentManifest.serializers.get(BigFormat.getInstance().name()));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     @Test(expected = EOFException.class)

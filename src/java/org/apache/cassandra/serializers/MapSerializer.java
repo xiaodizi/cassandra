@@ -89,6 +89,7 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
             for (int i = 0; i < n; i++)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 T key = readValue(input, accessor, offset, version);
                 offset += sizeOfValue(key, accessor, version);
                 keys.validate(key, accessor);
@@ -96,6 +97,8 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
                 T value = readValue(input, accessor, offset, version);
                 offset += sizeOfValue(value, accessor, version);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 T key = readNonNullValue(input, accessor, offset);
                 offset += sizeOfValue(key, accessor);
                 keys.validate(key, accessor);
@@ -132,6 +135,7 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
             for (int i = 0; i < n; i++)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 I key = readValue(input, accessor, offset, version);
                 offset += sizeOfValue(key, accessor, version);
                 keys.validate(key, accessor);
@@ -139,6 +143,8 @@ public class MapSerializer<K, V> extends CollectionSerializer<Map<K, V>>
                 I value = readValue(input, accessor, offset, version);
                 offset += sizeOfValue(value, accessor, version);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 I key = readNonNullValue(input, accessor, offset);
                 offset += sizeOfValue(key, accessor);
                 keys.validate(key, accessor);

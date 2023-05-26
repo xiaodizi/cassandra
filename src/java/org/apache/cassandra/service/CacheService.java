@@ -32,6 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import java.util.concurrent.ExecutionException;
 
@@ -46,8 +49,12 @@ import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.*;
 import org.apache.cassandra.db.context.CounterContext;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.apache.cassandra.db.filter.*;
 import org.apache.cassandra.db.lifecycle.SSTableSet;
+=======
+import org.apache.cassandra.db.filter.DataLimits;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.db.partitions.CachedBTreePartition;
 import org.apache.cassandra.db.partitions.CachedPartition;
 import org.apache.cassandra.db.rows.*;
@@ -428,7 +435,11 @@ public class CacheService implements CacheServiceMBean
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public static class KeyCacheSerializer implements CacheSerializer<KeyCacheKey, RowIndexEntry>
+=======
+    public static class KeyCacheSerializer extends CacheSerializer<KeyCacheKey, AbstractRowIndexEntry>
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
     public static class KeyCacheSerializer extends CacheSerializer<KeyCacheKey, AbstractRowIndexEntry>
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -497,6 +508,7 @@ public class CacheService implements CacheServiceMBean
                 return;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             TableMetadata tableMetadata = cfs.metadata();
             tableMetadata.id.serialize(out);
             out.writeUTF(tableMetadata.indexName().orElse(""));
@@ -526,6 +538,15 @@ public class CacheService implements CacheServiceMBean
 
         public Future<Pair<KeyCacheKey, AbstractRowIndexEntry>> deserialize(DataInputPlus input) throws IOException
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
+            writeSSTable(cfs, key.desc, out);
+            out.writeInt(key.key.length);
+            out.write(key.key);
+            entry.serializeForCache(out);
+        }
+
+        public Future<Pair<KeyCacheKey, AbstractRowIndexEntry>> deserialize(DataInputPlus input) throws IOException
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         {
             Pair<KeyCacheSupport<?>, SSTableFormat<?, ?>> reader = readSSTable(input);
             boolean skipEntry = reader.left == null || !reader.left.getKeyCache().isEnabled();
@@ -535,6 +556,7 @@ public class CacheService implements CacheServiceMBean
                 throw new IOException(String.format("Corrupted key cache. Key length of %d is longer than maximum of %d",
                                                     keyLength, FBUtilities.MAX_UNSIGNED_SHORT));
             ByteBuffer key = ByteBufferUtil.read(input, keyLength);
+<<<<<<< HEAD
 <<<<<<< HEAD
             int generation = input.readInt();
             SSTableId generationId = generation == Integer.MIN_VALUE
@@ -564,11 +586,16 @@ public class CacheService implements CacheServiceMBean
 
             if (skipEntry)
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
+
+            if (skipEntry)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             {
                 // The sstable doesn't exist anymore, so we can't be sure of the exact version and assume its the current version. The only case where we'll be
                 // wrong is during upgrade, in which case we fail at deserialization. This is not a huge deal however since 1) this is unlikely enough that
                 // this won't affect many users (if any) and only once, 2) this doesn't prevent the node from starting and 3) CASSANDRA-10219 shows that this
                 // part of the code has been broken for a while without anyone noticing (it is, btw, still broken until CASSANDRA-10219 is fixed).
+<<<<<<< HEAD
 <<<<<<< HEAD
                 RowIndexEntry.Serializer.skipForCache(input);
                 return null;
@@ -580,6 +607,8 @@ public class CacheService implements CacheServiceMBean
             RowIndexEntry<?> entry = indexSerializer.deserializeForCache(input);
             return ImmediateFuture.success(Pair.create(new KeyCacheKey(cfs.metadata(), reader.descriptor, key), entry));
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 SSTableFormat.KeyCacheValueSerializer<?, ?> serializer = reader.right.getKeyCacheValueSerializer();
 
                 serializer.skip(input);
@@ -598,6 +627,22 @@ public class CacheService implements CacheServiceMBean
             KeyCacheKey cacheKey = reader.left.getCacheKey(key);
             return ImmediateFuture.success(Pair.create(cacheKey, cacheValue));
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+        }
+
+        private void writeSSTable(ColumnFamilyStore cfs, Descriptor desc, DataOutputPlus out) throws IOException
+        {
+            getOrCreateCFSOrdinal(cfs);
+            Pair<Integer, ColumnFamilyStore> existing = readerOrdinals.putIfAbsent(desc, Pair.create(readerOrdinals.size(), cfs));
+            int ordinal = existing == null ? readerOrdinals.size() - 1 : existing.left;
+            out.writeUnsignedVInt32(ordinal);
+        }
+
+        private Pair<KeyCacheSupport<?>, SSTableFormat<?, ?>> readSSTable(DataInputPlus input) throws IOException
+        {
+            int ordinal = input.readUnsignedVInt32();
+            if (ordinal >= readers.size())
+                throw new IOException("Corrupted key cache. Failed to deserialize key of key cache - invalid sstable ordinal " + ordinal);
+            return readers.get(ordinal);
         }
 
         private void writeSSTable(ColumnFamilyStore cfs, Descriptor desc, DataOutputPlus out) throws IOException

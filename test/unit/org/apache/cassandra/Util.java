@@ -1042,4 +1042,26 @@ public class Util
     {
         view.forceBlockingFlush(ColumnFamilyStore.FlushReason.UNIT_TESTS);
     }
+<<<<<<< HEAD
+=======
+
+    public static class DataInputStreamPlusImpl extends DataInputStream implements DataInputPlus
+    {
+        private DataInputStreamPlusImpl(InputStream in)
+        {
+            super(in);
+        }
+
+        public static DataInputStreamPlus wrap(InputStream in)
+        {
+            DataInputStreamPlusImpl impl = new DataInputStreamPlusImpl(in);
+            return Mockito.mock(DataInputStreamPlus.class, new ForwardsInvocations(impl));
+        }
+    }
+
+    public static RuntimeException testMustBeImplementedForSSTableFormat()
+    {
+        return new UnsupportedOperationException("Test must be implemented for sstable format " + DatabaseDescriptor.getSelectedSSTableFormat().getClass().getName());
+    }
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 }

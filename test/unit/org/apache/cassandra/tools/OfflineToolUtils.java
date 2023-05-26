@@ -31,6 +31,13 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
+=======
+import com.google.common.collect.Iterables;
+
+import org.apache.cassandra.config.CassandraRelevantProperties;
+import org.apache.cassandra.config.DatabaseDescriptor;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.util.File;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -180,7 +187,7 @@ public abstract class OfflineToolUtils
     @BeforeClass
     public static void setupTester()
     {
-        System.setProperty("cassandra.partitioner", "org.apache.cassandra.dht.Murmur3Partitioner");
+        CassandraRelevantProperties.PARTITIONER.setString("org.apache.cassandra.dht.Murmur3Partitioner");
 
         // may start an async appender
         LoggerFactory.getLogger(OfflineToolUtils.class);

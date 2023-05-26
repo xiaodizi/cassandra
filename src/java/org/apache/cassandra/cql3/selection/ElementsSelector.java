@@ -50,6 +50,10 @@ abstract class ElementsSelector extends Selector
         super(kind);
         this.selected = selected;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        this.type = getCollectionType(selected);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
         this.type = getCollectionType(selected);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -277,8 +281,11 @@ abstract class ElementsSelector extends Selector
         {
             super(Kind.ELEMENT_SELECTOR, selected);
 <<<<<<< HEAD
+<<<<<<< HEAD
             assert selected.getType() instanceof MapType || selected.getType() instanceof SetType : "this shouldn't have passed validation in Selectable";
             this.type = (CollectionType<?>) selected.getType();
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             this.key = key;

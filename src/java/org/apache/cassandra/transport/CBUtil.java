@@ -48,6 +48,8 @@ import org.apache.cassandra.utils.UUIDGen;
 
 import static org.apache.cassandra.config.CassandraRelevantProperties.CASSANDRA_NETTY_USE_HEAP_ALLOCATOR;
 
+import static org.apache.cassandra.config.CassandraRelevantProperties.CASSANDRA_NETTY_USE_HEAP_ALLOCATOR;
+
 /**
  * ByteBuf utility methods.
  * Note that contrarily to ByteBufferUtil, these method do "read" the

@@ -35,9 +35,12 @@ import org.apache.cassandra.cql3.ColumnIdentifier;
 import org.apache.cassandra.cql3.CqlBuilder;
 import org.apache.cassandra.cql3.SchemaElement;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.apache.cassandra.db.*;
 import org.apache.cassandra.db.marshal.*;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.cql3.functions.Function;
 import org.apache.cassandra.cql3.functions.masking.ColumnMask;
 import org.apache.cassandra.db.Clustering;

@@ -80,7 +80,11 @@ public abstract class SSTable
     public static final int TOMBSTONE_HISTOGRAM_BIN_SIZE = 100;
     public static final int TOMBSTONE_HISTOGRAM_SPOOL_SIZE = 100000;
 <<<<<<< HEAD
+<<<<<<< HEAD
     public static final int TOMBSTONE_HISTOGRAM_TTL_ROUND_SECONDS = Integer.valueOf(System.getProperty("cassandra.streaminghistogram.roundseconds", "60"));
+=======
+    public static final int TOMBSTONE_HISTOGRAM_TTL_ROUND_SECONDS = CassandraRelevantProperties.STREAMING_HISTOGRAM_ROUND_SECONDS.getInt();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
     public static final int TOMBSTONE_HISTOGRAM_TTL_ROUND_SECONDS = CassandraRelevantProperties.STREAMING_HISTOGRAM_ROUND_SECONDS.getInt();
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -317,6 +321,7 @@ public abstract class SSTable
     public String toString()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         return getClass().getSimpleName() + "(" +
                "path='" + getFilename() + '\'' +
                ')';
@@ -388,6 +393,9 @@ public abstract class SSTable
     public AbstractBounds<Token> getBounds()
     {
         return AbstractBounds.bounds(first.getToken(), true, last.getToken(), true);
+=======
+        return String.format("%s:%s(path='%s')", getClass().getSimpleName(), descriptor.version.format.name(), getFilename());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
         return String.format("%s:%s(path='%s')", getClass().getSimpleName(), descriptor.version.format.name(), getFilename());
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

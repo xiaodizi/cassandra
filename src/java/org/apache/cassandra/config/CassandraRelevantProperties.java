@@ -23,7 +23,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import javax.annotation.Nullable;
 
 import com.google.common.primitives.Ints;
@@ -71,6 +74,7 @@ public enum CassandraRelevantProperties
      * the bootstrap; this property will avoid failing and allow bootstrap to continue if set to true.
      */
     BOOTSTRAP_SKIP_SCHEMA_CHECK("cassandra.skip_schema_check"),
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     /**
@@ -127,6 +131,8 @@ public enum CassandraRelevantProperties
     //cassandra properties (without the "cassandra." prefix)
 
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     BROADCAST_INTERVAL_MS("cassandra.broadcast_interval_ms", "60000"),
     BTREE_BRANCH_SHIFT("cassandra.btree.branchshift", "5"),
     BTREE_FAN_FACTOR("cassandra.btree.fanfactor"),
@@ -136,12 +142,16 @@ public enum CassandraRelevantProperties
     CASSANDRA_AVAILABLE_PROCESSORS("cassandra.available_processors"),
     /** The classpath storage configuration file. */
     CASSANDRA_CONFIG("cassandra.config", "cassandra.yaml"),
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /**
      * The cassandra-foreground option will tell CassandraDaemon whether
      * to close stdout/stderr, but it's up to us not to background.
      * yes/null
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     CASSANDRA_FOREGROUND ("cassandra-foreground"),
 
@@ -257,6 +267,25 @@ public enum CassandraRelevantProperties
     CASSANDRA_VERSION("cassandra.version"),
     /** default heartbeating period is 1 minute */
     CHECK_DATA_RESURRECTION_HEARTBEAT_PERIOD("check_data_resurrection_heartbeat_period_milli", "60000"),
+=======
+    CASSANDRA_FOREGROUND("cassandra-foreground"),
+    CASSANDRA_JMX_AUTHORIZER("cassandra.jmx.authorizer"),
+    CASSANDRA_JMX_LOCAL_PORT("cassandra.jmx.local.port"),
+    CASSANDRA_JMX_REMOTE_LOGIN_CONFIG("cassandra.jmx.remote.login.config"),
+    /** Cassandra jmx remote and local port */
+    CASSANDRA_JMX_REMOTE_PORT("cassandra.jmx.remote.port"),
+    CASSANDRA_MAX_HINT_TTL("cassandra.maxHintTTL", convertToString(Integer.MAX_VALUE)),
+    CASSANDRA_MINIMUM_REPLICATION_FACTOR("cassandra.minimum_replication_factor"),
+    CASSANDRA_NETTY_USE_HEAP_ALLOCATOR("cassandra.netty_use_heap_allocator"),
+    CASSANDRA_PID_FILE("cassandra-pidfile"),
+    CASSANDRA_RACKDC_PROPERTIES("cassandra-rackdc.properties"),
+    CASSANDRA_SKIP_AUTOMATIC_UDT_FIX("cassandra.skipautomaticudtfix"),
+    CASSANDRA_STREAMING_DEBUG_STACKTRACE_LIMIT("cassandra.streaming.debug_stacktrace_limit", "2"),
+    CASSANDRA_UNSAFE_TIME_UUID_NODE("cassandra.unsafe.timeuuidnode"),
+    CASSANDRA_VERSION("cassandra.version"),
+    /** default heartbeating period is 1 minute */
+    CHECK_DATA_RESURRECTION_HEARTBEAT_PERIOD("check_data_resurrection_heartbeat_period_milli", "60000"),
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     CHRONICLE_ANNOUNCER_DISABLE("chronicle.announcer.disable"),
     CLOCK_GLOBAL("cassandra.clock"),
     CLOCK_MONOTONIC_APPROX("cassandra.monotonic_clock.approx"),
@@ -489,14 +518,20 @@ public enum CassandraRelevantProperties
     NEVER_PURGE_TOMBSTONES("cassandra.never_purge_tombstones"),
     NIO_DATA_OUTPUT_STREAM_PLUS_BUFFER_SIZE("cassandra.nio_data_output_stream_plus_buffer_size", convertToString(32 * 1024)),
     NODETOOL_JMX_NOTIFICATION_POLL_INTERVAL_SECONDS("cassandra.nodetool.jmx_notification_poll_interval_seconds", convertToString(TimeUnit.SECONDS.convert(5, TimeUnit.MINUTES))),
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /** If set, {@link org.apache.cassandra.net.MessagingService} is shutdown abrtuptly without waiting for anything.
      * This is an optimization used in unit tests becuase we never restart a node there. The only node is stopoped
      * when the JVM terminates. Therefore, we can use such optimization and not wait unnecessarily. */
     NON_GRACEFUL_SHUTDOWN("cassandra.test.messagingService.nonGracefulShutdown"),
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /** for specific tests */
     /** This property indicates whether disable_mbean_registration is true */
     ORG_APACHE_CASSANDRA_DISABLE_MBEAN_REGISTRATION("org.apache.cassandra.disable_mbean_registration"),
@@ -605,6 +640,9 @@ public enum CassandraRelevantProperties
     TEST_DRIVER_READ_TIMEOUT_MS("cassandra.test.driver.read_timeout_ms", "12000"),
     TEST_FAIL_MV_LOCKS_COUNT("cassandra.test.fail_mv_locks_count", "0"),
     TEST_FAIL_WRITES_KS("cassandra.test.fail_writes_ks", ""),
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /** Flush changes of {@link org.apache.cassandra.schema.SchemaKeyspace} after each schema modification. In production,
      * we always do that. However, tests which do not restart nodes may disable this functionality in order to run
@@ -654,8 +692,11 @@ public enum CassandraRelevantProperties
     WAIT_FOR_TRACING_EVENTS_TIMEOUT_SECS("cassandra.wait_for_tracing_events_timeout_secs", "0");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     ;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     static
     {
         CassandraRelevantProperties[] values = CassandraRelevantProperties.values();
@@ -671,6 +712,9 @@ public enum CassandraRelevantProperties
                 prev = next;
         }
     }
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
     CassandraRelevantProperties(String key, String defaultVal)
@@ -808,6 +852,17 @@ public enum CassandraRelevantProperties
     {
         String prev = System.setProperty(key, convertToString(value));
         return prev == null ? null : BOOLEAN_CONVERTER.convert(prev);
+<<<<<<< HEAD
+=======
+    }
+
+    /**
+     * Clears the value set in the system property.
+     */
+    public void clearValue()
+    {
+        System.clearProperty(key);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     /**

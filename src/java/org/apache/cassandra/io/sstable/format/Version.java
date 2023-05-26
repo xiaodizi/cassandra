@@ -36,9 +36,12 @@ public abstract class Version
     private static final Pattern VALIDATION = Pattern.compile("[a-z]+");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     protected final String version;
     protected final SSTableFormat format;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public final String version;
     public final SSTableFormat<?, ?> format;
 
@@ -98,6 +101,9 @@ public abstract class Version
     public abstract boolean hasPartitionLevelDeletionsPresenceMarker();
 
     public abstract boolean hasKeyRange();
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
     /**
@@ -120,6 +126,15 @@ public abstract class Version
     }
 
     public String toFormatAndVersionString()
+<<<<<<< HEAD
+=======
+    {
+        return format.name() + '-' + version;
+    }
+
+    @Override
+    public boolean equals(Object other)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         return format.name() + '-' + version;
     }
@@ -139,6 +154,9 @@ public abstract class Version
 =======
         Version otherVersion = (Version) other;
         return Objects.equals(version, otherVersion.version) && Objects.equals(format.name(), otherVersion.format.name());
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 

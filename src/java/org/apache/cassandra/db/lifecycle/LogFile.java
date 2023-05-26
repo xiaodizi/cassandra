@@ -40,8 +40,11 @@ import org.apache.cassandra.db.lifecycle.LogRecord.Type;
 import org.apache.cassandra.io.sstable.SSTable;
 import org.apache.cassandra.io.sstable.format.SSTableReader;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.apache.cassandra.io.sstable.format.big.BigFormat;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.sstable.format.Version;
 import org.apache.cassandra.io.sstable.format.big.BigFormat;
 import org.apache.cassandra.io.util.File;
@@ -506,6 +509,7 @@ final class LogFile implements AutoCloseable
     private String getFileName()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         return StringUtils.join(BigFormat.latestVersion,
                                 LogFile.SEP,
                                 "txn",
@@ -515,6 +519,8 @@ final class LogFile implements AutoCloseable
                                 id.toString(),
                                 LogFile.EXT);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         // For pre-5.0 versions, only BigFormat is supported, and the file name includes only the version string.
         // To retain the ability to downgrade to 4.x, we keep the old file naming scheme for BigFormat sstables
         // and add format names for other formats as they are supported only in 5.0 and above.

@@ -30,6 +30,13 @@ import org.junit.Test;
 import org.apache.cassandra.SchemaLoader;
 import org.apache.cassandra.Util;
 import org.apache.cassandra.exceptions.ConfigurationException;
+<<<<<<< HEAD
+=======
+import org.apache.cassandra.io.sstable.AbstractRowIndexEntry;
+import org.apache.cassandra.io.sstable.format.SSTableReader;
+import org.apache.cassandra.io.sstable.keycache.KeyCacheSupport;
+import org.apache.cassandra.schema.ColumnMetadata;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.schema.KeyspaceParams;
 import org.apache.cassandra.service.CacheService;
 import org.apache.cassandra.utils.ByteBufferUtil;
@@ -44,6 +51,11 @@ public class AutoSavingCacheTest
     @BeforeClass
     public static void defineSchema() throws ConfigurationException
     {
+<<<<<<< HEAD
+=======
+        DatabaseDescriptor.daemonInitialization();
+        Assume.assumeTrue(KeyCacheSupport.isSupportedBy(DatabaseDescriptor.getSelectedSSTableFormat()));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         SchemaLoader.prepareServer();
         SchemaLoader.createKeyspace(KEYSPACE1,
                                     KeyspaceParams.simple(1),

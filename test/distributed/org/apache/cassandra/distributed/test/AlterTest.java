@@ -42,6 +42,7 @@ import org.apache.cassandra.distributed.util.QueryResultUtil;
 import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.Throwables;
 
+import static org.apache.cassandra.config.CassandraRelevantProperties.JOIN_RING;
 import static org.apache.cassandra.distributed.action.GossipHelper.withProperty;
 import static org.apache.cassandra.distributed.api.ConsistencyLevel.ONE;
 import static org.apache.cassandra.distributed.api.Feature.GOSSIP;
@@ -99,7 +100,7 @@ public class AlterTest extends TestBaseImpl
         {
             IInstanceConfig config = cluster.newInstanceConfig();
             IInvokableInstance gossippingOnlyMember = cluster.bootstrap(config);
-            withProperty("cassandra.join_ring", Boolean.toString(false), () -> gossippingOnlyMember.startup(cluster));
+            withProperty(JOIN_RING, false, () -> gossippingOnlyMember.startup(cluster));
 
             int attempts = 0;
             // it takes some time the underlying structure is populated otherwise the test is flaky

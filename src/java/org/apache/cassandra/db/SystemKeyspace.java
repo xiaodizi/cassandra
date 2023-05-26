@@ -96,7 +96,10 @@ import org.apache.cassandra.metrics.TopPartitionTracker;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.schema.CompactionParams;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.apache.cassandra.schema.Functions;
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.schema.KeyspaceMetadata;

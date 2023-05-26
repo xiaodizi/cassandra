@@ -72,6 +72,23 @@ public class ToJsonFct extends NativeScalarFunction
     {
         functions.add(new Factory("to_json"));
         functions.add(new Factory("tojson")); // deprecated pre-5.0 name
+<<<<<<< HEAD
+=======
+    }
+
+    private static class Factory extends FunctionFactory
+    {
+        public Factory(String name)
+        {
+            super(name, FunctionParameter.anyType(false));
+        }
+
+        @Override
+        protected NativeFunction doGetOrCreateFunction(List<AbstractType<?>> argTypes, AbstractType<?> receiverType)
+        {
+            return ToJsonFct.getInstance(name.name, argTypes);
+        }
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     private static class Factory extends FunctionFactory

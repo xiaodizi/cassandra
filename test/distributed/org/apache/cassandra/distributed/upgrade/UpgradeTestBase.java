@@ -139,13 +139,65 @@ public class UpgradeTestBase extends DistributedTestBase
             return this;
         }
 
+<<<<<<< HEAD
         /** performs all supported upgrade paths that exist in between from and CURRENT (inclusive) **/
         public TestCase upgradesFrom(Semver from)
+=======
+        /** performs all supported upgrade paths that exist in between from and end on CURRENT (inclusive)
+         * {@code upgradesToCurrentFrom(3.0); // produces: 3.0 -> CURRENT, 3.11 -> CURRENT, …}
+         **/
+        public TestCase upgradesToCurrentFrom(Semver from)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         {
             return upgrades(from, CURRENT);
         }
 
+<<<<<<< HEAD
         /** performs all supported upgrade paths that exist in between from and to (inclusive) **/
+=======
+        /**
+         * performs all supported upgrade paths to the "to" target; example
+         * {@code upgradesTo(3.0, 4.0); // produces: 3.0 -> 4.0, 3.11 -> 4.0}
+         */
+        public TestCase upgradesTo(Semver from, Semver to)
+        {
+            List<TestVersions> upgrade = new ArrayList<>();
+            NavigableSet<Semver> vertices = sortedVertices(SUPPORTED_UPGRADE_PATHS);
+            for (Semver start : vertices.subSet(from, true, to, false))
+            {
+                // only include pairs that are allowed, and start or end on CURRENT
+                if (SUPPORTED_UPGRADE_PATHS.hasEdge(start, to) && contains(start, to, CURRENT))
+                    upgrade.add(new TestVersions(versions.getLatest(start), Collections.singletonList(versions.getLatest(to))));
+            }
+            logger.info("Adding upgrades of\n{}", upgrade.stream().map(TestVersions::toString).collect(Collectors.joining("\n")));
+            this.upgrade.addAll(upgrade);
+            return this;
+        }
+
+        /**
+         * performs all supported upgrade paths from the "from" target; example
+         * {@code upgradesFrom(4.0, 4.2); // produces: 4.0 -> 4.1, 4.0 -> 4.2}
+         */
+        public TestCase upgradesFrom(Semver from, Semver to)
+        {
+            List<TestVersions> upgrade = new ArrayList<>();
+            NavigableSet<Semver> vertices = sortedVertices(SUPPORTED_UPGRADE_PATHS);
+            for (Semver end : vertices.subSet(from, false, to, true))
+            {
+                // only include pairs that are allowed, and start or end on CURRENT
+                if (SUPPORTED_UPGRADE_PATHS.hasEdge(from, end) && contains(from, end, CURRENT))
+                    upgrade.add(new TestVersions(versions.getLatest(from), Collections.singletonList(versions.getLatest(end))));
+            }
+            logger.info("Adding upgrades of\n{}", upgrade.stream().map(TestVersions::toString).collect(Collectors.joining("\n")));
+            this.upgrade.addAll(upgrade);
+            return this;
+        }
+
+        /**
+         * performs all supported upgrade paths that exist in between from and to that include the current version.
+         * This call is equivalent to calling {@code upgradesTo(from, CURRENT).upgradesFrom(CURRENT, to)}.
+         **/
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         public TestCase upgrades(Semver from, Semver to)
         {
             SUPPORTED_UPGRADE_PATHS.stream()

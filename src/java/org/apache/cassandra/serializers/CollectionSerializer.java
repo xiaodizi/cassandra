@@ -128,8 +128,11 @@ public abstract class CollectionSerializer<T> extends TypeSerializer<T>
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     protected static void skipValue(ByteBuffer input, ProtocolVersion version)
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public static <V> V readNonNullValue(V input, ValueAccessor<V> accessor, int offset)
     {
         V value = readValue(input, accessor, offset);

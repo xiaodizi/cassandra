@@ -80,9 +80,12 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
             for (int i = 0; i < n; i++)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 V value = readValue(input, accessor, offset, version);
                 offset += sizeOfValue(value, accessor, version);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 V value = readNonNullValue(input, accessor, offset);
                 offset += sizeOfValue(value, accessor);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -116,9 +119,12 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
             for (int i = 0; i < n; i++)
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 V value = readValue(input, accessor, offset, version);
                 offset += sizeOfValue(value, accessor, version);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 V value = readNonNullValue(input, accessor, offset);
                 offset += sizeOfValue(value, accessor);
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

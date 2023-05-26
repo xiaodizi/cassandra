@@ -27,9 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.apache.cassandra.config.Config;
 import org.apache.cassandra.db.*;
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.db.AbstractCompactionController;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.DecoratedKey;
@@ -167,9 +170,12 @@ public class CompactionController extends AbstractCompactionController
         logger.trace("Checking droppable sstables in {}", cfStore);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (NEVER_PURGE_TOMBSTONES || compacting == null || cfStore.getNeverPurgeTombstones())
             return Collections.<SSTableReader>emptySet();
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         if (NEVER_PURGE_TOMBSTONES_PROPERTY_VALUE || compacting == null || cfStore.getNeverPurgeTombstones() || overlapping == null)
             return Collections.emptySet();
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -258,7 +264,11 @@ public class CompactionController extends AbstractCompactionController
     public LongPredicate getPurgeEvaluator(DecoratedKey key)
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (NEVER_PURGE_TOMBSTONES || !compactingRepaired() || cfs.getNeverPurgeTombstones())
+=======
+        if (NEVER_PURGE_TOMBSTONES_PROPERTY_VALUE || !compactingRepaired() || cfs.getNeverPurgeTombstones() || overlapIterator == null)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
         if (NEVER_PURGE_TOMBSTONES_PROPERTY_VALUE || !compactingRepaired() || cfs.getNeverPurgeTombstones() || overlapIterator == null)
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

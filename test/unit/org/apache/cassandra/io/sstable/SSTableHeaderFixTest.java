@@ -386,7 +386,7 @@ public class SSTableHeaderFixTest
             ColumnMetadata cd = getColDef(col);
             AbstractType<?> dropType = cd.type.expandUserTypes();
             cols.removeRegularOrStaticColumn(ci)
-                .recordColumnDrop(new ColumnMetadata(cd.ksName, cd.cfName, cd.name, dropType, cd.position(), cd.kind), FBUtilities.timestampMicros());
+                .recordColumnDrop(new ColumnMetadata(cd.ksName, cd.cfName, cd.name, dropType, cd.position(), cd.kind, cd.getMask()), FBUtilities.timestampMicros());
         }
         tableMetadata = cols.build();
 
@@ -822,7 +822,11 @@ public class SSTableHeaderFixTest
         try
         {
 
+<<<<<<< HEAD
             Descriptor desc = new Descriptor(version, dir, "ks", "cf", MockSchema.sstableId(generation), SSTableFormat.Type.BIG);
+=======
+            Descriptor desc = new Descriptor(version, dir, "ks", "cf", MockSchema.sstableId(generation));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
             // Just create the component files - we don't really need those.
             for (Component component : requiredComponents)

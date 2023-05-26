@@ -50,6 +50,12 @@ public class IndexSummaryRedistributionTest
     @BeforeClass
     public static void defineSchema() throws ConfigurationException
     {
+<<<<<<< HEAD:test/unit/org/apache/cassandra/io/sstable/IndexSummaryRedistributionTest.java
+=======
+        DatabaseDescriptor.daemonInitialization();
+        Assume.assumeTrue("This test make sense only if the default SSTable format support index summary",
+                          IndexSummarySupport.isSupportedBy(DatabaseDescriptor.getSelectedSSTableFormat()));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/indexsummary/IndexSummaryRedistributionTest.java
         SchemaLoader.prepareServer();
         SchemaLoader.createKeyspace(KEYSPACE1,
                                     KeyspaceParams.simple(1),

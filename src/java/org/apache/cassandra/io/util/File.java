@@ -32,6 +32,9 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths; // checkstyle: permit this import
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import java.util.Objects;
 import java.util.function.BiPredicate;
@@ -155,7 +158,10 @@ public class File implements Comparable<File>
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public static Path getPath(String first, String... more)

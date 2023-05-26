@@ -94,9 +94,12 @@ public abstract class AggregateFcts
      * is specified.
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     public static final AggregateFunction countRowsFunction =
             new NativeAggregateFunction("countRows", LongType.instance)
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public static final CountRowsFunction countRowsFunction = new CountRowsFunction(false);
 
     public static class CountRowsFunction extends NativeAggregateFunction
@@ -110,6 +113,9 @@ public abstract class AggregateFcts
         public Aggregate newAggregate()
         {
             return new Aggregate()
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             {
                 private long count;

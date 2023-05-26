@@ -249,6 +249,21 @@ public final class Guardrails implements GuardrailsMBean
 
     /**
      * Guardrail on the size of a partition.
+<<<<<<< HEAD
+=======
+     */
+    public static final MaxThreshold partitionSize =
+    new MaxThreshold("partition_size",
+                     "Too large partitions can cause performance problems. ",
+                     state -> sizeToBytes(CONFIG_PROVIDER.getOrCreate(state).getPartitionSizeWarnThreshold()),
+                     state -> sizeToBytes(CONFIG_PROVIDER.getOrCreate(state).getPartitionSizeFailThreshold()),
+                     (isWarning, what, value, threshold) ->
+                             format("Partition %s has size %s, this exceeds the %s threshold of %s.",
+                                    what, value, isWarning ? "warning" : "failure", threshold));
+
+    /**
+     * Guardrail on the size of a collection.
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
      */
     public static final MaxThreshold partitionSize =
     new MaxThreshold("partition_size",
@@ -346,6 +361,24 @@ public final class Guardrails implements GuardrailsMBean
                                         what, value, threshold)
                                : format("The keyspace %s has a replication factor of %s, below the failure threshold of %s.",
                                         what, value, threshold));
+
+    public static final MaxThreshold maximumAllowableTimestamp =
+    new MaxThreshold("maximum_timestamp",
+                     "Timestamps too far in the future can lead to data that can't be easily overwritten",
+                     state -> maximumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMaximumTimestampWarnThreshold()),
+                     state -> maximumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMaximumTimestampFailThreshold()),
+                     (isWarning, what, value, threshold) ->
+                    format("The modification to table %s has a timestamp %s after the maximum allowable %s threshold %s",
+                           what, value, isWarning ? "warning" : "failure", threshold));
+
+    public static final MinThreshold minimumAllowableTimestamp =
+    new MinThreshold("minimum_timestamp",
+                     "Timestamps too far in the past can cause writes can be unexpectedly lost",
+                     state -> minimumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMinimumTimestampWarnThreshold()),
+                     state -> minimumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMinimumTimestampFailThreshold()),
+                     (isWarning, what, value, threshold) ->
+                     format("The modification to table %s has a timestamp %s before the minimum allowable %s threshold %s",
+                            what, value, isWarning ? "warning" : "failure", threshold));
 
     public static final MaxThreshold maximumAllowableTimestamp =
     new MaxThreshold("maximum_timestamp",
@@ -682,7 +715,10 @@ public final class Guardrails implements GuardrailsMBean
     @Override
     @Nullable
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public String getPartitionSizeWarnThreshold()
     {
         return sizeToString(DEFAULT_CONFIG.getPartitionSizeWarnThreshold());
@@ -1003,6 +1039,9 @@ public final class Guardrails implements GuardrailsMBean
         DEFAULT_CONFIG.setMinimumTimestampThreshold(durationFromString(warnSeconds), durationFromString(failSeconds));
     }
 
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static String toCSV(Set<String> values)
     {

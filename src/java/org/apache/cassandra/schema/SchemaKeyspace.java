@@ -185,6 +185,20 @@ public final class SchemaKeyspace {
           + "function_argument_nulls frozen<list<boolean>>," // arguments that are null
           + "PRIMARY KEY ((keyspace_name), table_name, column_name))");
 
+    private static final TableMetadata ColumnMasks =
+    parse(COLUMN_MASKS,
+          "column dynamic data masks",
+          "CREATE TABLE %s ("
+          + "keyspace_name text,"
+          + "table_name text,"
+          + "column_name text,"
+          + "function_keyspace text,"
+          + "function_name text,"
+          + "function_argument_types frozen<list<text>>,"
+          + "function_argument_values frozen<list<text>>,"
+          + "function_argument_nulls frozen<list<boolean>>," // arguments that are null
+          + "PRIMARY KEY ((keyspace_name), table_name, column_name))");
+
     private static final TableMetadata DroppedColumns =
             parse(DROPPED_COLUMNS,
                     "dropped column registry",
@@ -324,9 +338,12 @@ public final class SchemaKeyspace {
                             + "PRIMARY KEY ((keyspace_name), aggregate_name, argument_types))");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static final List<TableMetadata> ALL_TABLE_METADATA =
             ImmutableList.of(Keyspaces, Tables, Columns, Triggers, DroppedColumns, Views, Types, Functions, Aggregates, Indexes);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static final List<TableMetadata> ALL_TABLE_METADATA = ImmutableList.of(Keyspaces,
                                                                                    Tables,
                                                                                    Columns,
@@ -338,6 +355,9 @@ public final class SchemaKeyspace {
                                                                                    Functions,
                                                                                    Aggregates,
                                                                                    Indexes);
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
     private static TableMetadata parse(String name, String description, String cql) {
@@ -797,6 +817,9 @@ public final class SchemaKeyspace {
                            .add("function_argument_nulls", nulls);
             }
         }
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
@@ -954,9 +977,15 @@ public final class SchemaKeyspace {
         KeyspaceParams params = fetchKeyspaceParams(keyspaceName);
         Types types = fetchTypes(keyspaceName);
 <<<<<<< HEAD
+<<<<<<< HEAD
         Tables tables = fetchTables(keyspaceName, types);
         Views views = fetchViews(keyspaceName, types);
         Functions functions = fetchFunctions(keyspaceName, types);
+=======
+        UserFunctions functions = fetchFunctions(keyspaceName, types);
+        Tables tables = fetchTables(keyspaceName, types, functions);
+        Views views = fetchViews(keyspaceName, types, functions);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
         UserFunctions functions = fetchFunctions(keyspaceName, types);
         Tables tables = fetchTables(keyspaceName, types, functions);
@@ -988,8 +1017,11 @@ public final class SchemaKeyspace {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static Tables fetchTables(String keyspaceName, Types types) {
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static Tables fetchTables(String keyspaceName, Types types, UserFunctions functions)
     {
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -1022,11 +1054,14 @@ public final class SchemaKeyspace {
                         SchemaConstants.SCHEMA_KEYSPACE_NAME, COLUMNS);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                 if (IGNORE_CORRUPTED_SCHEMA_TABLES) {
                     logger.error(errorMsg, "", exc);
                 } else {
                     logger.error(errorMsg, "restart cassandra with -Dcassandra.ignore_corrupted_schema_tables=true and ");
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 if (IGNORE_CORRUPTED_SCHEMA_TABLES_PROPERTY_VALUE)
                 {
                     logger.error(errorMsg, "", exc);
@@ -1034,6 +1069,9 @@ public final class SchemaKeyspace {
                 else
                 {
                     logger.error(errorMsg, "restart cassandra with -D{}=true and ", IGNORE_CORRUPTED_SCHEMA_TABLES.getKey());
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                     throw exc;
                 }
@@ -1043,8 +1081,11 @@ public final class SchemaKeyspace {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static TableMetadata fetchTable(String keyspaceName, String tableName, Types types) {
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static TableMetadata fetchTable(String keyspaceName, String tableName, Types types, UserFunctions functions)
     {
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -1103,8 +1144,11 @@ public final class SchemaKeyspace {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static List<ColumnMetadata> fetchColumns(String keyspace, String table, Types types) {
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static List<ColumnMetadata> fetchColumns(String keyspace, String table, Types types, UserFunctions functions)
     {
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -1124,8 +1168,11 @@ public final class SchemaKeyspace {
 
     @VisibleForTesting
 <<<<<<< HEAD
+<<<<<<< HEAD
     static ColumnMetadata createColumnFromRow(UntypedResultSet.Row row, Types types) {
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public static ColumnMetadata createColumnFromRow(UntypedResultSet.Row row, Types types, UserFunctions functions)
     {
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -1251,8 +1298,11 @@ public final class SchemaKeyspace {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static Views fetchViews(String keyspaceName, Types types) {
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static Views fetchViews(String keyspaceName, Types types, UserFunctions functions)
     {
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -1265,8 +1315,11 @@ public final class SchemaKeyspace {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static ViewMetadata fetchView(String keyspaceName, String viewName, Types types) {
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static ViewMetadata fetchView(String keyspaceName, String viewName, Types types, UserFunctions functions)
     {
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

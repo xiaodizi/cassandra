@@ -44,6 +44,10 @@ import org.apache.cassandra.db.compaction.OperationType;
 import org.apache.cassandra.db.compaction.CompactionManager;
 import org.apache.cassandra.db.lifecycle.LifecycleTransaction;
 import org.apache.cassandra.exceptions.ConfigurationException;
+<<<<<<< HEAD:test/unit/org/apache/cassandra/db/KeyCacheTest.java
+=======
+import org.apache.cassandra.io.sstable.AbstractRowIndexEntry;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/keycache/KeyCacheTest.java
 import org.apache.cassandra.io.sstable.format.SSTableReader;
 import org.apache.cassandra.io.util.DataInputPlus;
 import org.apache.cassandra.schema.KeyspaceParams;
@@ -53,6 +57,7 @@ import org.apache.cassandra.utils.concurrent.Refs;
 import org.hamcrest.Matchers;
 import org.mockito.Mockito;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
+import org.mockito.invocation.InvocationOnMock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -82,6 +87,11 @@ public class KeyCacheTest
     @BeforeClass
     public static void defineSchema() throws ConfigurationException
     {
+<<<<<<< HEAD:test/unit/org/apache/cassandra/db/KeyCacheTest.java
+=======
+        DatabaseDescriptor.daemonInitialization();
+        sstableImplCachesKeys = KeyCacheSupport.isSupportedBy(DatabaseDescriptor.getSelectedSSTableFormat());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/keycache/KeyCacheTest.java
         SchemaLoader.prepareServer();
         SchemaLoader.createKeyspace(KEYSPACE1,
                                     KeyspaceParams.simple(1),
@@ -175,7 +185,12 @@ public class KeyCacheTest
             for (int i = 0; i < expected.columnsIndexCount(); i++)
             {
                 SSTableReader actualSstr = readerForKey(entry.getKey());
+<<<<<<< HEAD:test/unit/org/apache/cassandra/db/KeyCacheTest.java
                 try (RowIndexEntry.IndexInfoRetriever actualIir = actual.openWithIndex(actualSstr.getIndexFile()))
+=======
+                Assertions.assertThat(actualSstr.descriptor.version.format).isEqualTo(expected.getSSTableFormat());
+                if (actual instanceof RowIndexEntry)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/keycache/KeyCacheTest.java
                 {
                     RowIndexEntry.IndexInfoRetriever expectedIir = savedInfoMap.get(entry.getKey());
                     assertEquals(expectedIir.columnsIndex(i), actualIir.columnsIndex(i));
@@ -353,7 +368,6 @@ public class KeyCacheTest
         // Here max time to load cache is zero which means no time left to load cache. So the keyCache size should
         // be zero after loadSaved().
         assertKeyCacheSize(0, KEYSPACE1, cf);
-        assertEquals(0, CacheService.instance.keyCache.size());
     }
 
     @Test
@@ -375,7 +389,10 @@ public class KeyCacheTest
         // be zero after load.
         assertKeyCacheSize(numberOfRows, KEYSPACE1, columnFamily1);
         assertKeyCacheSize(numberOfRows, KEYSPACE2, columnFamily2);
+<<<<<<< HEAD:test/unit/org/apache/cassandra/db/KeyCacheTest.java
         assertEquals(numberOfRows * tables.size(), CacheService.instance.keyCache.size());
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/keycache/KeyCacheTest.java
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -399,9 +416,8 @@ public class KeyCacheTest
                                                               CacheService.CacheType.KEY_CACHE,
                                                               keyCacheSerializerSpy);
 
-        doAnswer(new AnswersWithDelay(delayMillis, answer -> keyCacheSerializer.deserialize(answer.getArgument(0),
-                                                                                            answer.getArgument(1)) ))
-               .when(keyCacheSerializerSpy).deserialize(any(DataInputPlus.class), any(ColumnFamilyStore.class));
+        doAnswer(new AnswersWithDelay(delayMillis, InvocationOnMock::callRealMethod)).when(keyCacheSerializerSpy)
+                                                                                     .deserialize(any(DataInputPlus.class));
 
         long maxExpectedKeyCache = Math.min(numberOfRows,
                                             1 + TimeUnit.SECONDS.toMillis(DatabaseDescriptor.getCacheLoadTimeout()) / delayMillis);

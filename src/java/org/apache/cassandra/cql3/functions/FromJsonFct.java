@@ -23,7 +23,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.apache.cassandra.cql3.Json;
+=======
+import org.apache.cassandra.cql3.CQL3Type;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 import org.apache.cassandra.cql3.CQL3Type;
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -75,7 +79,13 @@ public class FromJsonFct extends NativeScalarFunction
         catch (IOException exc)
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             throw FunctionExecutionException.create(NAME, Collections.singletonList("text"), String.format("Could not decode JSON string '%s': %s", jsonArg, exc.toString()));
+=======
+            throw FunctionExecutionException.create(name(), 
+                                                    Collections.singletonList("text"),
+                                                    format("Could not decode JSON string '%s': %s", jsonArg, exc));
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
             throw FunctionExecutionException.create(name(), 
                                                     Collections.singletonList("text"),
@@ -94,6 +104,26 @@ public class FromJsonFct extends NativeScalarFunction
     {
         functions.add(new Factory("from_json"));
         functions.add(new Factory("fromjson"));
+<<<<<<< HEAD
+=======
+    }
+    
+    private static class Factory extends FunctionFactory
+    {
+        private Factory(String name)
+        {
+            super(name, FunctionParameter.fixed(CQL3Type.Native.TEXT));
+        }
+
+        @Override
+        protected NativeFunction doGetOrCreateFunction(List<AbstractType<?>> argTypes, AbstractType<?> receiverType)
+        {
+            if (receiverType == null)
+                throw new InvalidRequestException(format("%s() cannot be used in the selection clause of a SELECT statement", name.name));
+
+            return FromJsonFct.getInstance(name, receiverType);
+        }
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
     
     private static class Factory extends FunctionFactory

@@ -38,11 +38,39 @@ import org.apache.cassandra.distributed.shared.Byteman;
 import org.apache.cassandra.distributed.shared.NetworkTopology;
 import org.apache.cassandra.utils.Shared;
 
+<<<<<<< HEAD
+=======
+import static org.apache.cassandra.config.CassandraRelevantProperties.RESET_BOOTSTRAP_PROGRESS;
+import static org.apache.cassandra.config.CassandraRelevantProperties.RING_DELAY;
+import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_WRITE_SURVEY;
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 /**
  * Replaces python dtest bootstrap_test.py::TestBootstrap::test_bootstrap_binary_disabled
  */
 public class BootstrapBinaryDisabledTest extends TestBaseImpl
 {
+<<<<<<< HEAD
+=======
+    static Boolean originalResetBootstrapProgress = null;
+
+    @BeforeClass
+    public static void beforeClass() throws Throwable
+    {
+        TestBaseImpl.beforeClass();
+        originalResetBootstrapProgress = RESET_BOOTSTRAP_PROGRESS.setBoolean(false);
+    }
+
+    @AfterClass
+    public static void afterClass()
+    {
+        if (originalResetBootstrapProgress == null)
+            RESET_BOOTSTRAP_PROGRESS.clearValue();
+        else
+            RESET_BOOTSTRAP_PROGRESS.setBoolean(originalResetBootstrapProgress);
+    }
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     @Test
     public void test() throws IOException, TimeoutException
     {
@@ -92,9 +120,9 @@ public class BootstrapBinaryDisabledTest extends TestBaseImpl
         config.forEach(nodeConfig::set);
 
         //TODO can we make this more isolated?
-        System.setProperty("cassandra.ring_delay_ms", "5000");
+        RING_DELAY.setLong(5000);
         if (isWriteSurvey)
-            System.setProperty("cassandra.write_survey", "true");
+            TEST_WRITE_SURVEY.setBoolean(true);
 
         RewriteEnabled.enable();
         cluster.bootstrap(nodeConfig).startup();

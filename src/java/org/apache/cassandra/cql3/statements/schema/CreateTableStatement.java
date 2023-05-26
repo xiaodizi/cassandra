@@ -160,6 +160,9 @@ public final class CreateTableStatement extends AlterSchemaStatement
             if (raw.rawMask != null)
                 ColumnMask.ensureEnabled();
         }
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 

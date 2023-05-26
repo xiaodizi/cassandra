@@ -93,19 +93,34 @@ public class BigTableWriterTest extends AbstractTransactionalTest
 
         protected void assertInProgress() throws Exception
         {
+<<<<<<< HEAD:test/unit/org/apache/cassandra/io/sstable/BigTableWriterTest.java
             assertExists(Component.DATA, Component.PRIMARY_INDEX);
             assertNotExists(Component.FILTER, Component.SUMMARY);
+=======
+            assertExists(descriptor.version.format.primaryComponents());
+            assertNotExists(descriptor.version.format.generatedOnLoadComponents());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/SSTableWriterTransactionTest.java
             Assert.assertTrue(file.length() > 0);
         }
 
         protected void assertPrepared() throws Exception
         {
+<<<<<<< HEAD:test/unit/org/apache/cassandra/io/sstable/BigTableWriterTest.java
             assertExists(Component.DATA, Component.PRIMARY_INDEX, Component.FILTER, Component.SUMMARY);
+=======
+            assertExists(descriptor.version.format.primaryComponents());
+            assertExists(descriptor.version.format.generatedOnLoadComponents());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/SSTableWriterTransactionTest.java
         }
 
         protected void assertAborted() throws Exception
         {
+<<<<<<< HEAD:test/unit/org/apache/cassandra/io/sstable/BigTableWriterTest.java
             assertNotExists(Component.DATA, Component.PRIMARY_INDEX, Component.FILTER, Component.SUMMARY);
+=======
+            assertNotExists(descriptor.version.format.primaryComponents());
+            assertNotExists(descriptor.version.format.generatedOnLoadComponents());
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/io/sstable/SSTableWriterTransactionTest.java
             Assert.assertFalse(file.exists());
         }
 

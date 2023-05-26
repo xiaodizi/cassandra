@@ -329,4 +329,7 @@ CREATE TABLE escape_quotes (
 );
 
 INSERT INTO escape_quotes (id, text_data, map_data, set_data, list_data, tuple_data, udt_data) values(1, 'I''m newb', {1:'I''m newb'}, {'I''m newb'}, ['I''m newb'], (1, 'I''m newb'), {data: 'I''m newb'});
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

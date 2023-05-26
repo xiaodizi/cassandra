@@ -149,6 +149,7 @@ abstract public class FileBasedSslContextFactory extends AbstractSslContextFacto
     protected KeyManagerFactory buildKeyManagerFactory() throws SSLException
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         try (InputStream ksf = Files.newInputStream(File.getPath(keystore)))
         {
@@ -169,6 +170,8 @@ abstract public class FileBasedSslContextFactory extends AbstractSslContextFacto
             throw new SSLException("failed to build key manager store for secure connections", e);
         }
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         /*
          * Validation of the password is delayed until this point to allow nullable keystore passwords
          * for other use-cases (CASSANDRA-18124).
@@ -199,7 +202,11 @@ abstract public class FileBasedSslContextFactory extends AbstractSslContextFacto
     protected TrustManagerFactory buildTrustManagerFactory() throws SSLException
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         try (InputStream tsf = Files.newInputStream(File.getPath(truststore)))
+=======
+        try (InputStream tsf = Files.newInputStream(File.getPath(trustStoreContext.filePath)))
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
         try (InputStream tsf = Files.newInputStream(File.getPath(trustStoreContext.filePath)))
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -208,7 +215,13 @@ abstract public class FileBasedSslContextFactory extends AbstractSslContextFacto
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
             KeyStore ts = KeyStore.getInstance(store_type);
 <<<<<<< HEAD
+<<<<<<< HEAD
             ts.load(tsf, truststore_password.toCharArray());
+=======
+
+            final char[] truststorePassword = StringUtils.isEmpty(trustStoreContext.password) ? null : trustStoreContext.password.toCharArray();
+            ts.load(tsf, truststorePassword);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 
             final char[] truststorePassword = StringUtils.isEmpty(trustStoreContext.password) ? null : trustStoreContext.password.toCharArray();

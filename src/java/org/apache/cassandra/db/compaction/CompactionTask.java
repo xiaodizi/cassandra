@@ -133,14 +133,20 @@ public class CompactionTask extends AbstractCompactionTask
 
             // select SSTables to compact based on available disk space.
 <<<<<<< HEAD
+<<<<<<< HEAD
             buildCompactionCandidatesForAvailableDiskSpace(fullyExpiredSSTables);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             if (!buildCompactionCandidatesForAvailableDiskSpace(fullyExpiredSSTables, taskId))
             {
                 // The set of sstables has changed (one or more were excluded due to limited available disk space).
                 // We need to recompute the overlaps between sstables.
                 controller.refreshOverlaps();
             }
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
             // sanity check: all sstables must belong to the same cfs
@@ -361,10 +367,18 @@ public class CompactionTask extends AbstractCompactionTask
     /*
      * Checks if we have enough disk space to execute the compaction.  Drops the largest sstable out of the Task until
 <<<<<<< HEAD
+<<<<<<< HEAD
      * there's enough space (in theory) to handle the compaction.  Does not take into account space that will be taken by
      * other compactions.
      */
     protected void buildCompactionCandidatesForAvailableDiskSpace(final Set<SSTableReader> fullyExpiredSSTables)
+=======
+     * there's enough space (in theory) to handle the compaction.
+     *
+     * @return true if there is enough disk space to execute the complete compaction, false if some sstables are excluded.
+     */
+    protected boolean buildCompactionCandidatesForAvailableDiskSpace(final Set<SSTableReader> fullyExpiredSSTables, TimeUUID taskId)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
      * there's enough space (in theory) to handle the compaction.
      *
@@ -435,7 +449,11 @@ public class CompactionTask extends AbstractCompactionTask
             return false;
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+        return true;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
         return true;
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

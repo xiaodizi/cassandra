@@ -191,6 +191,9 @@ Merged from 3.0:
  * Save host id to system.local and flush immediately after startup (CASSANDRA-18153)
 
 
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 4.1.1
  * Deprecate org.apache.cassandra.hadoop code (CASSANDRA-16984)
@@ -254,6 +257,11 @@ Merged from 3.0:
  * Allow pre-V5 global limit on bytes in flight to revert to zero asynchronously in RateLimitingTest (CASSANDRA-17927)
 Merged from 4.0:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+ * Backport CASSANDRA-17205 to 4.0 branch - Remove self-reference in SSTableTidier (CASSANDRA-18332)
+ * Avoid loading the preferred IP for BulkLoader streaming (CASSANDRA-18370)
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
  * Backport CASSANDRA-17205 to 4.0 branch - Remove self-reference in SSTableTidier (CASSANDRA-18332)
  * Avoid loading the preferred IP for BulkLoader streaming (CASSANDRA-18370)
@@ -276,6 +284,10 @@ Merged from 3.0:
  * Fix auto-completing "WITH" when creating a materialized view (CASSANDRA-17879)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

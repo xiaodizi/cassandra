@@ -430,7 +430,10 @@ public interface GuardrailsMBean
 
     /**
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
      * @return The threshold to warn when encountering partitions larger than threshold, as a string formatted as in,
      * for example, {@code 10GiB}, {@code 20MiB}, {@code 30KiB} or {@code 40B}. A {@code null} value means disabled.
      */
@@ -699,5 +702,8 @@ public interface GuardrailsMBean
      *                     {@code 20m}, {@code 30h} or {@code 40d}. A {@code null} value means disabled.
      */
     void setMinimumTimestampThreshold(@Nullable String warnDuration, @Nullable String failDuration);
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 }

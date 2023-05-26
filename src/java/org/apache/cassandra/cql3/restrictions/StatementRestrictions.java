@@ -277,7 +277,10 @@ public final class StatementRestrictions
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public boolean requiresAllowFilteringIfNotSpecified()
     {
         if (!table.isVirtual())

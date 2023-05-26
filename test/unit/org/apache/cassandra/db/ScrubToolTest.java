@@ -45,6 +45,7 @@ import static org.apache.cassandra.SchemaLoader.createKeyspace;
 import static org.apache.cassandra.SchemaLoader.getCompressionParameters;
 import static org.apache.cassandra.SchemaLoader.loadSchema;
 import static org.apache.cassandra.SchemaLoader.standardCFMD;
+<<<<<<< HEAD:test/unit/org/apache/cassandra/db/ScrubToolTest.java
 import static org.apache.cassandra.db.ScrubTest.CF_INDEX1;
 import static org.apache.cassandra.db.ScrubTest.CF_INDEX1_BYTEORDERED;
 import static org.apache.cassandra.db.ScrubTest.CF_INDEX2;
@@ -56,6 +57,20 @@ import static org.apache.cassandra.db.ScrubTest.assertOrderedAll;
 import static org.apache.cassandra.db.ScrubTest.fillCF;
 import static org.apache.cassandra.db.ScrubTest.fillCounterCF;
 import static org.apache.cassandra.db.ScrubTest.overrideWithGarbage;
+=======
+import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_UTIL_ALLOW_TOOL_REINIT_FOR_TEST;
+import static org.apache.cassandra.io.sstable.ScrubTest.CF_INDEX1;
+import static org.apache.cassandra.io.sstable.ScrubTest.CF_INDEX1_BYTEORDERED;
+import static org.apache.cassandra.io.sstable.ScrubTest.CF_INDEX2;
+import static org.apache.cassandra.io.sstable.ScrubTest.CF_INDEX2_BYTEORDERED;
+import static org.apache.cassandra.io.sstable.ScrubTest.CF_UUID;
+import static org.apache.cassandra.io.sstable.ScrubTest.COMPRESSION_CHUNK_LENGTH;
+import static org.apache.cassandra.io.sstable.ScrubTest.COUNTER_CF;
+import static org.apache.cassandra.io.sstable.ScrubTest.assertOrderedAll;
+import static org.apache.cassandra.io.sstable.ScrubTest.fillCF;
+import static org.apache.cassandra.io.sstable.ScrubTest.fillCounterCF;
+import static org.apache.cassandra.io.sstable.ScrubTest.overrideWithGarbage;
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:test/unit/org/apache/cassandra/tools/nodetool/ScrubToolTest.java
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -89,7 +104,7 @@ public class ScrubToolTest
         keyspace = Keyspace.open(ksName);
 
         CompactionManager.instance.disableAutoCompaction();
-        System.setProperty(org.apache.cassandra.tools.Util.ALLOW_TOOL_REINIT_FOR_TEST, "true"); // Necessary for testing
+        TEST_UTIL_ALLOW_TOOL_REINIT_FOR_TEST.setBoolean(true);
     }
 
     @Test

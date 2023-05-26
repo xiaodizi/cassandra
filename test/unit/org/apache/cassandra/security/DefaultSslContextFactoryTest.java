@@ -34,6 +34,8 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslProvider;
 import org.apache.cassandra.config.EncryptionOptions;
 
+import static org.apache.cassandra.config.CassandraRelevantProperties.DISABLE_TCACTIVE_OPENSSL;
+
 public class DefaultSslContextFactoryTest
 {
     private Map<String,Object> commonConfig = new HashMap<>();
@@ -112,6 +114,7 @@ public class DefaultSslContextFactoryTest
         Map<String,Object> config = new HashMap<>();
         config.putAll(commonConfig);
         config.put("keystore", "/this/is/probably/not/a/file/on/your/test/machine");
+        config.put("keystore_password", "ThisWontMatter");
 
         DefaultSslContextFactory defaultSslContextFactoryImpl = new DefaultSslContextFactory(config);
         defaultSslContextFactoryImpl.checkedExpiry = false;
@@ -151,19 +154,74 @@ public class DefaultSslContextFactoryTest
         DefaultSslContextFactory defaultSslContextFactoryImpl3 = new DefaultSslContextFactory(config);
         Assert.assertFalse(defaultSslContextFactoryImpl3.checkedExpiry);
         defaultSslContextFactoryImpl3.buildKeyManagerFactory();
+<<<<<<< HEAD
         Assert.assertTrue(defaultSslContextFactoryImpl3.checkedExpiry);
+=======
+        Assert.assertTrue(defaultSslContextFactoryImpl3.keystoreContext.checkedExpiry);
+    }
+
+    @Test(expected = IOException.class)
+    public void buildOutboundKeyManagerFactoryWithInvalidKeystoreFile() throws IOException
+    {
+        Map<String, Object> config = new HashMap<>();
+        config.putAll(commonConfig);
+        config.put("outbound_keystore", "/this/is/probably/not/a/file/on/your/test/machine");
+        config.put("outbound_keystore_password", "ThisWontMatter");
+
+        DefaultSslContextFactory defaultSslContextFactoryImpl = new DefaultSslContextFactory(config);
+        defaultSslContextFactoryImpl.outboundKeystoreContext.checkedExpiry = false;
+        defaultSslContextFactoryImpl.buildOutboundKeyManagerFactory();
+    }
+
+    @Test(expected = IOException.class)
+    public void buildOutboundKeyManagerFactoryWithBadPassword() throws IOException
+    {
+        Map<String, Object> config = new HashMap<>();
+        config.putAll(commonConfig);
+        addOutboundKeystoreOptions(config);
+        config.put("outbound_keystore_password", "HomeOfBadPasswords");
+
+        DefaultSslContextFactory defaultSslContextFactoryImpl = new DefaultSslContextFactory(config);
+        defaultSslContextFactoryImpl.buildOutboundKeyManagerFactory();
+    }
+
+    @Test
+    public void buildOutboundKeyManagerFactoryHappyPath() throws IOException
+    {
+        Map<String, Object> config = new HashMap<>();
+        config.putAll(commonConfig);
+
+        DefaultSslContextFactory defaultSslContextFactoryImpl = new DefaultSslContextFactory(config);
+        // Make sure the exiry check didn't happen so far for the private key
+        Assert.assertFalse(defaultSslContextFactoryImpl.outboundKeystoreContext.checkedExpiry);
+
+        addOutboundKeystoreOptions(config);
+        DefaultSslContextFactory defaultSslContextFactoryImpl2 = new DefaultSslContextFactory(config);
+        // Trigger the private key loading. That will also check for expired private key
+        defaultSslContextFactoryImpl2.buildOutboundKeyManagerFactory();
+        // Now we should have checked the private key's expiry
+        Assert.assertTrue(defaultSslContextFactoryImpl2.outboundKeystoreContext.checkedExpiry);
+        Assert.assertFalse(defaultSslContextFactoryImpl2.keystoreContext.checkedExpiry);
+
+        // Make sure that new factory object preforms the fresh private key expiry check
+        DefaultSslContextFactory defaultSslContextFactoryImpl3 = new DefaultSslContextFactory(config);
+        Assert.assertFalse(defaultSslContextFactoryImpl3.outboundKeystoreContext.checkedExpiry);
+        defaultSslContextFactoryImpl3.buildOutboundKeyManagerFactory();
+        Assert.assertTrue(defaultSslContextFactoryImpl3.outboundKeystoreContext.checkedExpiry);
+        Assert.assertFalse(defaultSslContextFactoryImpl2.keystoreContext.checkedExpiry);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     @Test
     public void testDisableOpenSslForInJvmDtests() {
         // The configuration name below is hard-coded intentionally to make sure we don't break the contract without
         // changing the documentation appropriately
-        System.setProperty("cassandra.disable_tcactive_openssl","true");
+        DISABLE_TCACTIVE_OPENSSL.setBoolean(true);
         Map<String,Object> config = new HashMap<>();
         config.putAll(commonConfig);
 
         DefaultSslContextFactory defaultSslContextFactoryImpl = new DefaultSslContextFactory(config);
         Assert.assertEquals(SslProvider.JDK, defaultSslContextFactoryImpl.getSslProvider());
-        System.clearProperty("cassandra.disable_tcactive_openssl");
+        DISABLE_TCACTIVE_OPENSSL.clearValue();
     }
 }

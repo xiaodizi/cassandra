@@ -1,7 +1,13 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 = New Features in Apache Cassandra 4.1
 =======
 = New Features
+=======
+= New Features
+
+== New Features in Apache Cassandra 5.0
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
 == New Features in Apache Cassandra 5.0
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -36,4 +42,7 @@ This section covers the new features in Apache Cassandra 4.1.
 * https://issues.apache.org/jira/browse/CASSANDRA-17221[Add new Mathematical CQL functions: abs, exp, log, log10 and round]
 * https://issues.apache.org/jira/browse/CASSANDRA-18060[Added new CQL native scalar functions for collections] 
 ** The new functions are mostly analogous to the existing aggregation functions, but they operate on the elements of collection columns. The new functions are `map_keys`, `map_values`, `collection_count`, `collection_min`, `collection_max`, `collection_sum` and `collection_avg`.
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f

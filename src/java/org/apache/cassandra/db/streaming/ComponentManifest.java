@@ -25,6 +25,9 @@ import com.google.common.collect.Iterators;
 =======
 
 import org.apache.cassandra.config.DatabaseDescriptor;
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.db.TypeSizes;
 import org.apache.cassandra.io.IVersionedSerializer;
@@ -120,16 +123,22 @@ public final class ComponentManifest implements Iterable<Component>
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public static final IVersionedSerializer<ComponentManifest> serializer = new IVersionedSerializer<ComponentManifest>()
     {
         public void serialize(ComponentManifest manifest, DataOutputPlus out, int version) throws IOException
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public static final Map<String, IVersionedSerializer<ComponentManifest>> serializers;
 
     static
     {
         ImmutableMap.Builder<String, IVersionedSerializer<ComponentManifest>> b = ImmutableMap.builder();
         for (SSTableFormat<?, ?> format : DatabaseDescriptor.getSSTableFormats().values())
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         {
             out.writeUnsignedVInt(manifest.components.size());
@@ -180,6 +189,9 @@ public final class ComponentManifest implements Iterable<Component>
             };
 
             b.put(format.name(), serializer);
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         }
 

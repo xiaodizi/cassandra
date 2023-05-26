@@ -136,6 +136,20 @@ public class BigFormat implements SSTableFormat
     public BigFormat(Map<String, String> options)
     {
         super(NAME, options);
+<<<<<<< HEAD
+=======
+    }
+
+    @Override
+    public String name()
+    {
+        return NAME;
+    }
+
+    public static boolean is(SSTableFormat<?, ?> format)
+    {
+        return format.name().equals(NAME);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     @Override
@@ -360,6 +374,22 @@ public class BigFormat implements SSTableFormat
         public boolean hasOldBfFormat()
         {
             return hasOldBfFormat;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class BigFormatFactory implements Factory
+    {
+        @Override
+        public String name()
+        {
+            return NAME;
+        }
+
+        @Override
+        public SSTableFormat<?, ?> getInstance(Map<String, String> options)
+        {
+            return new BigFormat(options);
         }
     }
 

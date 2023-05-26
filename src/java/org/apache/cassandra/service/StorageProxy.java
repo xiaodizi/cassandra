@@ -1593,8 +1593,11 @@ public class StorageProxy implements StorageProxyMBean
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static void performLocally(Stage stage, Replica localReplica, final Runnable runnable)
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static Replica pickReplica(EndpointsForToken targets)
     {
         EndpointsForToken healthy = targets.filter(r -> DynamicEndpointSnitch.getSeverity(r.endpoint()) == 0);

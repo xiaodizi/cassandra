@@ -23,7 +23,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.util.HashSet;
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 =======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import java.util.Map;
@@ -363,12 +366,20 @@ public class Config
     public String[] data_file_directories = new String[0];
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public static class SSTableConfig
     {
         public String selected_format = BigFormat.NAME;
         public Map<String, Map<String, String>> format = new HashMap<>();
     }
+<<<<<<< HEAD
+=======
+
+    public final SSTableConfig sstable = new SSTableConfig();
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
     public final SSTableConfig sstable = new SSTableConfig();
 
@@ -1223,5 +1234,8 @@ public class Config
     public String heap_dump_path = "heapdump";
 
     public double severity_during_decommission = 0;
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 }

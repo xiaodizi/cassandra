@@ -77,7 +77,10 @@ public class GuardrailsOptions implements GuardrailsConfig
         config.write_consistency_levels_warned = validateConsistencyLevels(config.write_consistency_levels_warned, "write_consistency_levels_warned");
         config.write_consistency_levels_disallowed = validateConsistencyLevels(config.write_consistency_levels_disallowed, "write_consistency_levels_disallowed");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         validateSizeThreshold(config.partition_size_warn_threshold, config.partition_size_fail_threshold, false, "partition_size");
         validateSizeThreshold(config.column_value_size_warn_threshold, config.column_value_size_fail_threshold, false, "column_value_size");
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
@@ -93,6 +96,9 @@ public class GuardrailsOptions implements GuardrailsConfig
         validateMaxRFThreshold(config.maximum_replication_factor_warn_threshold, config.maximum_replication_factor_fail_threshold);
         validateTimestampThreshold(config.maximum_timestamp_warn_threshold, config.maximum_timestamp_fail_threshold, "maximum_timestamp");
         validateTimestampThreshold(config.minimum_timestamp_warn_threshold, config.minimum_timestamp_fail_threshold, "minimum_timestamp");
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
@@ -508,7 +514,10 @@ public class GuardrailsOptions implements GuardrailsConfig
     @Override
     @Nullable
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public DataStorageSpec.LongBytesBound getPartitionSizeWarnThreshold()
     {
         return config.partition_size_warn_threshold;
@@ -818,6 +827,9 @@ public class GuardrailsOptions implements GuardrailsConfig
                                   x -> config.minimum_timestamp_fail_threshold = x);
     }
 
+<<<<<<< HEAD
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
+=======
 >>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static <T> void updatePropertyWithLogging(String propertyName, T newValue, Supplier<T> getter, Consumer<T> setter)
     {
@@ -890,6 +902,18 @@ public class GuardrailsOptions implements GuardrailsConfig
     {
         validateMinIntThreshold(warn, fail, name);
         validateMinRFVersusDefaultRF(fail, name);
+    }
+
+    public static void validateTimestampThreshold(DurationSpec.LongMicrosecondsBound warn,
+                                                  DurationSpec.LongMicrosecondsBound fail,
+                                                  String name)
+    {
+        // this function is used for both upper and lower thresholds because lower threshold is relative
+        // despite using MinThreshold we still want the warn threshold to be less than or equal to
+        // the fail threshold.
+        validateMaxLongThreshold(warn == null ? -1 : warn.toMicroseconds(),
+                                 fail == null ? -1 : fail.toMicroseconds(),
+                                 name, true);
     }
 
     public static void validateTimestampThreshold(DurationSpec.LongMicrosecondsBound warn,

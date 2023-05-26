@@ -51,8 +51,11 @@ public class DataOutputBuffer extends BufferedDataOutputStreamPlus
      * Only recycle OutputBuffers up to 1Mb. Larger buffers will be trimmed back to this size.
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static final int MAX_RECYCLE_BUFFER_SIZE = Integer.getInteger(Config.PROPERTY_PREFIX + "dob_max_recycle_bytes", 1024 * 1024);
 =======
+=======
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static final int MAX_RECYCLE_BUFFER_SIZE = DOB_MAX_RECYCLE_BYTES.getInt();
     private enum AllocationType { DIRECT, ONHEAP }
     private static final AllocationType ALLOCATION_TYPE = DATA_OUTPUT_BUFFER_ALLOCATE_TYPE.getEnum(AllocationType.DIRECT);

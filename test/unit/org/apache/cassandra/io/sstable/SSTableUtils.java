@@ -80,7 +80,11 @@ public class SSTableUtils
         File cfDir = new File(tempdir, keyspaceName + File.pathSeparator() + cfname);
         cfDir.tryCreateDirectories();
         cfDir.deleteOnExit();
+<<<<<<< HEAD
         File datafile = new File(new Descriptor(cfDir, keyspaceName, cfname, id, SSTableFormat.Type.BIG).filenameFor(Component.DATA));
+=======
+        File datafile = new Descriptor(cfDir, keyspaceName, cfname, id, BigFormat.getInstance()).fileFor(Components.DATA);
+>>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         if (!datafile.createFileIfNotExists())
             throw new IOException("unable to create file " + datafile);
         datafile.deleteOnExit();
