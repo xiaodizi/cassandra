@@ -121,7 +121,7 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps) {
+    public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps,String keyValue) {
 //        String nodeUrl = getRandomNode(url);
         String nodeUrl = url;
         System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
@@ -131,7 +131,7 @@ public class HttpUtil {
         }
         Unirest.setTimeouts(0, 0);
         try {
-            String bulkApiJson = EsUtil.getBulkCreateApiJson(maps);
+            String bulkApiJson = EsUtil.getBulkCreateApiJson(maps,keyValue);
             System.out.println("bulkApiJson:"+bulkApiJson);
             HttpResponse<String> response = Unirest.post(nodeUrl+"/"+indexName+"/_bulk")
                     .header("Content-Type", "application/x-ndjson")

@@ -136,7 +136,7 @@ public class AuditLogEntry {
                             if (aBoolean) {
                                 if (sql.indexOf("insert") > 0) {
                                     Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
-                                    HttpUtil.bulkIndex(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+                                    HttpUtil.bulkIndex(esNodeList, keyspace + "-" + matchSqlTableName, maps,null);
                                 } else if (sql.indexOf("update") > 0) {
                                     Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
 
@@ -176,7 +176,7 @@ public class AuditLogEntry {
                         } else {
                             Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
                             System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
-                            HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps);
+                            HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps,null);
                         }
                     }
                 }

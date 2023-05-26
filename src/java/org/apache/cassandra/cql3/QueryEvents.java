@@ -30,6 +30,9 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.cassandra.audit.es.BinaryStringConverteUtil;
 import org.apache.cassandra.audit.es.HttpUtil;
 import org.apache.cassandra.config.DatabaseDescriptor;
+import org.apache.cassandra.db.ColumnFamilyStore;
+import org.apache.cassandra.db.Keyspace;
+import org.apache.cassandra.schema.ColumnMetadata;
 import org.apache.cassandra.schema.TableMetadata;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -115,10 +118,6 @@ public class QueryEvents {
                     ColumnSpecification cs = statement.getBindVariables().get(i);
                     String boundName = cs.name.toString();
                     String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    System.out.println("字段名字:" + boundName + ";类型:" + cs.type.asCQL3Type());
-                    System.out.println("key:" + boundName);
-                    System.out.println("value:" + boundValue);
-                    System.out.println("Interned:"+cs.name);
                     // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
                     boundValue = boundValue.replace("\\", "");
                     boundValue = boundValue.replace("\"", "");
@@ -126,7 +125,16 @@ public class QueryEvents {
 
                 }
                 if (syncEs) {
-                    HttpUtil.bulkIndex("http://127.0.0.1:9200", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps);
+                    ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
+                    Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+                    List<Object> objects = new ArrayList<>();
+                    columnMetadata.forEach(objects::add);
+                    String keyValue="";
+                    if (objects.size() > 0) {
+                        String key = objects.get(0).toString();
+                        keyValue = maps.get(key).toString();
+                    }
+                    HttpUtil.bulkIndex("http://127.0.0.1:9200", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
                 }
 
             }
@@ -150,7 +158,16 @@ public class QueryEvents {
 
                 }
                 if (syncEs) {
-                    HttpUtil.bulkIndex("http://127.0.0.1:9200", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps);
+                    ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
+                    Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+                    List<Object> objects = new ArrayList<>();
+                    columnMetadata.forEach(objects::add);
+                    String keyValue="";
+                    if (objects.size() > 0) {
+                        String key = objects.get(0).toString();
+                        keyValue = maps.get(key).toString();
+                    }
+                    HttpUtil.bulkIndex("http://127.0.0.1:9200", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
                 }
 
             }
