@@ -18,6 +18,11 @@ import java.util.Map;
 
 public class HttpUtil {
 
+    static {
+        Unirest.setTimeouts(0, 0);
+    }
+
+
     public static DataRsp getClusterHealth(String url){
         String nodeUrl = getRandomNode(url);
         System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
@@ -26,7 +31,6 @@ public class HttpUtil {
             return DataRsp.getError406();
         }
         EsClusterDto esClusterDto=null;
-        Unirest.setTimeouts(0, 0);
         try {
             HttpResponse<String> response = Unirest.get(nodeUrl+"/_cluster/health")
                     .asString();
@@ -61,7 +65,6 @@ public class HttpUtil {
         DataRsp clusterHealth = getClusterHealth(url);
         int numSharedNodes = Integer.parseInt(clusterHealth.getData().toString());
 
-        Unirest.setTimeouts(0, 0);
         try {
             HttpResponse<String> response = Unirest.put(nodeUrl + "/" + indexName)
                     .header("Content-Type", "application/json")
@@ -97,7 +100,6 @@ public class HttpUtil {
             // es_node_list 配置为空 返回 406
             return DataRsp.getError406();
         }
-        Unirest.setTimeouts(0, 0);
         try {
             HttpResponse<String> response = Unirest.put(nodeUrl + "/" + indexName + "/_doc/" + id)
                     .header("Content-Type", "application/json")
@@ -122,14 +124,13 @@ public class HttpUtil {
 
 
     public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps,String keyValue) {
-//        String nodeUrl = getRandomNode(url);
-        String nodeUrl = url;
+        String nodeUrl = getRandomNode(url);
         System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             // es_node_list 配置为空 返回 406
             return DataRsp.getError406();
         }
-        Unirest.setTimeouts(0, 0);
+
         try {
             String bulkApiJson = EsUtil.getBulkCreateApiJson(maps,keyValue);
             System.out.println("bulkApiJson:"+bulkApiJson);
@@ -152,7 +153,6 @@ public class HttpUtil {
             // es_node_list 配置为空 返回 406
             return DataRsp.getError406();
         }
-        Unirest.setTimeouts(0, 0);
         try {
             String bulkApiJson = EsUtil.getBulkUpdateApiJson(maps,docId);
             HttpResponse<String> response = Unirest.post(nodeUrl+"/"+indexName+"/_bulk")
@@ -182,7 +182,6 @@ public class HttpUtil {
             return DataRsp.getError406();
         }
         List<Hites> hitesList = new ArrayList<>();
-        Unirest.setTimeouts(0, 0);
         try {
 
             String requestJson = EsUtil.getDslQueryJson(maps);
@@ -229,7 +228,6 @@ public class HttpUtil {
             // es_node_list 配置为空 返回 406
             return DataRsp.getError406();
         }
-        Unirest.setTimeouts(0, 0);
         try {
             HttpResponse<String> response = Unirest.get(nodeUrl + "/" + indexName + "/_doc/" + id)
                     .header("Content-Type", "application/json")
@@ -261,7 +259,6 @@ public class HttpUtil {
         if (StringUtils.isBlank(nodeUrl)) {
             return DataRsp.getError406();
         }
-        Unirest.setTimeouts(0, 0);
         try {
             String requestJson = EsUtil.getDslQueryJson(maps);
             System.out.println("删除 DSL：" + requestJson);
@@ -307,7 +304,6 @@ public class HttpUtil {
         if (StringUtils.isBlank(nodeUrl)) {
             return DataRsp.getError406();
         }
-        Unirest.setTimeouts(0, 0);
         try {
 
             HttpResponse<String> response = Unirest.delete(nodeUrl + "/" + indexName)

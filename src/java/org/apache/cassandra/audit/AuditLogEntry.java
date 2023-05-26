@@ -20,6 +20,7 @@ package org.apache.cassandra.audit;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.annotation.Nullable;
 
 import com.alibaba.fastjson2.JSON;
@@ -45,6 +46,13 @@ import static org.apache.cassandra.utils.Clock.Global.currentTimeMillis;
 public class AuditLogEntry {
 
     private static final Logger logger = LoggerFactory.getLogger(AuditLogEntry.class);
+
+    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(2000);
+    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
+    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
+            .MILLISECONDS,
+            workingQueue,
+            rejectedExecutionHandler);
 
     private final InetAddressAndPort host = FBUtilities.getBroadcastAddressAndPort();
     private final InetAddressAndPort source;
@@ -106,99 +114,104 @@ public class AuditLogEntry {
             String s = operation.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}+", " ");
             builder.append("|operation:").append(s);
 
-            System.out.println("操作CQL："+operation);
+            System.out.println("操作CQL：" + operation);
 
-            String esNodeList = DatabaseDescriptor.getEsNodeList();
+            fixedThreadPoolOtherData.execute(new Runnable() {
+                @Override
+                public void run() {
+                    String esNodeList = DatabaseDescriptor.getEsNodeList();
 
-            if (!operation.contains("?") && !operation.contains(":")) {
+                    if (!operation.contains("?") && !operation.contains(":")) {
 
-                if (type.toString().equals("CREATE_TABLE")) {
-                    boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
-                    logger.info("CREATE_TABLE 同步ES：" + syncEs);
-                    System.out.println("CREATE_TABLE 同步ES：" + syncEs);
-                    if (syncEs) {
-                        HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
-                    }
-                }
+                        if (type.toString().equals("CREATE_TABLE")) {
+                            boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
+                            logger.info("CREATE_TABLE 同步ES：" + syncEs);
+                            System.out.println("CREATE_TABLE 同步ES：" + syncEs);
+                            if (syncEs) {
+                                HttpUtil.newCreateIndex(esNodeList, keyspace + "-" + scope);
+                            }
+                        }
 
 
-                if (type.toString().equals("BATCH")) {
-                    String batchSql = s.replace("BEGIN BATCH", "").replace("APPLY BATCH;", "");
-                    String[] split = batchSql.split(";");
-                    for (int i = 0; i < split.length; i++) {
-                        String sql = split[i].toLowerCase();
-                        if (!StringUtils.isBlank(sql)) {
-                            sql = sql + ";";
-                            logger.info("BATCH 解析 CQL 语句:" + sql);
-                            String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
-                            Boolean aBoolean = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + matchSqlTableName) ? true : false;
-                            logger.info("BATCH 同步es：" + aBoolean);
-                            if (aBoolean) {
-                                if (sql.indexOf("insert") > 0) {
-                                    Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
-                                    HttpUtil.bulkIndex(esNodeList, keyspace + "-" + matchSqlTableName, maps,null);
-                                } else if (sql.indexOf("update") > 0) {
-                                    Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
+                        if (type.toString().equals("BATCH")) {
+                            String batchSql = s.replace("BEGIN BATCH", "").replace("APPLY BATCH;", "");
+                            String[] split = batchSql.split(";");
+                            for (int i = 0; i < split.length; i++) {
+                                String sql = split[i].toLowerCase();
+                                if (!StringUtils.isBlank(sql)) {
+                                    sql = sql + ";";
+                                    logger.info("BATCH 解析 CQL 语句:" + sql);
+                                    String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
+                                    Boolean aBoolean = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + matchSqlTableName) ? true : false;
+                                    logger.info("BATCH 同步es：" + aBoolean);
+                                    if (aBoolean) {
+                                        if (sql.indexOf("insert") > 0) {
+                                            Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
+                                            HttpUtil.bulkIndex(esNodeList, keyspace + "-" + matchSqlTableName, maps, null);
+                                        } else if (sql.indexOf("update") > 0) {
+                                            Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
 
-                                    Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(sql);
+                                            Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(sql);
+                                            DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                                            List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
+                                            hitesList.stream().forEach(hites -> {
+                                                Map<String, Object> source = hites.get_source();
+                                                Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
+                                                HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
+                                            });
+                                        } else if (sql.indexOf("delete") > 0) {
+                                            Map maps = SqlToJson.sqlDeleteToJson(sql);
+                                            HttpUtil.deleteData(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (type.toString().equals("UPDATE")) {
+                            boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
+                            logger.info("UPDATE 同步es：" + syncEs);
+                            if (syncEs) {
+                                if (s.toLowerCase(Locale.ROOT).contains("update")) {
+                                    Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
+
+                                    Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
                                     DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
                                     List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
                                     hitesList.stream().forEach(hites -> {
                                         Map<String, Object> source = hites.get_source();
                                         Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                                        HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
+                                        HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
                                     });
-                                } else if (sql.indexOf("delete") > 0) {
-                                    Map maps = SqlToJson.sqlDeleteToJson(sql);
-                                    HttpUtil.deleteData(esNodeList, keyspace + "-" + matchSqlTableName, maps);
+
+                                } else {
+                                    Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
+                                    System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
+                                    HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps, null);
                                 }
+                            }
+                        }
+
+
+                        if (type.toString().equals("DELETE")) {
+                            boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
+                            logger.info("DELETE 同步es：" + syncEs);
+                            if (syncEs) {
+                                Map maps = SqlToJson.sqlDeleteToJson(s);
+                                HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
+                            }
+                        }
+
+                        if (type.toString().equals("DROP_TABLE")) {
+                            boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
+                            logger.info("DROP TABLE 同步es：" + syncEs);
+                            if (syncEs) {
+                                HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
                             }
                         }
                     }
                 }
-
-                if (type.toString().equals("UPDATE")) {
-                    boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
-                    logger.info("UPDATE 同步es：" + syncEs);
-                    if (syncEs) {
-                        if (s.toLowerCase(Locale.ROOT).contains("update")) {
-                            Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
-
-                            Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
-                            DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
-                            List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
-                            hitesList.stream().forEach(hites -> {
-                                Map<String, Object> source = hites.get_source();
-                                Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                                HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
-                            });
-
-                        } else {
-                            Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
-                            System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
-                            HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps,null);
-                        }
-                    }
-                }
-
-
-                if (type.toString().equals("DELETE")) {
-                    boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
-                    logger.info("DELETE 同步es：" + syncEs);
-                    if (syncEs) {
-                        Map maps = SqlToJson.sqlDeleteToJson(s);
-                        HttpUtil.deleteData(esNodeList, keyspace + "-" + scope, maps);
-                    }
-                }
-
-                if (type.toString().equals("DROP_TABLE")) {
-                    boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
-                    logger.info("DROP TABLE 同步es：" + syncEs);
-                    if (syncEs) {
-                        HttpUtil.dropIndex(esNodeList, keyspace + "-" + scope);
-                    }
-                }
-            }
+            });
 
         }
         return builder.toString();

@@ -20,8 +20,7 @@ package org.apache.cassandra.cql3;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -52,6 +51,13 @@ public class QueryEvents {
     public static final QueryEvents instance = new QueryEvents();
 
     private final Set<Listener> listeners = new CopyOnWriteArraySet<>();
+
+    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(2000);
+    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
+    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
+            .MILLISECONDS,
+            workingQueue,
+            rejectedExecutionHandler);
 
     @VisibleForTesting
     public int listenerCount() {
@@ -111,64 +117,72 @@ public class QueryEvents {
             String cql = maybeObfuscatedQuery;
             System.out.println("------------notifyExecuteSuccess 找数据------------");
             if (cql.contains("?")) {
-                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(statement.getAuditLogContext().keyspace + "." + statement.getAuditLogContext().scope) ? true : false;
-                Map<String, Object> maps = new HashMap<>();
-                for (int i = 0; i < statement.getBindVariables().size(); i++) {
-
-                    ColumnSpecification cs = statement.getBindVariables().get(i);
-                    String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
-                    boundValue = boundValue.replace("\\", "");
-                    boundValue = boundValue.replace("\"", "");
-                    maps.put(boundName, boundValue);
-
-                }
-                if (syncEs) {
-                    ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
-                    Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
-                    List<Object> objects = new ArrayList<>();
-                    columnMetadata.forEach(objects::add);
-                    String keyValue="";
-                    if (objects.size() > 0) {
-                        String key = objects.get(0).toString();
-                        keyValue = maps.get(key).toString();
+                fixedThreadPoolOtherData.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(statement.getAuditLogContext().keyspace + "." + statement.getAuditLogContext().scope) ? true : false;
+                        Map<String, Object> maps = new HashMap<>();
+                        for (int i = 0; i < statement.getBindVariables().size(); i++) {
+                            ColumnSpecification cs = statement.getBindVariables().get(i);
+                            String boundName = cs.name.toString();
+                            String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                            // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                            boundValue = boundValue.replace("\\", "");
+                            boundValue = boundValue.replace("\"", "");
+                            maps.put(boundName, boundValue);
+                        }
+                        if (syncEs) {
+                            ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
+                            Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+                            List<Object> objects = new ArrayList<>();
+                            columnMetadata.forEach(objects::add);
+                            String keyValue="";
+                            if (objects.size() > 0) {
+                                String key = objects.get(0).toString();
+                                keyValue = maps.get(key).toString();
+                            }
+                            HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
+                        }
                     }
-                    HttpUtil.bulkIndex("http://127.0.0.1:9200", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
-                }
+                });
 
             }
 
             if (cql.contains(":")) {
-                boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(statement.getAuditLogContext().keyspace + "." + statement.getAuditLogContext().scope) ? true : false;
-                Map<String, Object> maps = new HashMap<>();
-                for (int i = 0; i < statement.getBindVariables().size(); i++) {
+                fixedThreadPoolOtherData.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(statement.getAuditLogContext().keyspace + "." + statement.getAuditLogContext().scope) ? true : false;
+                        Map<String, Object> maps = new HashMap<>();
+                        for (int i = 0; i < statement.getBindVariables().size(); i++) {
 
-                    ColumnSpecification cs = statement.getBindVariables().get(i);
-                    String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    System.out.println("字段名字:" + boundName + ";类型:" + cs.type.asCQL3Type());
-                    System.out.println("key:" + boundName);
-                    System.out.println("value:" + boundValue);
-                    System.out.println("Interned:"+cs.name.isInterned());
-                    // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
-                    boundValue = boundValue.replace("\\", "");
-                    boundValue = boundValue.replace("\"", "");
-                    maps.put(boundName, boundValue);
+                            ColumnSpecification cs = statement.getBindVariables().get(i);
+                            String boundName = cs.name.toString();
+                            String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                            System.out.println("字段名字:" + boundName + ";类型:" + cs.type.asCQL3Type());
+                            System.out.println("key:" + boundName);
+                            System.out.println("value:" + boundValue);
+                            System.out.println("Interned:"+cs.name.isInterned());
+                            // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                            boundValue = boundValue.replace("\\", "");
+                            boundValue = boundValue.replace("\"", "");
+                            maps.put(boundName, boundValue);
 
-                }
-                if (syncEs) {
-                    ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
-                    Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
-                    List<Object> objects = new ArrayList<>();
-                    columnMetadata.forEach(objects::add);
-                    String keyValue="";
-                    if (objects.size() > 0) {
-                        String key = objects.get(0).toString();
-                        keyValue = maps.get(key).toString();
+                        }
+                        if (syncEs) {
+                            ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
+                            Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+                            List<Object> objects = new ArrayList<>();
+                            columnMetadata.forEach(objects::add);
+                            String keyValue="";
+                            if (objects.size() > 0) {
+                                String key = objects.get(0).toString();
+                                keyValue = maps.get(key).toString();
+                            }
+                            HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
+                        }
                     }
-                    HttpUtil.bulkIndex("http://127.0.0.1:9200", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
-                }
+                });
 
             }
             System.out.println("------------------------------");
