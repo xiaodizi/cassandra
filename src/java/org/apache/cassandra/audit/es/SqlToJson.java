@@ -43,7 +43,7 @@ public class SqlToJson {
 
             String fields = dbRecord.substring(dbRecord.indexOf("(") + 1, dbRecord.indexOf(")"));
             String values = dbRecord.substring(dbRecord.lastIndexOf("(") + 1, dbRecord.lastIndexOf(")"));
-            String replacedFields = fields.replace("`", "").trim();
+            String replacedFields = fields.replace("`", "").replaceAll("\"","").trim();
             String replacedValues = values.replace("'", "").trim();
             String[] fieldsArr = replacedFields.split(",");
             String[] valuesArr = replacedValues.split(",");

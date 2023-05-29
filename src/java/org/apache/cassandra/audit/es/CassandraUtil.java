@@ -96,8 +96,12 @@ public class CassandraUtil {
         columnMetadata.forEach(objects::add);
         String keyValue="";
         if (objects.size() > 0) {
-            String key = objects.get(0).toString();
-            return maps.get(key).toString();
+            for (int i = 0; i < objects.size(); i++) {
+                String key = objects.get(0).toString();
+                keyValue += keyValue+"-"+maps.get(key).toString();
+            }
+
+            return String.valueOf(keyValue.hashCode());
         }
         return null;
     }
