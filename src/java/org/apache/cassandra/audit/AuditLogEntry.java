@@ -119,6 +119,8 @@ public class AuditLogEntry {
             String s = operation.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}+", " ");
             builder.append("|operation:").append(s);
 
+            logger.info("原始CQL："+s);
+
             if (!operation.contains(":") && !operation.contains("?")) {
 
                 if (type.toString().equals("CREATE_TABLE")) {
