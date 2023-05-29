@@ -63,12 +63,12 @@ public class AuditLogEntry {
     private final QueryOptions options;
     private final QueryState state;
 
-    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(2000);
-    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
-    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
-            .MILLISECONDS,
-            workingQueue,
-            rejectedExecutionHandler);
+//    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(2000);
+//    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
+//    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
+//            .MILLISECONDS,
+//            workingQueue,
+//            rejectedExecutionHandler);
 
 
     private AuditLogEntry(AuditLogEntryType type,
@@ -119,87 +119,49 @@ public class AuditLogEntry {
             String s = operation.replace('\r', ' ').replace('\n', ' ').replaceAll(" {2,}+", " ");
             builder.append("|operation:").append(s);
 
-            fixedThreadPoolOtherData.execute(new Runnable() {
-                @Override
-                public void run() {
-                    if (!operation.contains(":") && !operation.contains("?")) {
+            if (!operation.contains(":") && !operation.contains("?")) {
 
-                        if (type.toString().equals("CREATE_TABLE")) {
-                            boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace + "." + scope);
-                            fixedThreadPoolOtherData.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    HttpUtil.createCassandraMetadata(keyspace, scope, syncEs);
-                                }
-                            });
-
-                            logger.info("CREATE_TABLE 同步ES：" + syncEs);
-                            if (syncEs) {
-                                fixedThreadPoolOtherData.execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        HttpUtil.newCreateIndex(keyspace + "-" + scope);
-                                    }
-                                });
-                            }
+                if (type.toString().equals("CREATE_TABLE")) {
+                    boolean syncEs = CassandraUtil.syncTablesInfo.get(keyspace + "." + scope);
+                    fixedThreadPoolOtherData.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            HttpUtil.createCassandraMetadata(keyspace, scope, syncEs);
                         }
+                    });
 
-
-                        if (type.toString().equals("BATCH")) {
-                            String batchSql = s.replace("BEGIN BATCH", "").replace("APPLY BATCH;", "");
-                            String[] split = batchSql.split(";");
-                            for (int i = 0; i < split.length; i++) {
-                                String sql = split[i].toLowerCase();
-                                if (!StringUtils.isBlank(sql)) {
-                                    sql = sql + ";";
-                                    logger.info("BATCH 解析 CQL 语句:" + sql);
-                                    String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
-                                    Boolean aBoolean = HttpUtil.newGetSyncEs(keyspace, matchSqlTableName);
-                                    logger.info("BATCH 同步es：" + aBoolean);
-                                    if (aBoolean) {
-                                        if (sql.indexOf("insert") > 0) {
-                                            Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
-                                            String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, matchSqlTableName, maps);
-                                            HttpUtil.bulkIndex(keyspace + "-" + matchSqlTableName, maps, primaryKeyValue);
-                                        } else if (sql.indexOf("update") > 0) {
-                                            Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
-
-                                            Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(sql);
-                                            DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, updateSqlWhere);
-                                            List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
-                                            hitesList.stream().forEach(hites -> {
-                                                Map<String, Object> source = hites.get_source();
-                                                Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                                                fixedThreadPoolOtherData.execute(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        HttpUtil.bulkUpdate(keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
-                                                    }
-                                                });
-                                            });
-                                        } else if (sql.indexOf("delete") > 0) {
-                                            Map maps = SqlToJson.sqlDeleteToJson(sql);
-                                            fixedThreadPoolOtherData.execute(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    HttpUtil.deleteData(keyspace + "-" + matchSqlTableName, maps);
-                                                }
-                                            });
-
-                                        }
-                                    }
-                                }
+                    logger.info("CREATE_TABLE 同步ES：" + syncEs);
+                    if (syncEs) {
+                        fixedThreadPoolOtherData.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                HttpUtil.newCreateIndex(keyspace + "-" + scope);
                             }
-                        }
+                        });
+                    }
+                }
 
-                        if (type.toString().equals("UPDATE")) {
-                            boolean syncEs = HttpUtil.newGetSyncEs(keyspace, scope);
-                            logger.info("UPDATE 同步es：" + syncEs);
-                            if (syncEs) {
-                                if (s.toLowerCase(Locale.ROOT).contains("update")) {
-                                    Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
 
-                                    Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
+                if (type.toString().equals("BATCH")) {
+                    String batchSql = s.replace("BEGIN BATCH", "").replace("APPLY BATCH;", "");
+                    String[] split = batchSql.split(";");
+                    for (int i = 0; i < split.length; i++) {
+                        String sql = split[i].toLowerCase();
+                        if (!StringUtils.isBlank(sql)) {
+                            sql = sql + ";";
+                            logger.info("BATCH 解析 CQL 语句:" + sql);
+                            String matchSqlTableName = CassandraUtil.matchSqlTableName(sql.trim());
+                            Boolean aBoolean = HttpUtil.newGetSyncEs(keyspace, matchSqlTableName);
+                            logger.info("BATCH 同步es：" + aBoolean);
+                            if (aBoolean) {
+                                if (sql.indexOf("insert") > 0) {
+                                    Map<String, Object> maps = SqlToJson.sqlInsertToJosn(sql);
+                                    String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, matchSqlTableName, maps);
+                                    HttpUtil.bulkIndex(keyspace + "-" + matchSqlTableName, maps, primaryKeyValue);
+                                } else if (sql.indexOf("update") > 0) {
+                                    Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
+
+                                    Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(sql);
                                     DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, updateSqlWhere);
                                     List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
                                     hitesList.stream().forEach(hites -> {
@@ -208,62 +170,95 @@ public class AuditLogEntry {
                                         fixedThreadPoolOtherData.execute(new Runnable() {
                                             @Override
                                             public void run() {
-                                                HttpUtil.bulkUpdate(keyspace + "-" + scope, updateJson, hites.get_id());
+                                                HttpUtil.bulkUpdate(keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
                                             }
                                         });
                                     });
-
-                                } else {
-                                    Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
-                                    logger.info("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
+                                } else if (sql.indexOf("delete") > 0) {
+                                    Map maps = SqlToJson.sqlDeleteToJson(sql);
                                     fixedThreadPoolOtherData.execute(new Runnable() {
                                         @Override
                                         public void run() {
-                                            String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, scope, maps);
-                                            HttpUtil.bulkIndex(keyspace + "-" + scope, maps, primaryKeyValue);
+                                            HttpUtil.deleteData(keyspace + "-" + matchSqlTableName, maps);
                                         }
                                     });
+
                                 }
-                            }
-                        }
-
-
-                        if (type.toString().equals("DELETE")) {
-                            boolean syncEs = HttpUtil.newGetSyncEs(keyspace, scope);
-                            logger.info("DELETE 同步es：" + syncEs);
-                            if (syncEs) {
-                                Map maps = SqlToJson.sqlDeleteToJson(s);
-                                fixedThreadPoolOtherData.execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        HttpUtil.deleteData(keyspace + "-" + scope, maps);
-                                    }
-                                });
-                            }
-                        }
-
-                        if (type.toString().equals("DROP_TABLE")) {
-                            boolean syncEs = HttpUtil.newGetSyncEs(keyspace, scope);
-                            logger.info("DROP TABLE 同步es：" + syncEs);
-                            CassandraUtil.syncTablesInfo.remove(keyspace + "." + scope);
-                            fixedThreadPoolOtherData.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    HttpUtil.deleteCassandraMetadata(keyspace + "-" + scope);
-                                }
-                            });
-                            if (syncEs) {
-                                fixedThreadPoolOtherData.execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        HttpUtil.dropIndex(keyspace + "-" + scope);
-                                    }
-                                });
                             }
                         }
                     }
                 }
-            });
+
+                if (type.toString().equals("UPDATE")) {
+                    boolean syncEs = HttpUtil.newGetSyncEs(keyspace, scope);
+                    logger.info("UPDATE 同步es：" + syncEs);
+                    if (syncEs) {
+                        if (s.toLowerCase(Locale.ROOT).contains("update")) {
+                            Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
+
+                            Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
+                            DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, updateSqlWhere);
+                            List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
+                            hitesList.stream().forEach(hites -> {
+                                Map<String, Object> source = hites.get_source();
+                                Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
+                                fixedThreadPoolOtherData.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        HttpUtil.bulkUpdate(keyspace + "-" + scope, updateJson, hites.get_id());
+                                    }
+                                });
+                            });
+
+                        } else {
+                            Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
+                            logger.info("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
+                            fixedThreadPoolOtherData.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, scope, maps);
+                                    HttpUtil.bulkIndex(keyspace + "-" + scope, maps, primaryKeyValue);
+                                }
+                            });
+                        }
+                    }
+                }
+
+
+                if (type.toString().equals("DELETE")) {
+                    boolean syncEs = HttpUtil.newGetSyncEs(keyspace, scope);
+                    logger.info("DELETE 同步es：" + syncEs);
+                    if (syncEs) {
+                        Map maps = SqlToJson.sqlDeleteToJson(s);
+                        fixedThreadPoolOtherData.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                HttpUtil.deleteData(keyspace + "-" + scope, maps);
+                            }
+                        });
+                    }
+                }
+
+                if (type.toString().equals("DROP_TABLE")) {
+                    boolean syncEs = HttpUtil.newGetSyncEs(keyspace, scope);
+                    logger.info("DROP TABLE 同步es：" + syncEs);
+                    CassandraUtil.syncTablesInfo.remove(keyspace + "." + scope);
+                    fixedThreadPoolOtherData.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            HttpUtil.deleteCassandraMetadata(keyspace + "-" + scope);
+                        }
+                    });
+                    if (syncEs) {
+                        fixedThreadPoolOtherData.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                HttpUtil.dropIndex(keyspace + "-" + scope);
+                            }
+                        });
+                    }
+                }
+            }
 
         }
         return builder.toString();

@@ -27,12 +27,10 @@ import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.cassandra.audit.es.CassandraUtil;
-import org.apache.cassandra.audit.es.EsUtil;
 import org.apache.cassandra.audit.es.HttpUtil;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.schema.ColumnMetadata;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +49,12 @@ public class QueryEvents {
 
     private final Set<Listener> listeners = new CopyOnWriteArraySet<>();
 
-    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(2000);
-    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
-    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
-            .MILLISECONDS,
-            workingQueue,
-            rejectedExecutionHandler);
+//    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(1000);
+//    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
+//    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
+//            .MILLISECONDS,
+//            workingQueue,
+//            rejectedExecutionHandler);
 
 
     @VisibleForTesting
@@ -111,61 +109,57 @@ public class QueryEvents {
                                      Message.Response response) {
         try {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
-            fixedThreadPoolOtherData.execute(new Runnable() {
-                @Override
-                public void run() {
-                    String cql = maybeObfuscatedQuery;
-                    System.out.println("------------notifyExecuteSuccess 找数据------------");
-                    if (cql.contains("?")) {
-                        boolean syncEs = HttpUtil.newGetSyncEs(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope);
-                        if (syncEs) {
-                            Map<String, Object> maps = new HashMap<>();
-                            for (int i = 0; i < statement.getBindVariables().size(); i++) {
 
-                                ColumnSpecification cs = statement.getBindVariables().get(i);
-                                String boundName = cs.name.toString();
-                                String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                                // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
-                                boundValue = boundValue.replace("\\", "");
-                                boundValue = boundValue.replace("\"", "");
-                                maps.put(boundName, boundValue);
+            String cql = maybeObfuscatedQuery;
+            System.out.println("------------notifyExecuteSuccess 找数据------------");
+            if (cql.contains("?")) {
+                boolean syncEs = HttpUtil.newGetSyncEs(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope);
+                if (syncEs) {
+                    Map<String, Object> maps = new HashMap<>();
+                    for (int i = 0; i < statement.getBindVariables().size(); i++) {
 
-                            }
-                            ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
-                            Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
-                            List<Object> objects = new ArrayList<>();
-                            columnMetadata.forEach(objects::add);
-                            String keyValue="";
-                            if (objects.size() > 0) {
-                                String key = objects.get(0).toString();
-                                keyValue = maps.get(key).toString();
-                            }
-                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
+                        ColumnSpecification cs = statement.getBindVariables().get(i);
+                        String boundName = cs.name.toString();
+                        String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                        // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                        boundValue = boundValue.replace("\\", "");
+                        boundValue = boundValue.replace("\"", "");
+                        maps.put(boundName, boundValue);
 
-                        }
                     }
-                    if (cql.contains(":")) {
-                        boolean syncEs = HttpUtil.newGetSyncEs(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope);
-                        if (syncEs) {
-                            Map<String, Object> maps = new HashMap<>();
-                            for (int i = 0; i < statement.getBindVariables().size(); i++) {
-
-                                ColumnSpecification cs = statement.getBindVariables().get(i);
-                                String boundName = cs.name.toString();
-                                String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                                // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
-                                boundValue = boundValue.replace("\\", "");
-                                boundValue = boundValue.replace("\"", "");
-                                maps.put(boundName, boundValue);
-
-                            }
-                            String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope, maps);
-                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,primaryKeyValue);
-                        }
+                    ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
+                    Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+                    List<Object> objects = new ArrayList<>();
+                    columnMetadata.forEach(objects::add);
+                    String keyValue="";
+                    if (objects.size() > 0) {
+                        String key = objects.get(0).toString();
+                        keyValue = maps.get(key).toString();
                     }
-                    System.out.println("------------------------------");
+                    HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
+
                 }
-            });
+            }
+            if (cql.contains(":")) {
+                boolean syncEs = HttpUtil.newGetSyncEs(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope);
+                if (syncEs) {
+                    Map<String, Object> maps = new HashMap<>();
+                    for (int i = 0; i < statement.getBindVariables().size(); i++) {
+
+                        ColumnSpecification cs = statement.getBindVariables().get(i);
+                        String boundName = cs.name.toString();
+                        String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                        // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                        boundValue = boundValue.replace("\\", "");
+                        boundValue = boundValue.replace("\"", "");
+                        maps.put(boundName, boundValue);
+
+                    }
+                    String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope, maps);
+                    HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,primaryKeyValue);
+                }
+            }
+            System.out.println("------------------------------");
 
             for (Listener listener : listeners)
                 listener.executeSuccess(statement, maybeObfuscatedQuery, options, state, queryTime, response);
