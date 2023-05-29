@@ -28,7 +28,7 @@ public class HttpUtil {
 
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl+"/_cluster/health")
                     .build();
             Response response = client.newCall(request).execute();
@@ -65,7 +65,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, "{\n  \"settings\":{\n    \"number_of_shards\":"+numSharedNodes+",\n    \"number_of_replicas\":"+(numSharedNodes-1)+"\n  }\n}");
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/" + indexName)
                     .method("PUT", body)
                     .build();
@@ -93,7 +93,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, json);
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/" + indexName + "/_doc/" + id)
                     .method("PUT", body)
                     .addHeader("Content-Type", "application/json")
@@ -126,7 +126,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, bulkApiJson);
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl+"/"+indexName+"/_bulk")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
@@ -150,7 +150,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, bulkApiJson);
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl+"/"+indexName+"/_bulk")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
@@ -176,7 +176,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, requestJson);
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/" + indexName + "/_search")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
@@ -216,7 +216,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("text/plain");
             RequestBody body = RequestBody.create(mediaType, "");
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/" + indexName + "/_doc/" + id)
                     .method("GET", body)
                     .build();
@@ -247,7 +247,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, requestJson);
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/" + indexName + "/_delete_by_query?slices=auto&conflicts=proceed&wait_for_completion=false")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
@@ -277,7 +277,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("text/plain");
             RequestBody body = RequestBody.create(mediaType, "");
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/" + indexName)
                     .method("DELETE", body)
                     .build();
@@ -317,7 +317,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, json);
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/.cassandra_metadata/_doc/" + keyspace + "-" + table)
                     .method("PUT", body)
                     .addHeader("Content-Type", "application/json")
@@ -346,7 +346,7 @@ public class HttpUtil {
 
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/.cassandra_metadata")
                     .method("HEAD", null)
                     .build();
@@ -371,7 +371,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
             RequestBody body = RequestBody.create(mediaType, "{\n  \"query\": {\n    \"bool\": {\n      \"filter\": [\n        {\n          \"match\": {\n            \"keyspace.keyword\": \""+keyspace+"\"\n          }\n        },\n        {\n          \"match\": {\n            \"table.keyword\": \""+table+"\"\n          }\n        }\n      ]\n    }\n  }\n}");
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl+"/.cassandra_metadata/_search")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
@@ -398,7 +398,7 @@ public class HttpUtil {
                     .build();
             MediaType mediaType = MediaType.parse("text/plain");
             RequestBody body = RequestBody.create(mediaType, "");
-            Request request = new Request.Builder()
+            Request request = new Request.Builder().addHeader("Connection","close")
                     .url(nodeUrl + "/.cassandra_metadata/_doc/"+indexName)
                     .method("DELETE", body)
                     .build();
