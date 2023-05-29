@@ -63,12 +63,12 @@ public class AuditLogEntry {
     private final QueryOptions options;
     private final QueryState state;
 
-//    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(2000);
-//    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
-//    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
-//            .MILLISECONDS,
-//            workingQueue,
-//            rejectedExecutionHandler);
+    private static final BlockingQueue<Runnable> workingQueue = new LinkedBlockingQueue<>(2000);
+    private static final RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
+    private static final ExecutorService fixedThreadPoolOtherData = new ThreadPoolExecutor(40, 50, 5L, TimeUnit
+            .MILLISECONDS,
+            workingQueue,
+            rejectedExecutionHandler);
 
 
     private AuditLogEntry(AuditLogEntryType type,
