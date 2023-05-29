@@ -80,22 +80,8 @@ public class QueryEvents {
                                    Message.Response response) {
         try {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
-
-            String cql = maybeObfuscatedQuery;
-            System.out.println("Cql:" + cql);
-            if (cql.contains("?")) {
-                System.out.println("------------ 找数据------------");
-                for (int i = 0; i < statement.getBindVariables().size(); i++) {
-                    ColumnSpecification cs = statement.getBindVariables().get(i);
-                    //String boundName = cs.name.toString();
-                    String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                    cql = cql.replaceFirst("\\?", boundValue);
-                }
-                System.out.println("------------------------------");
-            }
-
             for (Listener listener : listeners)
-                listener.querySuccess(statement, cql, options, state, queryTime, response);
+                listener.querySuccess(statement, maybeObfuscatedQuery, options, state, queryTime, response);
         } catch (Throwable t) {
             noSpam1m.error("Failed notifying listeners", t);
             JVMStabilityInspector.inspectThrowable(t);
@@ -125,26 +111,26 @@ public class QueryEvents {
                                      Message.Response response) {
         try {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
-            String cql = maybeObfuscatedQuery;
-            System.out.println("------------notifyExecuteSuccess 找数据------------");
-            if (cql.contains("?")) {
-                boolean syncEs = HttpUtil.newGetSyncEs(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope);
-                if (syncEs) {
-                    Map<String, Object> maps = new HashMap<>();
-                    for (int i = 0; i < statement.getBindVariables().size(); i++) {
+            fixedThreadPoolOtherData.execute(new Runnable() {
+                @Override
+                public void run() {
+                    String cql = maybeObfuscatedQuery;
+                    System.out.println("------------notifyExecuteSuccess 找数据------------");
+                    if (cql.contains("?")) {
+                        boolean syncEs = HttpUtil.newGetSyncEs(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope);
+                        if (syncEs) {
+                            Map<String, Object> maps = new HashMap<>();
+                            for (int i = 0; i < statement.getBindVariables().size(); i++) {
 
-                        ColumnSpecification cs = statement.getBindVariables().get(i);
-                        String boundName = cs.name.toString();
-                        String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                        // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
-                        boundValue = boundValue.replace("\\", "");
-                        boundValue = boundValue.replace("\"", "");
-                        maps.put(boundName, boundValue);
+                                ColumnSpecification cs = statement.getBindVariables().get(i);
+                                String boundName = cs.name.toString();
+                                String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                                // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                                boundValue = boundValue.replace("\\", "");
+                                boundValue = boundValue.replace("\"", "");
+                                maps.put(boundName, boundValue);
 
-                    }
-                    fixedThreadPoolOtherData.execute(new Runnable() {
-                        @Override
-                        public void run() {
+                            }
                             ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
                             Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
                             List<Object> objects = new ArrayList<>();
@@ -155,38 +141,31 @@ public class QueryEvents {
                                 keyValue = maps.get(key).toString();
                             }
                             HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
+
                         }
-                    });
-
-                }
-
-            }
-
-            if (cql.contains(":")) {
-                boolean syncEs = HttpUtil.newGetSyncEs(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope);
-                if (syncEs) {
-                    Map<String, Object> maps = new HashMap<>();
-                    for (int i = 0; i < statement.getBindVariables().size(); i++) {
-
-                        ColumnSpecification cs = statement.getBindVariables().get(i);
-                        String boundName = cs.name.toString();
-                        String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-                        // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
-                        boundValue = boundValue.replace("\\", "");
-                        boundValue = boundValue.replace("\"", "");
-                        maps.put(boundName, boundValue);
-
                     }
-                    fixedThreadPoolOtherData.execute(new Runnable() {
-                        @Override
-                        public void run() {
+                    if (cql.contains(":")) {
+                        boolean syncEs = HttpUtil.newGetSyncEs(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope);
+                        if (syncEs) {
+                            Map<String, Object> maps = new HashMap<>();
+                            for (int i = 0; i < statement.getBindVariables().size(); i++) {
+
+                                ColumnSpecification cs = statement.getBindVariables().get(i);
+                                String boundName = cs.name.toString();
+                                String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
+                                // Opensearch 数据里不能有特殊字符 \ 和 ", 过滤掉
+                                boundValue = boundValue.replace("\\", "");
+                                boundValue = boundValue.replace("\"", "");
+                                maps.put(boundName, boundValue);
+
+                            }
                             String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope, maps);
                             HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,primaryKeyValue);
                         }
-                    });
+                    }
+                    System.out.println("------------------------------");
                 }
-            }
-            System.out.println("------------------------------");
+            });
 
             for (Listener listener : listeners)
                 listener.executeSuccess(statement, maybeObfuscatedQuery, options, state, queryTime, response);
@@ -265,22 +244,8 @@ public class QueryEvents {
             if (prepared != null) {
                 try {
                     final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(prepared.statement, query) : query;
-
-                    String cql = maybeObfuscatedQuery;
-                    System.out.println("Cql:" + cql);
-//                    if (cql.contains("?")) {
-//                        System.out.println("------------ 找数据------------");
-//                        for (int i = 0; i < statement.getBindVariables().size(); i++) {
-//                            ColumnSpecification cs = statement.getBindVariables().get(i);
-//                            //String boundName = cs.name.toString();
-//                            String boundValue = cs.type.asCQL3Type().toCQLLiteral(options.getValues().get(i), options.getProtocolVersion());
-//                            cql =cql.replaceFirst("\\?",boundValue);
-//                        }
-//                        System.out.println("------------------------------");
-//                    }
-
                     for (Listener listener : listeners)
-                        listener.prepareSuccess(prepared.statement, cql, state, queryTime, response);
+                        listener.prepareSuccess(prepared.statement, maybeObfuscatedQuery, state, queryTime, response);
                 } catch (Throwable t) {
                     noSpam1m.error("Failed notifying listeners", t);
                     JVMStabilityInspector.inspectThrowable(t);

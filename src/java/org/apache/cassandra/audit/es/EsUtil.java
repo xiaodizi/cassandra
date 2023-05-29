@@ -19,7 +19,6 @@
 package org.apache.cassandra.audit.es;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.queryparser.classic.QueryParser;
 
 import java.util.*;
 
@@ -217,10 +216,6 @@ public class EsUtil {
         return false;
     }
 
-
-    public static String escapeExprSpecialWord(String keyword) {
-        return QueryParser.escape(keyword);
-    }
 
 
 }
