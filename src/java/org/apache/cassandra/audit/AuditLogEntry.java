@@ -157,7 +157,7 @@ public class AuditLogEntry {
                                             hitesList.stream().forEach(hites -> {
                                                 Map<String, Object> source = hites.get_source();
                                                 Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                                                HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
+                                               HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + matchSqlTableName, updateJson, hites.get_id());
                                             });
                                         } else if (sql.indexOf("delete") > 0) {
                                             Map maps = SqlToJson.sqlDeleteToJson(sql);
