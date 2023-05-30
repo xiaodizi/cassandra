@@ -161,7 +161,7 @@
     <property name="dtest-api.version" value="0.0.13"/>
 
     <property name="fastjson2.version" value="2.0.21" />
-    <property name="okhttp.version" value="4.11.0" />
+    <property name="okhttp.version" value="4.10.0" />
 
     <condition property="maven-ant-tasks.jar.exists">
         <available file="${build.dir}/maven-ant-tasks-${maven-ant-tasks.version}.jar"/>
@@ -754,7 +754,7 @@
                 <dependency groupId="org.hamcrest" artifactId="hamcrest" version="2.2" scope="test"/>
                 <dependency groupId="com.github.seancfoley" artifactId="ipaddress" version="5.3.3"/>
                 <dependency groupId="com.alibaba.fastjson2" artifactId="fastjson2" version="2.0.21"/>
-                <dependency groupId="com.squareup.okhttp3" artifactId="okhttp" version="4.11.0"/>
+                <dependency groupId="com.squareup.okhttp3" artifactId="okhttp" version="4.10.0"/>
                 <dependency groupId="org.projectlombok" artifactId="lombok" version="1.18.22"/>
             </dependencyManagement>
             <developer id="adelapena" name="Andres de la Peña"/>
@@ -946,7 +946,7 @@
             <dependency groupId="org.jboss.byteman" artifactId="byteman-bmunit"/>
             <dependency groupId="com.github.seancfoley" artifactId="ipaddress"/>
             <dependency groupId="com.alibaba.fastjson2" artifactId="fastjson2" version="2.0.21"/>
-            <dependency groupId="com.squareup.okhttp3" artifactId="okhttp" version="4.11.0"/>
+            <dependency groupId="com.squareup.okhttp3" artifactId="okhttp" version="4.10.0"/>
             <dependency groupId="org.projectlombok" artifactId="lombok" version="1.18.22"/>
         </artifact:pom>
     </target>

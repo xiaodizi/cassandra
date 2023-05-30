@@ -187,7 +187,7 @@ public class AuditLogEntry {
                             String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, scope, maps);
                             System.out.println("主键的值："+primaryKeyValue);
                             System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
-                            HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps, null);
+                            HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps, primaryKeyValue);
                         }
                     }
                 }

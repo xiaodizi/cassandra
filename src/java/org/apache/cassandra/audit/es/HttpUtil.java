@@ -129,7 +129,7 @@ public class HttpUtil {
 
 
     public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps, String keyValue) {
-        String nodeUrl = "http://127.0.0.1:9200";
+        String nodeUrl = getRandomNode(url);
         System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
         if (StringUtils.isBlank(nodeUrl)) {
             // es_node_list 配置为空 返回 406

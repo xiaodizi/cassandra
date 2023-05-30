@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.cassandra.audit.es.BinaryStringConverteUtil;
+import org.apache.cassandra.audit.es.CassandraUtil;
 import org.apache.cassandra.audit.es.HttpUtil;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.ColumnFamilyStore;
@@ -114,12 +115,12 @@ public class QueryEvents {
                                      Message.Response response) {
         try {
             final String maybeObfuscatedQuery = listeners.size() > 0 ? maybeObfuscatePassword(statement, query) : query;
-            String cql = maybeObfuscatedQuery;
-            System.out.println("------------notifyExecuteSuccess 找数据------------");
-            if (cql.contains("?")) {
-                fixedThreadPoolOtherData.execute(new Runnable() {
-                    @Override
-                    public void run() {
+            fixedThreadPoolOtherData.execute(new Runnable() {
+                @Override
+                public void run() {
+                    String cql = maybeObfuscatedQuery;
+                    System.out.println("------------notifyExecuteSuccess 找数据------------");
+                    if (cql.contains("?")) {
                         boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(statement.getAuditLogContext().keyspace + "." + statement.getAuditLogContext().scope) ? true : false;
                         Map<String, Object> maps = new HashMap<>();
                         for (int i = 0; i < statement.getBindVariables().size(); i++) {
@@ -132,26 +133,13 @@ public class QueryEvents {
                             maps.put(boundName, boundValue);
                         }
                         if (syncEs) {
-                            ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
-                            Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
-                            List<Object> objects = new ArrayList<>();
-                            columnMetadata.forEach(objects::add);
-                            String keyValue="";
-                            if (objects.size() > 0) {
-                                String key = objects.get(0).toString();
-                                keyValue = maps.get(key).toString();
-                            }
-                            HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
+                            String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope, maps);
+                            HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,primaryKeyValue);
                         }
+
                     }
-                });
 
-            }
-
-            if (cql.contains(":")) {
-                fixedThreadPoolOtherData.execute(new Runnable() {
-                    @Override
-                    public void run() {
+                    if (cql.contains(":")) {
                         boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(statement.getAuditLogContext().keyspace + "." + statement.getAuditLogContext().scope) ? true : false;
                         Map<String, Object> maps = new HashMap<>();
                         for (int i = 0; i < statement.getBindVariables().size(); i++) {
@@ -181,11 +169,11 @@ public class QueryEvents {
                             }
                             HttpUtil.bulkIndex("", statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
                         }
-                    }
-                });
 
-            }
-            System.out.println("------------------------------");
+                    }
+                    System.out.println("------------------------------");
+                }
+            });
 
 
             for (Listener listener : listeners)
