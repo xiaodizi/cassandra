@@ -131,7 +131,12 @@ public class QueryEvents {
 
                             }
                             String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope, maps);
-                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,primaryKeyValue);
+
+                            if (cql.contains("UPDATE")){
+                                HttpUtil.bulkUpdate(statement.getAuditLogContext().keyspace+"-"+statement.getAuditLogContext().scope,maps,primaryKeyValue);
+                            }else {
+                                HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps, primaryKeyValue);
+                            }
 
                         }
                     }
@@ -151,7 +156,11 @@ public class QueryEvents {
 
                             }
                             String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope, maps);
-                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,primaryKeyValue);
+                            if (cql.contains("UPDATE")){
+                                HttpUtil.bulkUpdate(statement.getAuditLogContext().keyspace+"-"+statement.getAuditLogContext().scope,maps,primaryKeyValue);
+                            }else {
+                                HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps, primaryKeyValue);
+                            }
                         }
                     }
                     System.out.println("------------------------------");
