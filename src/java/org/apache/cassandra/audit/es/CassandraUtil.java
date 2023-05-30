@@ -105,6 +105,6 @@ public class CassandraUtil {
                 keyValue =keyValue+"|"+key+":"+value;
             }
         }
-        return String.valueOf(keyValue.hashCode());
+        return keyValue;
     }
 }
