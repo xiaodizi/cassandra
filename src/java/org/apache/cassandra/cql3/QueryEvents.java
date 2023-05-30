@@ -130,16 +130,8 @@ public class QueryEvents {
                                 maps.put(boundName, boundValue);
 
                             }
-                            ColumnFamilyStore cfs = Keyspace.open(statement.getAuditLogContext().keyspace).getColumnFamilyStore(statement.getAuditLogContext().scope);
-                            Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
-                            List<Object> objects = new ArrayList<>();
-                            columnMetadata.forEach(objects::add);
-                            String keyValue="";
-                            if (objects.size() > 0) {
-                                String key = objects.get(0).toString();
-                                keyValue = maps.get(key).toString();
-                            }
-                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,keyValue);
+                            String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(statement.getAuditLogContext().keyspace, statement.getAuditLogContext().scope, maps);
+                            HttpUtil.bulkIndex(statement.getAuditLogContext().keyspace + "-" + statement.getAuditLogContext().scope, maps,primaryKeyValue);
 
                         }
                     }

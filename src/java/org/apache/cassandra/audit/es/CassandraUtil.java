@@ -92,17 +92,19 @@ public class CassandraUtil {
     public static String getPrimaryKeyValue(String keyspace,String table,Map maps){
         ColumnFamilyStore cfs = Keyspace.open(keyspace).getColumnFamilyStore(table);
         Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+
         List<Object> objects = new ArrayList<>();
         columnMetadata.forEach(objects::add);
         String keyValue="";
-        if (objects.size() > 0) {
-            for (int i = 0; i < objects.size(); i++) {
-                String key = objects.get(0).toString();
-                keyValue += keyValue+"-"+maps.get(key).toString();
+        for (int i = 0; i < objects.size() ; i++) {
+            String key = objects.get(i).toString();
+            String value = maps.get(key).toString();
+            if (i == 0) {
+                keyValue = key+":"+value;
+            }else {
+                keyValue =keyValue+"|"+key+":"+value;
             }
-
-            return String.valueOf(keyValue.hashCode());
         }
-        return null;
+        return String.valueOf(keyValue.hashCode());
     }
 }
