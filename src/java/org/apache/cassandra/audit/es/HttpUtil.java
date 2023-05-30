@@ -17,12 +17,7 @@ import java.util.Map;
 public class HttpUtil {
 
     public static DataRsp getClusterHealth(String url){
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
+        String nodeUrl = "http://127.0.0.1:9200";
         EsClusterDto esClusterDto=null;
         try {
 
@@ -56,12 +51,7 @@ public class HttpUtil {
 
 
     public static DataRsp newCreateIndex(String url,String indexName){
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
+        String nodeUrl = "http://127.0.0.1:9200";
 
         DataRsp clusterHealth = getClusterHealth(url);
         int numSharedNodes = Integer.parseInt(clusterHealth.getData().toString());
@@ -92,12 +82,7 @@ public class HttpUtil {
 
 
     public static DataRsp createIndex(String url, String indexName, String json, String id) {
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
+        String nodeUrl = "http://127.0.0.1:9200";
         try {
 
             OkHttpClient client = new OkHttpClient().newBuilder()
@@ -129,13 +114,7 @@ public class HttpUtil {
 
 
     public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps, String keyValue) {
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
-
+        String nodeUrl = "http://127.0.0.1:9200";
         try {
             String bulkApiJson = EsUtil.getBulkCreateApiJson(maps,keyValue);
             OkHttpClient client = new OkHttpClient().newBuilder()
@@ -158,12 +137,8 @@ public class HttpUtil {
 
 
     public static DataRsp bulkUpdate(String url,String indexName,Map<String,Object> maps,String docId){
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
+        String nodeUrl = "http://127.0.0.1:9200";
+
         try {
             String bulkApiJson = EsUtil.getBulkUpdateApiJson(maps,docId);
 
@@ -187,12 +162,8 @@ public class HttpUtil {
 
 
     public static DataRsp<Object> getSearch(String url, String indexName, Map<String, Object> maps) {
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
+        String nodeUrl = "http://127.0.0.1:9200";
+
         List<Hites> hitesList = new ArrayList<>();
         try {
 
@@ -316,10 +287,7 @@ public class HttpUtil {
 
     public static DataRsp dropIndex(String url, String indexName) {
 
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            return DataRsp.getError406();
-        }
+        String nodeUrl = "http://127.0.0.1:9200";
         try {
 
             OkHttpClient client = new OkHttpClient().newBuilder()

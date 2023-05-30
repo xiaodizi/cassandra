@@ -106,7 +106,9 @@ public class EsUtil {
             keyValue = String.valueOf(maps.hashCode());
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"index\":{\"_id\" : \""+keyValue+"\" }}\n");
+        //sb.append("{\"index\":{\"_id\" : \""+keyValue+"\" }}\n");
+
+        sb.append("{\"index\":{}}\n");
         sb.append("{");
         int i=0;
         for (String key:maps.keySet()){

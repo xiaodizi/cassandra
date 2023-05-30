@@ -116,7 +116,9 @@ public class AuditLogEntry {
 
             System.out.println("操作CQL：" + operation);
 
-            String esNodeList = DatabaseDescriptor.getEsNodeList();
+            String esNodeList = "http://127.0.0.1:9200";
+
+            System.out.println("节点地址:"+esNodeList);
 
             if (!operation.contains("?") && !operation.contains(":")) {
 
@@ -166,29 +168,25 @@ public class AuditLogEntry {
                 }
 
                 if (type.toString().equals("UPDATE")) {
-                    boolean syncEs = StringUtils.isBlank(DatabaseDescriptor.getSyncEsTable()) || !DatabaseDescriptor.getSyncEsTable().equals(keyspace + "." + scope) ? true : false;
-                    logger.info("UPDATE 同步es：" + syncEs);
-                    if (syncEs) {
-                        if (s.toLowerCase(Locale.ROOT).contains("update")) {
-                            Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
+                    if (s.toLowerCase(Locale.ROOT).contains("update")) {
+                        Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
 
-                            Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
-                            DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
-                            List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
-                            hitesList.stream().forEach(hites -> {
-                                Map<String, Object> source = hites.get_source();
-                                Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
-                                HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
-                            });
+                        Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
+                        DataRsp<Object> dataRsp = HttpUtil.getSearch(esNodeList, keyspace + "-" + scope, updateSqlWhere);
+                        List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
+                        hitesList.stream().forEach(hites -> {
+                            Map<String, Object> source = hites.get_source();
+                            Map updateJson = EsUtil.mergeTwoMap(sqlMaps, source);
+                            HttpUtil.bulkUpdate(esNodeList, keyspace + "-" + scope, updateJson, hites.get_id());
+                        });
 
-                        } else {
-                            Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
+                    } else {
+                        Map<String, Object> maps = SqlToJson.sqlInsertToJosn(s);
 
-                            String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, scope, maps);
-                            System.out.println("主键的值："+primaryKeyValue);
-                            System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
-                            HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps, primaryKeyValue);
-                        }
+                        String primaryKeyValue = CassandraUtil.getPrimaryKeyValue(keyspace, scope, maps);
+                        System.out.println("主键的值："+primaryKeyValue);
+                        System.out.println("LEI TEST [INFO][INSERT] 需要发送ES的数据:" + JSON.toJSONString(maps));
+                        HttpUtil.bulkIndex(esNodeList, keyspace + "-" + scope, maps, primaryKeyValue);
                     }
                 }
 

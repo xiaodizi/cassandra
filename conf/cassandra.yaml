@@ -1809,7 +1809,7 @@ drop_compact_storage_enabled: false
 
 # es 节点 列表
 # es_node_list: http://ip1:9200,http://ip2:9200,http://ip3:9200
-es_node_list: "http://127.0.0.1:9200"
+es_node_list: http://127.0.0.1:9200
 # 不想同步到es的表配置
 # 配置例子：keyspace名字.表名
 sync_es_table:
