@@ -141,7 +141,8 @@ public class EsUtil {
 
 
     public static Map<String, Object> getUpdateSqlWhere(String sql) {
-        String dbRecord = sql.replace("\"", " ").replace(";", "");
+        sql=SqlToJson.formattingSql(sql);
+        String dbRecord = sql.replace("\"", "").replace(";", "");
         String[] insertArr = dbRecord.split("where");
         List<String> stringList = Arrays.asList(insertArr);
         if (stringList.size() < 2) {

@@ -24,7 +24,7 @@ import java.util.*;
 
 public class SqlToJson {
 
-    private static String formattingSql(String sql){
+    public static String formattingSql(String sql){
         String sql1 =sql.replace(" ","");
 
         sql1 = sql1.toLowerCase(Locale.ROOT);
@@ -99,6 +99,7 @@ public class SqlToJson {
 
 
     public static Map sqlDeleteToJson(String sql){
+        sql =formattingSql(sql);
         String dbRecord= sql.replace("\"","").replace(";","").toLowerCase(Locale.ROOT);
         String[] insertArr = dbRecord.split(" ");
         List<String> stringList = Arrays.asList(insertArr);
