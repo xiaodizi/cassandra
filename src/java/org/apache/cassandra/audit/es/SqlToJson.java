@@ -23,7 +23,7 @@ import java.util.*;
 public class SqlToJson {
 
 
-    private static String formattingSql(String sql){
+    public static String formattingSql(String sql){
         String sql1 =sql.replace(" ","");
 
         sql1 = sql1.toLowerCase(Locale.ROOT);
@@ -39,7 +39,6 @@ public class SqlToJson {
     }
 
     public static Map<String,Object> sqlInsertToJosn(String sql) {
-        sql = formattingSql(sql);
         String dbRecordSql = sql+"\n";
         String[] insertArr = dbRecordSql.split("INSERT");
         List<String> dbRecordList = Arrays.asList(insertArr);
@@ -81,13 +80,13 @@ public class SqlToJson {
                 for (int i = 0; i < splitd.length; i++) {
                     if (splitd[i].contains("=")){
                         String[] split = splitd[i].split("=");
-                        maps.put(split[0].replace("\'"," ").replace("\""," "),split[1].replace("\'"," ").replace("\""," "));
+                        maps.put(split[0].replace("\'","").replace("\"",""),split[1].replace("\'","").replace("\"",""));
                     }
                 }
             }else {
                 if (s.contains("=")) {
                     String[] split = s.split("=");
-                    maps.put(split[0].replace("\'", " ").replace("\"", " "), split[1].replace("\'", " ").replace("\"", " "));
+                    maps.put(split[0].replace("\'", "").replace("\"", ""), split[1].replace("\'", "").replace("\"", ""));
                 }
             }
         });
@@ -104,7 +103,7 @@ public class SqlToJson {
         stringList.forEach(str->{
             if (str.contains("=")){
                 String[] split = str.split("=");
-                maps.put(split[0].trim(),split[1].replace("'"," ").trim());
+                maps.put(split[0].trim(),split[1].replace("'","").trim());
             }
         });
         return maps;

@@ -106,9 +106,7 @@ public class EsUtil {
             keyValue = String.valueOf(maps.hashCode());
         }
         StringBuilder sb = new StringBuilder();
-        //sb.append("{\"index\":{\"_id\" : \""+keyValue+"\" }}\n");
-
-        sb.append("{\"index\":{}}\n");
+        sb.append("{\"index\":{\"_id\" : \""+keyValue+"\" }}\n");
         sb.append("{");
         int i=0;
         for (String key:maps.keySet()){
@@ -143,6 +141,7 @@ public class EsUtil {
 
 
     public static Map<String, Object> getUpdateSqlWhere(String sql) {
+        sql = SqlToJson.formattingSql(sql);
         String dbRecord = sql.replace("\"", " ").replace(";", "");
         String[] insertArr = dbRecord.split("where");
         List<String> stringList = Arrays.asList(insertArr);

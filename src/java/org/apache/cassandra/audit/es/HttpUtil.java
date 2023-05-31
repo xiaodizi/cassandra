@@ -141,7 +141,7 @@ public class HttpUtil {
 
         try {
             String bulkApiJson = EsUtil.getBulkUpdateApiJson(maps,docId);
-
+            System.out.println("bulkApiJsonUpdate:"+bulkApiJson);
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
@@ -161,13 +161,25 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp<Object> getSearch(String url, String indexName, Map<String, Object> maps) {
+    public static DataRsp<Object> getSearch(String url, String indexName, String id) {
         String nodeUrl = "http://127.0.0.1:9200";
 
         List<Hites> hitesList = new ArrayList<>();
         try {
 
-            String requestJson = EsUtil.getDslQueryJson(maps);
+            String requestJson = "{\n" +
+                    "  \"query\": {\n" +
+                    "    \"bool\": {\n" +
+                    "      \"must\": [\n" +
+                    "        {\n" +
+                    "          \"match_phrase\": {\n" +
+                    "            \"_id\": \""+id+"\"\n" +
+                    "          }\n" +
+                    "        }\n" +
+                    "      ]\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
             System.out.println("查询 DSL：" + requestJson);
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
