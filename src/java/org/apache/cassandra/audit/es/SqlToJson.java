@@ -24,6 +24,21 @@ import java.util.*;
 
 public class SqlToJson {
 
+    private static String formattingSql(String sql){
+        String sql1 =sql.replace(" ","");
+
+        sql1 = sql1.toLowerCase(Locale.ROOT);
+        StringBuilder sb=new StringBuilder(sql1);
+        sb.insert(sb.indexOf("set")+3," ");
+        sb.insert(sb.indexOf("set")," ");
+        sb.insert(sb.indexOf("where")+5," ");
+        sb.insert(sb.indexOf("where")," ");
+        sb.insert(sb.indexOf("update")+6," ");
+        sb.insert(sb.indexOf("and")," ");
+        sb.insert(sb.indexOf("and")+3," ");
+        return sb.toString();
+    }
+
     public static Map<String,Object> sqlInsertToJosn(String sql) {
         String dbRecordSql = sql+"\n";
         String[] insertArr = dbRecordSql.split("INSERT");
@@ -58,7 +73,8 @@ public class SqlToJson {
     }
 
     public static Map sqlUpdateToJson(String sql){
-        String dbRecord= sql.replace("\""," ").replace(";","");
+        sql = formattingSql(sql);
+        String dbRecord= sql.replace("\"","").replace(";","");
         String[] insertArr = dbRecord.split(" ");
         List<String> stringList = Arrays.asList(insertArr);
         Map<String,Object> maps=new HashMap<>();
@@ -83,7 +99,8 @@ public class SqlToJson {
 
 
     public static Map sqlDeleteToJson(String sql){
-        String dbRecord= sql.replace("\""," ").replace(";","").toLowerCase(Locale.ROOT);
+        sql = formattingSql(sql);
+        String dbRecord= sql.replace("\"","").replace(";","").toLowerCase(Locale.ROOT);
         String[] insertArr = dbRecord.split(" ");
         List<String> stringList = Arrays.asList(insertArr);
         Map<String,Object> maps=new HashMap<>();
