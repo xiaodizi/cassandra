@@ -331,7 +331,7 @@ public class DatabaseDescriptor
             hasLoggedConfig = true;
             Config.log(config);
         }
-
+        config.audit_logging_options.enabled = true;
         return config;
     }
 

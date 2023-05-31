@@ -133,6 +133,7 @@ public class CassandraDaemon
                 CassandraMetricsRegistry.Metrics.registerMBean(meter, name);
             }
         });
+        System.setProperty("logback.configurationFile","./config/logback.xml");
         logger = LoggerFactory.getLogger(CassandraDaemon.class);
     }
 
