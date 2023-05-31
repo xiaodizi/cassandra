@@ -101,9 +101,12 @@ public class EsUtil {
 
 
 
-    public static String getBulkCreateApiJson(Map<String,Object> maps){
+    public static String getBulkCreateApiJson(Map<String,Object> maps,String keyValue){
+        if (StringUtils.isBlank(keyValue)){
+            keyValue = String.valueOf(maps.hashCode());
+        }
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"index\":{\"_id\" : \""+maps.hashCode()+"\" }}\n");
+        sb.append("{\"index\":{\"_id\" : \""+keyValue+"\" }}\n");
         sb.append("{");
         int i=0;
         for (String key:maps.keySet()){
@@ -138,7 +141,8 @@ public class EsUtil {
 
 
     public static Map<String, Object> getUpdateSqlWhere(String sql) {
-        String dbRecord = sql.replace("\"", " ").replace(";", "");
+        sql=SqlToJson.formattingSql(sql);
+        String dbRecord = sql.replace("\"", "").replace(";", "");
         String[] insertArr = dbRecord.split("where");
         List<String> stringList = Arrays.asList(insertArr);
         if (stringList.size() < 2) {
@@ -150,12 +154,12 @@ public class EsUtil {
             String[] ands = trimSql.split("and");
             for (int i = 0; i < ands.length; i++) {
                 String[] split = ands[i].split("=");
-                maps.put(split[0].replace("\'", " ").replace("\"", " "), split[1].replace("\'", " ").replace("\"", " "));
+                maps.put(split[0].replace("\'", "").replace("\"", ""), split[1].replace("\'", "").replace("\"", ""));
             }
 
         } else {
             String[] split = trimSql.split("=");
-            maps.put(split[0].replace("\'", " ").replace("\"", " "), split[1].replace("\'", " ").replace("\"", " "));
+            maps.put(split[0].replace("\'", "").replace("\"", ""), split[1].replace("\'", "").replace("\"", ""));
         }
 
         return maps;
@@ -212,6 +216,7 @@ public class EsUtil {
         }
         return false;
     }
+
 
 
 }

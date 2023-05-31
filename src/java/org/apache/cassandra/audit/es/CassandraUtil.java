@@ -18,14 +18,15 @@
 
 package org.apache.cassandra.audit.es;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
+import org.apache.cassandra.schema.ColumnMetadata;
 import org.apache.cassandra.schema.Schema;
 import org.apache.cassandra.schema.TableMetadata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -85,5 +86,25 @@ public class CassandraUtil {
         TableMetadata tableMetadata = columnFamilyStore.metadata.get();
         boolean syncEs = tableMetadata.params.syncEs;
         return syncEs;
+    }
+
+
+    public static String getPrimaryKeyValue(String keyspace,String table,Map maps){
+        ColumnFamilyStore cfs = Keyspace.open(keyspace).getColumnFamilyStore(table);
+        Iterable<ColumnMetadata> columnMetadata = cfs.metadata().primaryKeyColumns();
+
+        List<Object> objects = new ArrayList<>();
+        columnMetadata.forEach(objects::add);
+        String keyValue="";
+        for (int i = 0; i < objects.size() ; i++) {
+            String key = objects.get(i).toString();
+            String value = maps.get(key).toString();
+            if (i == 0) {
+                keyValue = key+":"+value;
+            }else {
+                keyValue =keyValue+"|"+key+":"+value;
+            }
+        }
+        return keyValue;
     }
 }

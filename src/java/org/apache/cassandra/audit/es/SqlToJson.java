@@ -18,9 +18,26 @@
 
 package org.apache.cassandra.audit.es;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.*;
 
 public class SqlToJson {
+
+    public static String formattingSql(String sql){
+        String sql1 =sql.replace(" ","");
+
+        sql1 = sql1.toLowerCase(Locale.ROOT);
+        StringBuilder sb=new StringBuilder(sql1);
+        sb.insert(sb.indexOf("set")+3," ");
+        sb.insert(sb.indexOf("set")," ");
+        sb.insert(sb.indexOf("where")+5," ");
+        sb.insert(sb.indexOf("where")," ");
+        sb.insert(sb.indexOf("update")+6," ");
+        sb.insert(sb.indexOf("and")," ");
+        sb.insert(sb.indexOf("and")+3," ");
+        return sb.toString();
+    }
 
     public static Map<String,Object> sqlInsertToJosn(String sql) {
         String dbRecordSql = sql+"\n";
@@ -41,11 +58,14 @@ public class SqlToJson {
 
             String fields = dbRecord.substring(dbRecord.indexOf("(") + 1, dbRecord.indexOf(")"));
             String values = dbRecord.substring(dbRecord.lastIndexOf("(") + 1, dbRecord.lastIndexOf(")"));
-            String replacedFields = fields.replace("`", "").trim();
+            String replacedFields = fields.replace("`", "").replaceAll("\"","").trim();
             String replacedValues = values.replace("'", "").trim();
             String[] fieldsArr = replacedFields.split(",");
             String[] valuesArr = replacedValues.split(",");
             for (int j = 0; j < fieldsArr.length; j++) {
+                if (StringUtils.isBlank(valuesArr[j]) || valuesArr[j].equals("null")){
+                    valuesArr[j] = "null";
+                }
                 maps.put(fieldsArr[j].trim(),valuesArr[j].trim());
             }
         }
@@ -53,7 +73,8 @@ public class SqlToJson {
     }
 
     public static Map sqlUpdateToJson(String sql){
-        String dbRecord= sql.replace("\""," ").replace(";","");
+        sql = formattingSql(sql);
+        String dbRecord= sql.replace("\"","").replace(";","");
         String[] insertArr = dbRecord.split(" ");
         List<String> stringList = Arrays.asList(insertArr);
         Map<String,Object> maps=new HashMap<>();
@@ -63,13 +84,13 @@ public class SqlToJson {
                 for (int i = 0; i < splitd.length; i++) {
                     if (splitd[i].contains("=")){
                         String[] split = splitd[i].split("=");
-                        maps.put(split[0].replace("\'"," ").replace("\""," "),split[1].replace("\'"," ").replace("\""," "));
+                        maps.put(split[0].replace("\'","").replace("\"",""),split[1].replace("\'","").replace("\"",""));
                     }
                 }
             }else {
                 if (s.contains("=")) {
                     String[] split = s.split("=");
-                    maps.put(split[0].replace("\'", " ").replace("\"", " "), split[1].replace("\'", " ").replace("\"", " "));
+                    maps.put(split[0].replace("\'", "").replace("\"", ""), split[1].replace("\'", "").replace("\"", ""));
                 }
             }
         });
@@ -78,14 +99,15 @@ public class SqlToJson {
 
 
     public static Map sqlDeleteToJson(String sql){
-        String dbRecord= sql.replace("\""," ").replace(";","").toLowerCase(Locale.ROOT);
+        sql =formattingSql(sql);
+        String dbRecord= sql.replace("\"","").replace(";","").toLowerCase(Locale.ROOT);
         String[] insertArr = dbRecord.split(" ");
         List<String> stringList = Arrays.asList(insertArr);
         Map<String,Object> maps=new HashMap<>();
         stringList.forEach(str->{
             if (str.contains("=")){
                 String[] split = str.split("=");
-                maps.put(split[0].trim(),split[1].replace("'"," ").trim());
+                maps.put(split[0].trim(),split[1].replace("'","").trim());
             }
         });
         return maps;
