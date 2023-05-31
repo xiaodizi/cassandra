@@ -2,9 +2,7 @@ package org.apache.cassandra.audit.es;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import okhttp3.*;
 import org.apache.cassandra.audit.es.common.ErrorEnum;
 import org.apache.cassandra.audit.es.dto.EsClusterDto;
 import org.apache.cassandra.audit.es.dto.EsResDto;
@@ -19,27 +17,29 @@ import java.util.Map;
 public class HttpUtil {
 
     public static DataRsp getClusterHealth(String url){
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
+        String nodeUrl = "http://127.0.0.1:9200";
         EsClusterDto esClusterDto=null;
-        Unirest.setTimeouts(0, 0);
         try {
-            HttpResponse<String> response = Unirest.get(nodeUrl+"/_cluster/health")
-                    .asString();
-            System.out.println("获取集群健康状态，返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
-            if (response.getStatus() != ErrorEnum.SUCCESS.code) {
+
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl+"/_cluster/health")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            String bodyMessage=response.body().string();
+
+            System.out.println("获取集群健康状态，返回：code:" + response.code() + "; 返回内容:" + bodyMessage);
+            if (response.code() != ErrorEnum.SUCCESS.code) {
                 return DataRsp.builder()
-                        .code(response.getStatus())
-                        .message(response.getStatusText())
+                        .code(response.code())
+                        .message(response.message())
                         .build();
             }
-            esClusterDto = JSONObject.parseObject(response.getBody(), EsClusterDto.class);
+            esClusterDto = JSONObject.parseObject(bodyMessage, EsClusterDto.class);
 
-        } catch (UnirestException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return DataRsp.builder()
@@ -51,27 +51,27 @@ public class HttpUtil {
 
 
     public static DataRsp newCreateIndex(String url,String indexName){
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
+        String nodeUrl = "http://127.0.0.1:9200";
 
         DataRsp clusterHealth = getClusterHealth(url);
         int numSharedNodes = Integer.parseInt(clusterHealth.getData().toString());
 
-        Unirest.setTimeouts(0, 0);
         try {
-            HttpResponse<String> response = Unirest.put(nodeUrl + "/" + indexName)
-                    .header("Content-Type", "application/json")
-                    .body("{\n  \"settings\":{\n    \"number_of_shards\":"+numSharedNodes+",\n    \"number_of_replicas\":"+(numSharedNodes-1)+"\n  }\n}")
-                    .asString();
-            System.out.println("创建索引返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
-            if (response.getStatus() != ErrorEnum.SUCCESS.code) {
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, "{\n  \"settings\":{\n    \"number_of_shards\":"+numSharedNodes+",\n    \"number_of_replicas\":"+(numSharedNodes-1)+"\n  }\n}");
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl + "/" + indexName)
+                    .method("PUT", body)
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            System.out.println("创建索引返回：code:" + response.code() + "; 返回内容:" + response.body().string());
+            if (response.code() != ErrorEnum.SUCCESS.code) {
                 return DataRsp.builder()
-                        .code(response.getStatus())
-                        .message(response.getStatusText())
+                        .code(response.code())
+                        .message(response.message())
                         .build();
             }
         }catch (Exception e){
@@ -81,39 +81,31 @@ public class HttpUtil {
     }
 
 
-    /**
-     * 创建索引
-     *
-     * @param url
-     * @param indexName
-     * @param json
-     * @param id
-     * @return
-     */
     public static DataRsp createIndex(String url, String indexName, String json, String id) {
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
-        Unirest.setTimeouts(0, 0);
+        String nodeUrl = "http://127.0.0.1:9200";
         try {
-            HttpResponse<String> response = Unirest.put(nodeUrl + "/" + indexName + "/_doc/" + id)
-                    .header("Content-Type", "application/json")
-                    .body(json)
-                    .asString();
+
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, json);
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl + "/" + indexName + "/_doc/" + id)
+                    .method("PUT", body)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+            Response response = client.newCall(request).execute();
 
 
-            System.out.println("Insert 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            System.out.println("Insert 数据返回：code:" + response.code() + "; 返回内容:" + response.body().string());
 
-            if (response.getStatus() != ErrorEnum.SUCCESS.code) {
+            if (response.code() != ErrorEnum.SUCCESS.code) {
                 return DataRsp.builder()
-                        .code(response.getStatus())
-                        .message(response.getStatusText())
+                        .code(response.code())
+                        .message(response.message())
                         .build();
             }
-        } catch (UnirestException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -121,23 +113,22 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps,String keyValue) {
-//        String nodeUrl = getRandomNode(url);
-        String nodeUrl = url;
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
-        Unirest.setTimeouts(0, 0);
+    public static DataRsp bulkIndex(String url, String indexName, Map<String, Object> maps, String keyValue) {
+        String nodeUrl = "http://127.0.0.1:9200";
         try {
             String bulkApiJson = EsUtil.getBulkCreateApiJson(maps,keyValue);
-            System.out.println("bulkApiJson:"+bulkApiJson);
-            HttpResponse<String> response = Unirest.post(nodeUrl+"/"+indexName+"/_bulk")
-                    .header("Content-Type", "application/x-ndjson")
-                    .body(bulkApiJson)
-                    .asString();
-            System.out.println("Bulk 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, bulkApiJson);
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl+"/"+indexName+"/_bulk")
+                    .method("POST", body)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            System.out.println("Bulk 数据返回：code:" + response.code() + "; 返回内容:" + response.body().string());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,64 +137,76 @@ public class HttpUtil {
 
 
     public static DataRsp bulkUpdate(String url,String indexName,Map<String,Object> maps,String docId){
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
-        Unirest.setTimeouts(0, 0);
+        String nodeUrl = "http://127.0.0.1:9200";
+
         try {
             String bulkApiJson = EsUtil.getBulkUpdateApiJson(maps,docId);
-            HttpResponse<String> response = Unirest.post(nodeUrl+"/"+indexName+"/_bulk")
-                    .header("Content-Type", "application/x-ndjson")
-                    .body(bulkApiJson)
-                    .asString();
-            System.out.println("Bulk 数据返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
+            System.out.println("bulkApiJsonUpdate:"+bulkApiJson);
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, bulkApiJson);
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl+"/"+indexName+"/_bulk")
+                    .method("POST", body)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            System.out.println("Bulk 数据返回：code:" + response.code()+ "; 返回内容:" + response.body().string());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return DataRsp.getError200();
     }
 
-    /**
-     * 查询方法,match  keyword
-     * 多条件 使用bool 查询
-     *
-     * @param url
-     * @param indexName
-     * @return
-     */
-    public static DataRsp<Object> getSearch(String url, String indexName, Map<String, Object> maps) {
-        String nodeUrl = getRandomNode(url);
-        System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
-        if (StringUtils.isBlank(nodeUrl)) {
-            // es_node_list 配置为空 返回 406
-            return DataRsp.getError406();
-        }
+
+    public static DataRsp<Object> getSearch(String url, String indexName, String id) {
+        String nodeUrl = "http://127.0.0.1:9200";
+
         List<Hites> hitesList = new ArrayList<>();
-        Unirest.setTimeouts(0, 0);
         try {
 
-            String requestJson = EsUtil.getDslQueryJson(maps);
+            String requestJson = "{\n" +
+                    "  \"query\": {\n" +
+                    "    \"bool\": {\n" +
+                    "      \"must\": [\n" +
+                    "        {\n" +
+                    "          \"match_phrase\": {\n" +
+                    "            \"_id\": \""+id+"\"\n" +
+                    "          }\n" +
+                    "        }\n" +
+                    "      ]\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
             System.out.println("查询 DSL：" + requestJson);
-            HttpResponse<String> response = Unirest.post(nodeUrl + "/" + indexName + "/_search")
-                    .header("Content-Type", "application/json")
-                    .body(requestJson)
-                    .asString();
-            if (response.getStatus() != ErrorEnum.SUCCESS.code) {
-                return DataRsp.builder()
-                        .code(response.getStatus())
-                        .message(response.getStatusText())
-                        .data(hitesList)
-                        .build();
-            }
-            System.out.println("结果1：" + response.getBody());
-            EsResDto esResDto = JSONObject.parseObject(response.getBody(), EsResDto.class);
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, requestJson);
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl + "/" + indexName + "/_search")
+                    .method("POST", body)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            String respBody=response.body().string();
+
+            System.out.println("结果1：" + response.code());
+            EsResDto esResDto = JSONObject.parseObject(respBody, EsResDto.class);
             System.out.println("结果2：" + JSON.toJSONString(esResDto));
             hitesList = esResDto.getHits().getHits();
 
-        } catch (UnirestException e) {
+            if (response.code() != ErrorEnum.SUCCESS.code) {
+                return DataRsp.builder()
+                        .code(response.code())
+                        .message(response.message())
+                        .data(hitesList)
+                        .build();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -213,15 +216,7 @@ public class HttpUtil {
                 .build();
     }
 
-    /**
-     * 获取索引是否存在
-     * 通过ID 查询
-     *
-     * @param url
-     * @param indexName
-     * @param id
-     * @return 非200都是不存在
-     */
+
     public static DataRsp<Object> getIndex(String url, String indexName, String id) {
         String nodeUrl = getRandomNode(url);
         System.out.println("LEI TEST INFO: 节点地址:" + nodeUrl);
@@ -229,16 +224,23 @@ public class HttpUtil {
             // es_node_list 配置为空 返回 406
             return DataRsp.getError406();
         }
-        Unirest.setTimeouts(0, 0);
         try {
-            HttpResponse<String> response = Unirest.get(nodeUrl + "/" + indexName + "/_doc/" + id)
-                    .header("Content-Type", "application/json")
-                    .asString();
 
-            if (ErrorEnum.SUCCESS.code != response.getStatus()) {
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("text/plain");
+            RequestBody body = RequestBody.create(mediaType, "");
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl + "/" + indexName + "/_doc/" + id)
+                    .method("GET", body)
+                    .build();
+            Response response = client.newCall(request).execute();
+
+
+            if (ErrorEnum.SUCCESS.code != response.code()) {
                 return DataRsp.builder()
-                        .code(response.getStatus())
-                        .message(response.getStatusText())
+                        .code(response.code())
+                        .message(response.message())
                         .build();
             }
         } catch (Exception e) {
@@ -248,32 +250,32 @@ public class HttpUtil {
         return DataRsp.getError200();
     }
 
-    /**
-     * 删除数据
-     *
-     * @param url
-     * @param indexName
-     * @param maps
-     * @return
-     */
+
     public static DataRsp deleteData(String url, String indexName, Map maps) {
         String nodeUrl = getRandomNode(url);
         if (StringUtils.isBlank(nodeUrl)) {
             return DataRsp.getError406();
         }
-        Unirest.setTimeouts(0, 0);
         try {
             String requestJson = EsUtil.getDslQueryJson(maps);
             System.out.println("删除 DSL：" + requestJson);
-            HttpResponse<String> response = Unirest.post(nodeUrl + "/" + indexName + "/_delete_by_query?slices=auto&conflicts=proceed&wait_for_completion=false")
-                    .header("Content-Type", "application/json")
-                    .body(requestJson)
-                    .asString();
-            System.out.println("删除返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
-            if (ErrorEnum.SUCCESS.code != response.getStatus()) {
+
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, requestJson);
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl + "/" + indexName + "/_delete_by_query?slices=auto&conflicts=proceed&wait_for_completion=false")
+                    .method("POST", body)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            System.out.println("删除返回：code:" + response.code() + "; 返回内容:" + response.body().string());
+            if (ErrorEnum.SUCCESS.code != response.code()) {
                 return DataRsp.builder()
-                        .code(response.getStatus())
-                        .message(response.getStatusText())
+                        .code(response.code())
+                        .message(response.message())
                         .build();
             }
         } catch (Exception e) {
@@ -294,30 +296,27 @@ public class HttpUtil {
         return nodeList[index];
     }
 
-    /**
-     * 删除索引
-     *
-     * @param url
-     * @param indexName
-     * @return
-     */
+
     public static DataRsp dropIndex(String url, String indexName) {
 
-        String nodeUrl = getRandomNode(url);
-        if (StringUtils.isBlank(nodeUrl)) {
-            return DataRsp.getError406();
-        }
-        Unirest.setTimeouts(0, 0);
+        String nodeUrl = "http://127.0.0.1:9200";
         try {
 
-            HttpResponse<String> response = Unirest.delete(nodeUrl + "/" + indexName)
-                    .asString();
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("text/plain");
+            RequestBody body = RequestBody.create(mediaType, "");
+            Request request = new Request.Builder().addHeader("Connection","close")
+                    .url(nodeUrl + "/" + indexName)
+                    .method("DELETE", body)
+                    .build();
+            Response response = client.newCall(request).execute();
 
-            System.out.println("删除索引返回：code:" + response.getStatus() + "; 返回内容:" + response.getBody());
-            if (ErrorEnum.SUCCESS.code != response.getStatus()) {
+            System.out.println("删除索引返回：code:" + response.code() + "; 返回内容:" + response.body().string());
+            if (ErrorEnum.SUCCESS.code != response.code()) {
                 return DataRsp.builder()
-                        .code(response.getStatus())
-                        .message(response.getStatusText())
+                        .code(response.code())
+                        .message(response.message())
                         .build();
             }
 
@@ -327,4 +326,5 @@ public class HttpUtil {
         }
         return DataRsp.getError200();
     }
+
 }

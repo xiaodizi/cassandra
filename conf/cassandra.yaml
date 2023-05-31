@@ -1894,29 +1894,7 @@ drop_compact_storage_enabled: false
 #    excluded_keyspaces: # comma separated list of keyspaces to exclude from the check
 #    excluded_tables: # comma separated list of keyspace.table pairs to exclude from the check
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
 # es 节点 列表
 # es_node_list: http://ip1:9200,http://ip2:9200,http://ip3:9200
-es_node_list:
+# es_node_list: http://127.0.0.1:9200
 
-# 不想同步到es的表配置
-# 配置例子：keyspace名字.表名
-sync_es_table:
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-# The sstable formats configuration. SSTable formats implementations are loaded using the service loader mechanism.
-# In this section, one can select the format for created sstables and pass additional parameters for the formats
-# available on the classpath.
-#sstable:
-#  selected_format: big
-#  format:
-#    big:
-#      param1: value1
-#      ...
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
