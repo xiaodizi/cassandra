@@ -53,7 +53,7 @@ public class SqlToJson {
     }
 
     public static Map sqlUpdateToJson(String sql){
-        String dbRecord= sql.replace("\""," ").replace(";","");
+        String dbRecord= sql.replace("\"","").replace(";","");
         String[] insertArr = dbRecord.split(" ");
         List<String> stringList = Arrays.asList(insertArr);
         Map<String,Object> maps=new HashMap<>();
@@ -78,7 +78,7 @@ public class SqlToJson {
 
 
     public static Map sqlDeleteToJson(String sql){
-        String dbRecord= sql.replace("\""," ").replace(";","").toLowerCase(Locale.ROOT);
+        String dbRecord= sql.replace("\"","").replace(";","").toLowerCase(Locale.ROOT);
         String[] insertArr = dbRecord.split(" ");
         List<String> stringList = Arrays.asList(insertArr);
         Map<String,Object> maps=new HashMap<>();
