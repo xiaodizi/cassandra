@@ -166,13 +166,24 @@ public class HttpUtil {
     }
 
 
-    public static DataRsp<Object> getSearch(String indexName, Map<String, Object> maps) {
+    public static DataRsp<Object> getSearch(String indexName, String id) {
         String nodeUrl = "http://" + DatabaseDescriptor.getRpcAddress().getHostAddress() + ":9200";
         List<Hites> hitesList = new ArrayList<>();
         try {
 
-            String requestJson = EsUtil.getDslQueryJson(maps);
-            System.out.println("查询 DSL：" + requestJson);
+            String requestJson = "{\n" +
+                    "  \"query\": {\n" +
+                    "    \"bool\": {\n" +
+                    "      \"must\": [\n" +
+                    "        {\n" +
+                    "          \"match_phrase\": {\n" +
+                    "            \"_id\": \""+id+"\"\n" +
+                    "          }\n" +
+                    "        }\n" +
+                    "      ]\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
             MediaType mediaType = MediaType.parse("application/json");

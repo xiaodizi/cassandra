@@ -154,12 +154,12 @@ public class EsUtil {
             String[] ands = trimSql.split("and");
             for (int i = 0; i < ands.length; i++) {
                 String[] split = ands[i].split("=");
-                maps.put(split[0].replace("\'", " ").replace("\"", " "), split[1].replace("\'", " ").replace("\"", " "));
+                maps.put(split[0].replace("\'", "").replace("\"", ""), split[1].replace("\'", "").replace("\"", ""));
             }
 
         } else {
             String[] split = trimSql.split("=");
-            maps.put(split[0].replace("\'", " ").replace("\"", " "), split[1].replace("\'", " ").replace("\"", " "));
+            maps.put(split[0].replace("\'", "").replace("\"", ""), split[1].replace("\'", "").replace("\"", ""));
         }
 
         return maps;

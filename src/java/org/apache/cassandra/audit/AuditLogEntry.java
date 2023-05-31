@@ -163,8 +163,8 @@ public class AuditLogEntry {
                                 } else if (sql.indexOf("update") > 0) {
                                     Map sqlMaps = SqlToJson.sqlUpdateToJson(sql);
 
-                                    Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(sql);
-                                    DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, updateSqlWhere);
+                                    String id = CassandraUtil.getPrimaryKeyValue(keyspace,scope,sqlMaps).replace(" ","");
+                                    DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, id);
                                     List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
                                     hitesList.stream().forEach(hites -> {
                                         Map<String, Object> source = hites.get_source();
@@ -198,8 +198,8 @@ public class AuditLogEntry {
                         if (s.toLowerCase(Locale.ROOT).contains("update")) {
                             Map sqlMaps = SqlToJson.sqlUpdateToJson(s);
 
-                            Map<String, Object> updateSqlWhere = EsUtil.getUpdateSqlWhere(s);
-                            DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, updateSqlWhere);
+                            String id = CassandraUtil.getPrimaryKeyValue(keyspace,scope,sqlMaps);
+                            DataRsp<Object> dataRsp = HttpUtil.getSearch(keyspace + "-" + scope, id);
                             List<Hites> hitesList = EsUtil.castList(dataRsp.getData(), Hites.class);
                             hitesList.stream().forEach(hites -> {
                                 Map<String, Object> source = hites.get_source();
