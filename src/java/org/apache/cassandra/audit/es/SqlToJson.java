@@ -99,7 +99,6 @@ public class SqlToJson {
 
 
     public static Map sqlDeleteToJson(String sql){
-        sql = formattingSql(sql);
         String dbRecord= sql.replace("\"","").replace(";","").toLowerCase(Locale.ROOT);
         String[] insertArr = dbRecord.split(" ");
         List<String> stringList = Arrays.asList(insertArr);
