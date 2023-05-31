@@ -44,8 +44,8 @@ num_tokens: 16
 allocate_tokens_for_local_replication_factor: 3
 
 # initial_token allows you to specify tokens manually.  While you can use it with
-# vnodes (num_tokens > 1, above) -- in which case you should provide a 
-# comma-separated list -- it's primarily used when adding nodes to legacy clusters 
+# vnodes (num_tokens > 1, above) -- in which case you should provide a
+# comma-separated list -- it's primarily used when adding nodes to legacy clusters
 # that do not have vnodes enabled.
 # initial_token:
 
@@ -275,7 +275,7 @@ credentials_validity: 2000ms
 partitioner: org.apache.cassandra.dht.Murmur3Partitioner
 
 # Directories where Cassandra should store data on disk. If multiple
-# directories are specified, Cassandra will spread data evenly across 
+# directories are specified, Cassandra will spread data evenly across
 # them by partitioning the token ranges.
 # If not set, the default directory is $CASSANDRA_HOME/data/data.
 # data_file_directories:
@@ -469,8 +469,8 @@ counter_cache_save_period: 7200s
 # Min unit: s
 # cache_load_timeout: 30s
 
-# commitlog_sync may be either "periodic", "group", or "batch." 
-# 
+# commitlog_sync may be either "periodic", "group", or "batch."
+#
 # When in batch mode, Cassandra won't ack writes until the commit log
 # has been flushed to disk.  Each incoming write will trigger the flush task.
 # commitlog_sync_batch_window_in_ms is a deprecated value. Previously it had
@@ -908,7 +908,7 @@ incremental_backups: false
 snapshot_before_compaction: false
 
 # Whether or not a snapshot is taken of the data before keyspace truncation
-# or dropping of column families. The STRONGLY advised default of true 
+# or dropping of column families. The STRONGLY advised default of true
 # should be used to provide data safety. If you set this flag to false, you will
 # lose data on truncation or drop.
 auto_snapshot: true
@@ -962,7 +962,7 @@ column_index_cache_size: 2KiB
 #
 # concurrent_compactors defaults to the smaller of (number of disks,
 # number of cores), with a minimum of 2 and a maximum of 8.
-# 
+#
 # If your data directories are backed by SSD, you should increase this
 # to the number of cores.
 # concurrent_compactors: 1
@@ -990,7 +990,7 @@ compaction_throughput: 64MiB/s
 
 # When compacting, the replacement sstable(s) can be opened before they
 # are completely written, and used in place of the prior sstables for
-# any range that has been written. This helps to smoothly transfer reads 
+# any range that has been written. This helps to smoothly transfer reads
 # between the sstables, reducing page cache churn and keeping hot rows hot
 # Set sstable_preemptive_open_interval to null for disabled which is equivalent to
 # sstable_preemptive_open_interval_in_mb being negative
@@ -1138,10 +1138,10 @@ slow_query_log_timeout: 500ms
 # Enable operation timeout information exchange between nodes to accurately
 # measure request timeouts.  If disabled, replicas will assume that requests
 # were forwarded to them instantly by the coordinator, which means that
-# under overload conditions we will waste that much extra time processing 
+# under overload conditions we will waste that much extra time processing
 # already-timed-out requests.
 #
-# Warning: It is generally assumed that users have setup NTP on their clusters, and that clocks are modestly in sync, 
+# Warning: It is generally assumed that users have setup NTP on their clusters, and that clocks are modestly in sync,
 # since this is a requirement for general correctness of last write wins.
 # internode_timeout: true
 
@@ -1472,19 +1472,19 @@ tombstone_failure_threshold: 100000
 # mechanism materializes replica results by partition on-heap at the coordinator. The more possibly
 # stale results returned by the replicas, the more rows materialized during the query.
 replica_filtering_protection:
-    # These thresholds exist to limit the damage severely out-of-date replicas can cause during these
-    # queries. They limit the number of rows from all replicas individual index and filtering queries
-    # can materialize on-heap to return correct results at the desired read consistency level.
-    #
-    # "cached_replica_rows_warn_threshold" is the per-query threshold at which a warning will be logged.
-    # "cached_replica_rows_fail_threshold" is the per-query threshold at which the query will fail.
-    #
-    # These thresholds may also be adjusted at runtime using the StorageService mbean.
-    #
-    # If the failure threshold is breached, it is likely that either the current page/fetch size
-    # is too large or one or more replicas is severely out-of-sync and in need of repair.
-    cached_rows_warn_threshold: 2000
-    cached_rows_fail_threshold: 32000
+  # These thresholds exist to limit the damage severely out-of-date replicas can cause during these
+  # queries. They limit the number of rows from all replicas individual index and filtering queries
+  # can materialize on-heap to return correct results at the desired read consistency level.
+  #
+  # "cached_replica_rows_warn_threshold" is the per-query threshold at which a warning will be logged.
+  # "cached_replica_rows_fail_threshold" is the per-query threshold at which the query will fail.
+  #
+  # These thresholds may also be adjusted at runtime using the StorageService mbean.
+  #
+  # If the failure threshold is breached, it is likely that either the current page/fetch size
+  # is too large or one or more replicas is severely out-of-sync and in need of repair.
+  cached_rows_warn_threshold: 2000
+  cached_rows_fail_threshold: 32000
 
 # Log WARN on any multiple-partition batch size exceeding this value. 5KiB per batch by default.
 # Caution should be taken on increasing the size of this threshold as it can lead to node instability.
@@ -1568,9 +1568,9 @@ audit_logging_options:
   # max_archive_retries: 10
 
 
-# default options for full query logging - these can be overridden from command line when executing
-# nodetool enablefullquerylog
-# full_query_logging_options:
+  # default options for full query logging - these can be overridden from command line when executing
+  # nodetool enablefullquerylog
+  # full_query_logging_options:
   # log_dir:
   # roll_cycle: HOURLY
   # block: true
@@ -1805,6 +1805,7 @@ drop_compact_storage_enabled: false
 #    heartbeat_file: /var/lib/cassandra/data/cassandra-heartbeat
 #    excluded_keyspaces: # comma separated list of keyspaces to exclude from the check
 #    excluded_tables: # comma separated list of keyspace.table pairs to exclude from the check
+
 
 # 日志配置
 # path_logs: /Users/lei.fu
