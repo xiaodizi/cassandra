@@ -26,7 +26,7 @@ import org.apache.cassandra.diag.DiagnosticEvent;
 import org.apache.cassandra.diag.DiagnosticEventService;
 
 /**
- * {@Link AuditLogEntry} wrapper to expose audit events as {@link DiagnosticEvent}s.
+ * { AuditLogEntry} wrapper to expose audit events as { DiagnosticEvent}s.
  */
 public final class AuditEvent extends DiagnosticEvent
 {

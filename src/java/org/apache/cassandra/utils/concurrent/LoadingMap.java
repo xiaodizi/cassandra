@@ -39,8 +39,8 @@ import org.cliffc.high_scale_lib.NonBlockingHashMap;
  * scenario is forbidden in case of {@link ConcurrentHashMap} and leads to a deadlock. On the other hand, {@link NonBlockingHashMap}
  * does not guarantee at-most-once semantics of running the mapping function for a single key.
  *
- * @param <K>
- * @param <V>
+ * @param <K>  参数1
+ * @param <V>  参数2
  */
 public class LoadingMap<K, V>
 {

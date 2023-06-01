@@ -55,7 +55,7 @@ import static org.apache.cassandra.utils.concurrent.Awaitable.SyncAwaitable.wait
  * the result must be a correctly typed object (modulo generics pitfalls).
  * All special values are also instances of FailureHolder, which simplifies a number of the logical conditions.
  *
- * @param <V>
+ * @param <V> 参数
  */
 public class SyncFuture<V> extends AbstractFuture<V>
 {

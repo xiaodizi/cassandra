@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
  * A simple append-only collection supporting an unbounded number of concurrent readers/writers,
  * but a bounded number of items.
  *
- * @param <E>
+ * @param <E>  参数
  */
 public class Accumulator<E>
 {

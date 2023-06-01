@@ -34,12 +34,12 @@ import org.apache.cassandra.utils.concurrent.OpOrder;
 + * The SlabAllocator is a bump-the-pointer allocator that allocates
 + * large (1MiB) global regions and then doles them out to threads that
 + * request smaller sized (up to 128KiB) slices into the array.
- * <p></p>
+ *
  * The purpose of this class is to combat heap fragmentation in long lived
  * objects: by ensuring that all allocations with similar lifetimes
  * only to large regions of contiguous memory, we ensure that large blocks
  * get freed up at the same time.
- * <p></p>
+ *
  * Otherwise, variable length byte arrays allocated end up
  * interleaved throughout the heap, and the old generation gets progressively
  * more fragmented until a stop-the-world compacting collection occurs.
