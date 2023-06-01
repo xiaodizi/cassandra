@@ -809,7 +809,7 @@ public class StressProfile implements Serializable
     {
         try
         {
-            Constructor constructor = new Constructor(StressYaml.class);
+            Constructor constructor = new Constructor(null);
 
             Yaml yaml = new Yaml(constructor);
 
