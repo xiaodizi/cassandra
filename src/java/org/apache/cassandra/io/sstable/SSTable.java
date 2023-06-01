@@ -120,7 +120,8 @@ public abstract class SSTable
      * if such a marker exists on startup, the file should be removed.
      *
      * This method will also remove SSTables that are marked as temporary.
-     *
+     * @param desc 描述
+     * @param components 描述
      * @return true if the file was deleted
      */
     public static boolean delete(Descriptor desc, Set<Component> components)
@@ -161,6 +162,8 @@ public abstract class SSTable
     /**
      * If the given @param key occupies only part of a larger buffer, allocate a new buffer that is only
      * as large as necessary.
+     * @param key 仅仅是个描述
+     * @return DecoratedKey 仅仅是个描述
      */
     public static DecoratedKey getMinimalKey(DecoratedKey key)
     {
@@ -241,6 +244,8 @@ public abstract class SSTable
 
     /**
      * Discovers existing components for the descriptor. Slow: only intended for use outside the critical path.
+     * @param desc 仅仅是个描述
+     * @return Set<Component> 仅仅是个描述
      */
     public static Set<Component> componentsFor(final Descriptor desc)
     {
@@ -281,7 +286,12 @@ public abstract class SSTable
         return components;
     }
 
-    /** @return An estimate of the number of keys contained in the given index file. */
+    /**
+     * @return An estimate of the number of keys contained in the given index file.
+     * @param ifile 仅仅是个描述
+     * @param descriptor 仅仅是个描述
+     * @throws IOException 仅仅是个描述
+     */
     public static long estimateRowsFromIndex(RandomAccessReader ifile, Descriptor descriptor) throws IOException
     {
         // collect sizes for the first 10000 keys, or first 10 mebibytes of data
@@ -319,7 +329,9 @@ public abstract class SSTable
 
     /**
      * Reads the list of components from the TOC component.
+     * @param descriptor 仅仅是个描述
      * @return set of components found in the TOC
+     * @throws IOException 仅仅是个描述
      */
     protected static Set<Component> readTOC(Descriptor descriptor) throws IOException
     {
@@ -329,7 +341,9 @@ public abstract class SSTable
     /**
      * Reads the list of components from the TOC component.
      * @param skipMissing, skip adding the component to the returned set if the corresponding file is missing.
+     * @param descriptor 仅仅是个描述
      * @return set of components found in the TOC
+     * @throws IOException 仅仅增加个描述
      */
     protected static Set<Component> readTOC(Descriptor descriptor, boolean skipMissing) throws IOException
     {
@@ -349,6 +363,8 @@ public abstract class SSTable
 
     /**
      * Appends new component names to the TOC component.
+     * @param descriptor 仅仅是个描述
+     * @param components 仅仅是个描述
      */
     protected static void appendTOC(Descriptor descriptor, Collection<Component> components)
     {

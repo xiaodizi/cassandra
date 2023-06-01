@@ -47,7 +47,7 @@ import static org.apache.cassandra.cql3.functions.types.DataType.*;
  * A Codec that can serialize and deserialize to and from a given {@link #getCqlType() CQL type} and
  * a given {@link #getJavaType() Java Type}.
  *
- * <p>
+ *
  *
  * <h3>Serializing and deserializing</h3>
  *
@@ -61,7 +61,7 @@ import static org.apache.cassandra.cql3.functions.types.DataType.*;
  * instance corresponding to the codec's CQL type to the codec's Java type.
  * </ol>
  *
- * <p>
+ *
  *
  * <h3>Formatting and parsing</h3>
  *
@@ -72,13 +72,13 @@ import static org.apache.cassandra.cql3.functions.types.DataType.*;
  * <li>{@link #parse(String)}; parses a CQL string into the Java type handled by the codec.
  * </ol>
  *
- * <p>
+ *
  *
  * <h3>Inspection</h3>
  *
  * <p>Codecs also have the following inspection methods:
  *
- * <p>
+ *
  *
  * <ol>
  * <li>{@link #accepts(DataType)}: returns true if the codec can deserialize the given CQL type;
@@ -86,11 +86,11 @@ import static org.apache.cassandra.cql3.functions.types.DataType.*;
  * <li>{@link #accepts(Object)}; returns true if the codec can serialize the given object.
  * </ol>
  *
- * <p>
+ *
  *
  * <h3>Implementation notes</h3>
  *
- * <p>
+ *
  *
  * <ol>
  * <li>TypeCodec implementations <em>must</em> be thread-safe.

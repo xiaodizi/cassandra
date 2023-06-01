@@ -531,7 +531,11 @@ public class CassandraRoleManager implements IRoleManager
         return StringUtils.replace(name, "'", "''");
     }
 
-    /** Allows selective overriding of the consistency level for specific roles. */
+    /**
+     * Allows selective overriding of the consistency level for specific roles.
+     * @param role 仅仅是个描述
+     * @return ConsistencyLevel 仅仅是个描述
+     */
     protected static ConsistencyLevel consistencyForRoleWrite(String role)
     {
         return role.equals(DEFAULT_SUPERUSER_NAME) ?

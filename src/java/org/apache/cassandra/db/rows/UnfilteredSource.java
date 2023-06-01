@@ -38,6 +38,7 @@ public interface UnfilteredSource
      * @param columnFilter filter to apply to all returned partitions
      * @param reversed true if the content should be returned in reverse order
      * @param listener a listener used to handle internal read events
+     * @return 仅仅是个描述
      */
     UnfilteredRowIterator rowIterator(DecoratedKey key,
                                       Slices slices,
@@ -56,14 +57,23 @@ public interface UnfilteredSource
      * @param columnFilter filter to apply to all returned partitions
      * @param dataRange the partition and clustering range queried
      * @param listener a listener used to handle internal read events
+     * @return  仅仅是个描述
      */
     UnfilteredPartitionIterator partitionIterator(ColumnFilter columnFilter,
                                                   DataRange dataRange,
                                                   SSTableReadsListener listener);
 
-    /** Minimum timestamp of all stored data */
+    /**
+     * Minimum timestamp of all stored data
+     * 所有存储数据的最小时间戳
+     * @return 只是个描述
+     */
     long getMinTimestamp();
 
-    /** Minimum local deletion time in the memtable */
+    /**
+     * Minimum local deletion time in the memtable
+     * 内存表中的最短本地删除时间
+     * @return 只是个描述
+     */
     int getMinLocalDeletionTime();
 }

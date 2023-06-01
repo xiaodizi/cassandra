@@ -33,6 +33,7 @@ public interface IVerbHandler<T>
      * because the implementation may be synchronized.
      *
      * @param message - incoming message that needs handling.
+     * @throws IOException - 仅仅是个描述
      */
     void doVerb(Message<T> message) throws IOException;
 }

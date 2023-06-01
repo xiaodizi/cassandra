@@ -33,12 +33,15 @@ public abstract class DCPermissions
 {
     /**
      * returns true if the user can access the given dc
+     * @param dc 仅仅是个描述
+     * @return boolean 仅仅是个描述
      */
     public abstract boolean canAccess(String dc);
 
     /**
      * Indicates whether the permissions object explicitly allow access to
      * some dcs (true) or if it implicitly allows access to all dcs (false)
+     * @return 仅仅是个描述
      */
     public abstract boolean restrictsAccess();
     public abstract Set<String> allowedDCs();

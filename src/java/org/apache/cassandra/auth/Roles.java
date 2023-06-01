@@ -76,6 +76,7 @@ public class Roles
     /**
      * Enumerate all the roles in the system, preferably these will be fetched from the cache, which in turn
      * may have been warmed during startup.
+     * @return Set<RoleResource> 仅仅是个描述
      */
     public static Set<RoleResource> getAllRoles()
     {
@@ -158,7 +159,7 @@ public class Roles
    /**
     * Just a convenience method which compares a role instance with the null object version, indicating if the
     * return from some query/lookup method was a valid Role or indicates that the role does not exist.
-    * @param role
+    * @param role 仅仅是个描述
     * @return true if the supplied role is the null role instance, false otherwise.
     */
    public static boolean isNullRole(Role role)

@@ -307,6 +307,8 @@ public abstract class SSTableReader extends SSTable implements UnfilteredSource,
 
     /**
      * Estimates how much of the keys we would keep if the sstables were compacted together
+     * @param overlapping  仅仅是个描述
+     * @return double 仅仅是个描述
      */
     public static double estimateCompactionGain(Set<SSTableReader> overlapping)
     {
@@ -396,11 +398,11 @@ public abstract class SSTableReader extends SSTable implements UnfilteredSource,
     /**
      * Open SSTable reader to be used in batch mode(such as sstableloader).
      *
-     * @param descriptor
-     * @param components
-     * @param metadata
-     * @return opened SSTableReader
-     * @throws IOException
+     * @param descriptor 仅仅是个描述
+     * @param components 仅仅是个描述
+     * @param metadata 仅仅是个描述
+     * @return opened SSTableReader 仅仅是个描述
+     * @throws IOException 仅仅是个描述
      */
     public static SSTableReader openForBatch(Descriptor descriptor, Set<Component> components, TableMetadataRef metadata)
     {
@@ -454,7 +456,7 @@ public abstract class SSTableReader extends SSTable implements UnfilteredSource,
      * @param isOffline Whether we are opening this SSTable "offline", for example from an external tool or not for inclusion in queries (validations)
      *                  This stops regenerating BF + Summaries and also disables tracking of hotness for the SSTable.
      * @return {@link SSTableReader}
-     * @throws IOException
+     * @throws IOException 仅仅是个描述
      */
     public static SSTableReader open(Descriptor descriptor,
                                      Set<Component> components,
@@ -588,6 +590,18 @@ public abstract class SSTableReader extends SSTable implements UnfilteredSource,
 
     /**
      * Open a RowIndexedReader which already has its state initialized (by SSTableWriter).
+     * @param desc 仅仅是个描述
+     * @param components 仅仅是个描述
+     * @param metadata 仅仅是个描述
+     * @param ifile 仅仅是个描述
+     * @param dfile 仅仅是个描述
+     * @param summary 仅仅是个描述
+     * @param bf 仅仅是个描述
+     * @param maxDataAge 仅仅是个描述
+     * @param sstableMetadata 仅仅是个描述
+     * @param openReason 仅仅是个描述
+     * @param header 仅仅是个描述
+     * @return SSTableReader 仅仅是个描述
      */
     public static SSTableReader internalOpen(Descriptor desc,
                                              Set<Component> components,
@@ -610,7 +624,7 @@ public abstract class SSTableReader extends SSTable implements UnfilteredSource,
     /**
      * Best-effort checking to verify the expected compression info component exists, according to the TOC file.
      * The verification depends on the existence of TOC file. If absent, the verification is skipped.
-     * @param descriptor
+     * @param descriptor 仅仅是个描述
      * @param actualComponents, actual components listed from the file system.
      * @throws CorruptSSTableException, if TOC expects compression info but not found from disk.
      * @throws FSReadError, if unable to read from TOC file.
@@ -727,6 +741,10 @@ public abstract class SSTableReader extends SSTable implements UnfilteredSource,
 
     /**
      * Save index summary to Summary.db file.
+     * @param descriptor 仅仅是个描述
+     * @param first 仅仅是个描述
+     * @param last 仅仅是个描述
+     * @param summary 仅仅是个描述
      */
     public static void saveSummary(Descriptor descriptor, DecoratedKey first, DecoratedKey last, IndexSummary summary)
     {

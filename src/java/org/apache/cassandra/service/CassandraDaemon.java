@@ -187,8 +187,8 @@ public class CassandraDaemon
     }
 
     @VisibleForTesting
-    public static Runnable SPECULATION_THRESHOLD_UPDATER = 
-        () -> 
+    public static Runnable SPECULATION_THRESHOLD_UPDATER =
+        () ->
         {
             try
             {
@@ -253,7 +253,7 @@ public class CassandraDaemon
 
         logSystemInfo();
 
-        //NativeLibrary.tryMlockall();
+        NativeLibrary.tryMlockall();
 
         CommitLog.instance.start();
 
@@ -482,7 +482,7 @@ public class CassandraDaemon
         ScheduledExecutors.optionalTasks.scheduleWithFixedDelay(ColumnFamilyStore.getBackgroundCompactionTaskSubmitter(), 5, 1, TimeUnit.MINUTES);
 
         // schedule periodic recomputation of speculative retry thresholds
-        ScheduledExecutors.optionalTasks.scheduleWithFixedDelay(SPECULATION_THRESHOLD_UPDATER, 
+        ScheduledExecutors.optionalTasks.scheduleWithFixedDelay(SPECULATION_THRESHOLD_UPDATER,
                                                                 DatabaseDescriptor.getReadRpcTimeout(NANOSECONDS),
                                                                 DatabaseDescriptor.getReadRpcTimeout(NANOSECONDS),
                                                                 NANOSECONDS);

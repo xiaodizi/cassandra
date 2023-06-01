@@ -43,7 +43,7 @@ import org.apache.cassandra.utils.ByteBufferUtil;
  *      if (value < 0.0)
  *          throw RequestValidations.invalidRequest("negative value: %s", toReadableText(value));
  *  </pre>
- * </p>
+ *
  */
 public final class RequestValidations
 {

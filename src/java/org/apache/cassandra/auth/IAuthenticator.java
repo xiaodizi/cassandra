@@ -140,7 +140,7 @@ public interface IAuthenticator
          * Returning AuthenticatedUser.ANONYMOUS_USER is an option if authentication is not required.
          *
          * @return non-null representation of the authenticated subject
-         * @throws AuthenticationException
+         * @throws AuthenticationException 身份验证异常
          */
         public AuthenticatedUser getAuthenticatedUser() throws AuthenticationException;
     }

@@ -56,6 +56,10 @@ public final class Batch
 
     /**
      * Creates a 'local' batch - with all enclosed mutations in decoded form (as Mutation instances)
+     * @param id 仅仅是个描述
+     * @param creationTime 仅仅是个描述
+     * @param mutations 仅仅是个描述
+     * @return Batch 仅仅是个描述
      */
     public static Batch createLocal(TimeUUID id, long creationTime, Collection<Mutation> mutations)
     {
@@ -66,6 +70,10 @@ public final class Batch
      * Creates a 'remote' batch - with all enclosed mutations in encoded form (as ByteBuffer instances)
      *
      * The mutations will always be encoded using the current messaging version.
+     * @param id  - 就是个描述
+     * @param creationTime - 就是个描述
+     * @param mutations - 就是个描述
+     * @return 仅仅是个描述
      */
     @SuppressWarnings("RedundantTypeArguments")
     public static Batch createRemote(TimeUUID id, long creationTime, Collection<ByteBuffer> mutations)
@@ -75,12 +83,13 @@ public final class Batch
 
     /**
      * Count of the mutations in the batch.
+     * @return 仅仅是个描述
      */
     public int size()
     {
         return decodedMutations.size() + encodedMutations.size();
     }
-    
+
     @VisibleForTesting
     public Collection<ByteBuffer> getEncodedMutations()
     {
@@ -88,17 +97,17 @@ public final class Batch
     }
 
     /**
-     * Local batches contain only already decoded {@link Mutation} instances. Unlike remote 
-     * batches, which contain mutations encoded as {@link ByteBuffer} instances, local batches 
+     * Local batches contain only already decoded {@link Mutation} instances. Unlike remote
+     * batches, which contain mutations encoded as {@link ByteBuffer} instances, local batches
      * can be serialized and sent over the wire.
-     * 
-     * @return {@code true} if there are no encoded mutations present, and {@code false} otherwise 
+     *
+     * @return {@code true} if there are no encoded mutations present, and {@code false} otherwise
      */
     public boolean isLocal()
     {
         return encodedMutations.isEmpty();
     }
-    
+
     public static final class Serializer implements IVersionedSerializer<Batch>
     {
         public long serializedSize(Batch batch, int version)

@@ -34,8 +34,8 @@ public class RoleOptions
     /**
      * Set a value for a specific option.
      * Throws SyntaxException if the same option is set multiple times
-     * @param option
-     * @param value
+     * @param option 仅仅是个描述
+     * @param value 仅仅是个描述
      */
     public void setOption(IRoleManager.Option option, Object value)
     {

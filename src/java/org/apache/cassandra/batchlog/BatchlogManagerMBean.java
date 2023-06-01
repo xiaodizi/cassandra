@@ -33,6 +33,7 @@ public interface BatchlogManagerMBean
 
     /**
      * Forces batchlog replay. Blocks until completion.
+     * @throws Exception 仅仅是个异常
      */
     public void forceBatchlogReplay() throws Exception;
 }

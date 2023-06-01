@@ -47,7 +47,7 @@ public final class Resources
      * Creates an IResource instance from its external name.
      * Resource implementation class is inferred by matching against the known IResource
      * impls' root level resources.
-     * @param name
+     * @param name 仅仅是个描述
      * @return an IResource instance created from the name
      */
     public static IResource fromName(String name)

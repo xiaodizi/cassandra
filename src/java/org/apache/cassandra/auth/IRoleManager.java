@@ -47,12 +47,14 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
     /**
      * Set of options supported by CREATE ROLE and ALTER ROLE queries.
      * Should never return null - always return an empty set instead.
+     * @return Set<Option> 仅仅是个描述
      */
     Set<Option> supportedOptions();
 
     /**
      * Subset of supportedOptions that users are allowed to alter when performing ALTER ROLE [themselves].
      * Should never return null - always return an empty set instead.
+     * @return Set<Option> 仅仅是个描述
      */
     Set<Option> alterableOptions();
 
@@ -63,8 +65,8 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
      * @param performer User issuing the create role statement.
      * @param role Rolei being created
      * @param options Options the role will be created with
-     * @throws RequestValidationException
-     * @throws RequestExecutionException
+     * @throws RequestValidationException 请求执行异常
+     * @throws RequestExecutionException 请求执行异常
      */
     void createRole(AuthenticatedUser performer, RoleResource role, RoleOptions options)
     throws RequestValidationException, RequestExecutionException;
@@ -75,8 +77,8 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
      *
      * @param performer User issuing the drop role statement.
      * @param role Role to be dropped.
-     * @throws RequestValidationException
-     * @throws RequestExecutionException
+     * @throws RequestValidationException 请求执行异常
+     * @throws RequestExecutionException 请求执行异常
      */
     void dropRole(AuthenticatedUser performer, RoleResource role) throws RequestValidationException, RequestExecutionException;
 
@@ -89,8 +91,8 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
      * @param performer User issuing the alter role statement.
      * @param role Role that will be altered.
      * @param options Options to alter.
-     * @throws RequestValidationException
-     * @throws RequestExecutionException
+     * @throws RequestValidationException 请求执行异常
+     * @throws RequestExecutionException 请求执行异常
      */
     void alterRole(AuthenticatedUser performer, RoleResource role, RoleOptions options)
     throws RequestValidationException, RequestExecutionException;
@@ -103,8 +105,8 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
      * @param performer User issuing the grant statement.
      * @param role Role to be granted to the grantee.
      * @param grantee Role acting as the grantee.
-     * @throws RequestValidationException
-     * @throws RequestExecutionException
+     * @throws RequestValidationException 请求执行异常
+     * @throws RequestExecutionException 请求执行异常
      */
     void grantRole(AuthenticatedUser performer, RoleResource role, RoleResource grantee)
     throws RequestValidationException, RequestExecutionException;
@@ -117,8 +119,8 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
      * @param performer User issuing the revoke statement.
      * @param role Role to be revoked.
      * @param revokee Role from which the granted role is to be revoked.
-     * @throws RequestValidationException
-     * @throws RequestExecutionException
+     * @throws RequestValidationException 请求执行异常
+     * @throws RequestExecutionException 请求执行异常
      */
     void revokeRole(AuthenticatedUser performer, RoleResource role, RoleResource revokee)
     throws RequestValidationException, RequestExecutionException;
@@ -130,8 +132,8 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
      * @param grantee Role whose granted roles will be listed.
      * @param includeInherited if True will list inherited roles as well as those directly granted to the grantee.
      * @return A list containing the granted roles for the user.
-     * @throws RequestValidationException
-     * @throws RequestExecutionException
+     * @throws RequestValidationException 请求执行异常
+     * @throws RequestExecutionException 请求执行异常
      */
     Set<RoleResource> getRoles(RoleResource grantee, boolean includeInherited) throws RequestValidationException, RequestExecutionException;
 
@@ -157,8 +159,8 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
      * Returns the total set of distinct roles in the system.
      *
      * @return the set of all roles in the system.
-     * @throws RequestValidationException
-     * @throws RequestExecutionException
+     * @throws RequestValidationException 请求执行异常
+     * @throws RequestExecutionException 请求执行异常
      */
     Set<RoleResource> getAllRoles() throws RequestValidationException, RequestExecutionException;
 
@@ -216,7 +218,7 @@ public interface IRoleManager extends AuthCache.BulkLoader<RoleResource, Set<Rol
     /**
      * Hook to perform validation of an implementation's configuration (if supported).
      *
-     * @throws ConfigurationException
+     * @throws ConfigurationException 配置异常
      */
     void validateConfiguration() throws ConfigurationException;
 
