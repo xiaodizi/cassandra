@@ -253,7 +253,7 @@ public class CassandraDaemon
 
         logSystemInfo();
 
-        NativeLibrary.tryMlockall();
+        //NativeLibrary.tryMlockall();
 
         CommitLog.instance.start();
 
