@@ -43,17 +43,18 @@ public class SecondIndex implements Index, INotificationConsumer {
 
     private final ColumnFamilyStore baseCfs;
     private final IndexMetadata config;
-    private final ColumnIndex index;
+    //private final ColumnIndex index;
 
     public SecondIndex(ColumnFamilyStore baseCfs, IndexMetadata config){
         this.baseCfs = baseCfs;
         this.config = config;
-        System.out.println("----------lei------------");
-        System.out.println(baseCfs);
+        System.out.println("---------- lei test-----------");
+        System.out.println(baseCfs.metadata());
+
         System.out.println(config);
-        System.out.println("-------------------------");
-        ColumnMetadata column = TargetParser.parse(baseCfs.metadata(), config).left;
-        this.index = new ColumnIndex(baseCfs.metadata().partitionKeyType, column, config);
+        System.out.println("------------------------------");
+//        ColumnMetadata column = TargetParser.parse(baseCfs.metadata(), config).left;
+//        this.index = new ColumnIndex(baseCfs.metadata().partitionKeyType, column, config);
     }
     @Override
     public Callable<?> getInitializationTask() {
