@@ -79,16 +79,8 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
             int offset = sizeOfCollectionSize(n, version);
             for (int i = 0; i < n; i++)
             {
-<<<<<<< HEAD
-<<<<<<< HEAD
                 V value = readValue(input, accessor, offset, version);
                 offset += sizeOfValue(value, accessor, version);
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-                V value = readNonNullValue(input, accessor, offset);
-                offset += sizeOfValue(value, accessor);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 elements.validate(value, accessor);
             }
             if (!accessor.isEmptyFromOffset(input, offset))
@@ -118,16 +110,8 @@ public class SetSerializer<T> extends CollectionSerializer<Set<T>>
 
             for (int i = 0; i < n; i++)
             {
-<<<<<<< HEAD
-<<<<<<< HEAD
                 V value = readValue(input, accessor, offset, version);
                 offset += sizeOfValue(value, accessor, version);
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-                V value = readNonNullValue(input, accessor, offset);
-                offset += sizeOfValue(value, accessor);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                 elements.validate(value, accessor);
                 l.add(elements.deserialize(value, accessor));
             }

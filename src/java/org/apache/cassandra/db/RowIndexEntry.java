@@ -131,7 +131,6 @@ import static org.apache.cassandra.metrics.CassandraMetricsRegistry.Metrics;
  */
 public class RowIndexEntry<T> implements IMeasurableMemory
 {
-    private static final BigFormat FORMAT = BigFormat.getInstance();
     private static final long EMPTY_SIZE = ObjectSizes.measure(new RowIndexEntry(0));
 
     // constants for type of row-index-entry as serialized for saved-cache
@@ -183,16 +182,6 @@ public class RowIndexEntry<T> implements IMeasurableMemory
         return 0;
     }
 
-<<<<<<< HEAD:src/java/org/apache/cassandra/db/RowIndexEntry.java
-=======
-    @Override
-    public BigFormat getSSTableFormat()
-    {
-        return FORMAT;
-    }
-
-    @Override
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f:src/java/org/apache/cassandra/io/sstable/format/big/RowIndexEntry.java
     public long unsharedHeapSize()
     {
         return EMPTY_SIZE;

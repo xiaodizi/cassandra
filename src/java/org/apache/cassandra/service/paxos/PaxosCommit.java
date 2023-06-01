@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cassandra.concurrent.ExecutorPlus;
-import org.apache.cassandra.config.CassandraRelevantProperties;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.db.Mutation;
@@ -58,7 +57,7 @@ public class PaxosCommit<OnDone extends Consumer<? super PaxosCommit.Status>> ex
     public static final RequestHandler requestHandler = new RequestHandler();
     private static final Logger logger = LoggerFactory.getLogger(PaxosCommit.class);
 
-    private static volatile boolean ENABLE_DC_LOCAL_COMMIT = CassandraRelevantProperties.ENABLE_DC_LOCAL_COMMIT.getBoolean();
+    private static volatile boolean ENABLE_DC_LOCAL_COMMIT = Boolean.parseBoolean(System.getProperty("cassandra.enable_dc_local_commit", "true"));
 
     public static boolean getEnableDcLocalCommit()
     {

@@ -34,7 +34,7 @@ public class GuidGenerator
     {
         if (!JAVA_SECURITY_EGD.isPresent())
         {
-            JAVA_SECURITY_EGD.setString("file:/dev/urandom");
+            System.setProperty("java.security.egd", "file:/dev/urandom");
         }
         mySecureRand = new SecureRandom();
         long secureInitializer = mySecureRand.nextLong();

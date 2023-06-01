@@ -26,8 +26,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import com.codahale.metrics.ExponentiallyDecayingReservoir;
 
 import com.codahale.metrics.Snapshot;
@@ -43,14 +41,12 @@ import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.MBeanWrapper;
 
-import static org.apache.cassandra.config.CassandraRelevantProperties.IGNORE_DYNAMIC_SNITCH_SEVERITY;
-
 /**
  * A dynamic snitch that sorts endpoints by latency with an adapted phi failure detector
  */
 public class DynamicEndpointSnitch extends AbstractEndpointSnitch implements LatencySubscribers.Subscriber, DynamicEndpointSnitchMBean
 {
-    private static final boolean USE_SEVERITY = !IGNORE_DYNAMIC_SNITCH_SEVERITY.getBoolean();
+    private static final boolean USE_SEVERITY = !Boolean.getBoolean("cassandra.ignore_dynamic_snitch_severity");
 
     private static final double ALPHA = 0.75; // set to 0.75 to make EDS more biased to towards the newer values
     private static final int WINDOW_SIZE = 100;
@@ -204,7 +200,7 @@ public class DynamicEndpointSnitch extends AbstractEndpointSnitch implements Lat
         {
             Double score = scores.get(replica.endpoint());
             if (score == null)
-                score = defaultStore(replica.endpoint());
+                score = 0.0;
             subsnitchOrderedScores.add(score);
         }
 
@@ -228,11 +224,6 @@ public class DynamicEndpointSnitch extends AbstractEndpointSnitch implements Lat
         return replicas;
     }
 
-    private static double defaultStore(InetAddressAndPort target)
-    {
-        return USE_SEVERITY ? getSeverity(target) : 0.0;
-    }
-
     // Compare endpoints given an immutable snapshot of the scores
     private int compareEndpoints(InetAddressAndPort target, Replica a1, Replica a2, Map<InetAddressAndPort, Double> scores)
     {
@@ -241,12 +232,12 @@ public class DynamicEndpointSnitch extends AbstractEndpointSnitch implements Lat
         
         if (scored1 == null)
         {
-            scored1 = defaultStore(a1.endpoint());
+            scored1 = 0.0;
         }
 
         if (scored2 == null)
         {
-            scored2 = defaultStore(a2.endpoint());
+            scored2 = 0.0;
         }
 
         if (scored1.equals(scored2))
@@ -278,8 +269,7 @@ public class DynamicEndpointSnitch extends AbstractEndpointSnitch implements Lat
         sample.update(unit.toMillis(latency));
     }
 
-    @VisibleForTesting
-    public void updateScores() // this is expensive
+    private void updateScores() // this is expensive
     {
         if (!StorageService.instance.isInitialized())
             return;
@@ -369,19 +359,12 @@ public class DynamicEndpointSnitch extends AbstractEndpointSnitch implements Lat
         return timings;
     }
 
-    @Override
     public void setSeverity(double severity)
-    {
-        addSeverity(severity);
-    }
-
-    public static void addSeverity(double severity)
     {
         Gossiper.instance.addLocalApplicationState(ApplicationState.SEVERITY, StorageService.instance.valueFactory.severity(severity));
     }
 
-    @VisibleForTesting
-    public static double getSeverity(InetAddressAndPort endpoint)
+    private double getSeverity(InetAddressAndPort endpoint)
     {
         EndpointState state = Gossiper.instance.getEndpointStateForEndpoint(endpoint);
         if (state == null)

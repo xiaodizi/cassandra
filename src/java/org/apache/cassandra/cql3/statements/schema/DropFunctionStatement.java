@@ -118,21 +118,7 @@ public final class DropFunctionStatement extends AlterSchemaStatement
         if (!dependentAggregates.isEmpty())
             throw ire("Function '%s' is still referenced by aggregates %s", name, dependentAggregates);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         return schema.withAddedOrUpdated(keyspace.withSwapped(keyspace.functions.without(function)));
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-        String dependentTables = keyspace.tablesUsingFunction(function)
-                                         .map(table -> table.name)
-                                         .collect(joining(", "));
-
-        if (!dependentTables.isEmpty())
-            throw ire("Function '%s' is still referenced by column masks in tables %s", name, dependentTables);
-
-        return schema.withAddedOrUpdated(keyspace.withSwapped(keyspace.userFunctions.without(function)));
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     SchemaChange schemaChangeEvent(KeyspacesDiff diff)

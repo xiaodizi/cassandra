@@ -287,7 +287,7 @@ public class ByteOrderedPartitioner implements IPartitioner
         Token lastToken = sortedTokens.get(sortedTokens.size() - 1);
         for (Token node : sortedTokens)
         {
-            allTokens.put(node, 0.0F);
+            allTokens.put(node, new Float(0.0));
             sortedRanges.add(new Range<Token>(lastToken, node));
             lastToken = node;
         }
@@ -305,7 +305,7 @@ public class ByteOrderedPartitioner implements IPartitioner
         }
 
         // Sum every count up and divide count/total for the fractional ownership.
-        Float total = 0.0F;
+        Float total = new Float(0.0);
         for (Float f : allTokens.values())
             total += f;
         for (Map.Entry<Token, Float> row : allTokens.entrySet())

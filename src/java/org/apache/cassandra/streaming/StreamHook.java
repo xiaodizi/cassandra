@@ -22,8 +22,6 @@ import org.apache.cassandra.schema.TableId;
 import org.apache.cassandra.streaming.messages.OutgoingStreamMessage;
 import org.apache.cassandra.utils.FBUtilities;
 
-import static org.apache.cassandra.config.CassandraRelevantProperties.STREAM_HOOK;
-
 public interface StreamHook
 {
     public static final StreamHook instance = createHook();
@@ -34,7 +32,7 @@ public interface StreamHook
 
     static StreamHook createHook()
     {
-        String className = STREAM_HOOK.getString();
+        String className =  System.getProperty("cassandra.stream_hook");
         if (className != null)
         {
             return FBUtilities.construct(className, StreamHook.class.getSimpleName());

@@ -31,11 +31,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cassandra.config.CassandraRelevantProperties;
 import org.apache.cassandra.config.DataStorageSpec;
 import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.config.DurationSpec;
 import org.apache.cassandra.config.GuardrailsOptions;
 import org.apache.cassandra.db.ConsistencyLevel;
 import org.apache.cassandra.locator.InetAddressAndPort;
-import org.apache.cassandra.service.ClientState;
 import org.apache.cassandra.service.disk.usage.DiskUsageBroadcaster;
 import org.apache.cassandra.utils.MBeanWrapper;
 
@@ -52,7 +50,7 @@ public final class Guardrails implements GuardrailsMBean
     private static final GuardrailsOptions DEFAULT_CONFIG = DatabaseDescriptor.getGuardrailsConfig();
 
     @VisibleForTesting
-    public static final Guardrails instance = new Guardrails();
+    static final Guardrails instance = new Guardrails();
 
     /**
      * Guardrail on the total number of user keyspaces.
@@ -248,33 +246,6 @@ public final class Guardrails implements GuardrailsMBean
                  "write consistency levels");
 
     /**
-     * Guardrail on the size of a partition.
-<<<<<<< HEAD
-=======
-     */
-    public static final MaxThreshold partitionSize =
-    new MaxThreshold("partition_size",
-                     "Too large partitions can cause performance problems. ",
-                     state -> sizeToBytes(CONFIG_PROVIDER.getOrCreate(state).getPartitionSizeWarnThreshold()),
-                     state -> sizeToBytes(CONFIG_PROVIDER.getOrCreate(state).getPartitionSizeFailThreshold()),
-                     (isWarning, what, value, threshold) ->
-                             format("Partition %s has size %s, this exceeds the %s threshold of %s.",
-                                    what, value, isWarning ? "warning" : "failure", threshold));
-
-    /**
-     * Guardrail on the size of a collection.
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-     */
-    public static final MaxThreshold partitionSize =
-    new MaxThreshold("partition_size",
-                     "Too large partitions can cause performance problems. ",
-                     state -> sizeToBytes(CONFIG_PROVIDER.getOrCreate(state).getPartitionSizeWarnThreshold()),
-                     state -> sizeToBytes(CONFIG_PROVIDER.getOrCreate(state).getPartitionSizeFailThreshold()),
-                     (isWarning, what, value, threshold) ->
-                             format("Partition %s has size %s, this exceeds the %s threshold of %s.",
-                                    what, value, isWarning ? "warning" : "failure", threshold));
-
-    /**
      * Guardrail on the size of a collection.
      */
     public static final MaxThreshold collectionSize =
@@ -361,42 +332,6 @@ public final class Guardrails implements GuardrailsMBean
                                         what, value, threshold)
                                : format("The keyspace %s has a replication factor of %s, below the failure threshold of %s.",
                                         what, value, threshold));
-
-    public static final MaxThreshold maximumAllowableTimestamp =
-    new MaxThreshold("maximum_timestamp",
-                     "Timestamps too far in the future can lead to data that can't be easily overwritten",
-                     state -> maximumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMaximumTimestampWarnThreshold()),
-                     state -> maximumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMaximumTimestampFailThreshold()),
-                     (isWarning, what, value, threshold) ->
-                    format("The modification to table %s has a timestamp %s after the maximum allowable %s threshold %s",
-                           what, value, isWarning ? "warning" : "failure", threshold));
-
-    public static final MinThreshold minimumAllowableTimestamp =
-    new MinThreshold("minimum_timestamp",
-                     "Timestamps too far in the past can cause writes can be unexpectedly lost",
-                     state -> minimumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMinimumTimestampWarnThreshold()),
-                     state -> minimumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMinimumTimestampFailThreshold()),
-                     (isWarning, what, value, threshold) ->
-                     format("The modification to table %s has a timestamp %s before the minimum allowable %s threshold %s",
-                            what, value, isWarning ? "warning" : "failure", threshold));
-
-    public static final MaxThreshold maximumAllowableTimestamp =
-    new MaxThreshold("maximum_timestamp",
-                     "Timestamps too far in the future can lead to data that can't be easily overwritten",
-                     state -> maximumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMaximumTimestampWarnThreshold()),
-                     state -> maximumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMaximumTimestampFailThreshold()),
-                     (isWarning, what, value, threshold) ->
-                    format("The modification to table %s has a timestamp %s after the maximum allowable %s threshold %s",
-                           what, value, isWarning ? "warning" : "failure", threshold));
-
-    public static final MinThreshold minimumAllowableTimestamp =
-    new MinThreshold("minimum_timestamp",
-                     "Timestamps too far in the past can cause writes can be unexpectedly lost",
-                     state -> minimumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMinimumTimestampWarnThreshold()),
-                     state -> minimumTimestampAsRelativeMicros(CONFIG_PROVIDER.getOrCreate(state).getMinimumTimestampFailThreshold()),
-                     (isWarning, what, value, threshold) ->
-                     format("The modification to table %s has a timestamp %s before the minimum allowable %s threshold %s",
-                            what, value, isWarning ? "warning" : "failure", threshold));
 
     private Guardrails()
     {
@@ -714,52 +649,6 @@ public final class Guardrails implements GuardrailsMBean
 
     @Override
     @Nullable
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    public String getPartitionSizeWarnThreshold()
-    {
-        return sizeToString(DEFAULT_CONFIG.getPartitionSizeWarnThreshold());
-    }
-
-    @Override
-    @Nullable
-    public String getPartitionSizeFailThreshold()
-    {
-        return sizeToString(DEFAULT_CONFIG.getPartitionSizeFailThreshold());
-    }
-
-    @Override
-    public void setPartitionSizeThreshold(@Nullable String warnSize, @Nullable String failSize)
-    {
-        DEFAULT_CONFIG.setPartitionSizeThreshold(sizeFromString(warnSize), sizeFromString(failSize));
-    }
-
-    @Override
-    @Nullable
-    public String getColumnValueSizeWarnThreshold()
-    {
-        return sizeToString(DEFAULT_CONFIG.getColumnValueSizeWarnThreshold());
-    }
-
-    @Override
-    @Nullable
-    public String getColumnValueSizeFailThreshold()
-    {
-        return sizeToString(DEFAULT_CONFIG.getColumnValueSizeFailThreshold());
-    }
-
-    @Override
-    public void setColumnValueSizeThreshold(@Nullable String warnSize, @Nullable String failSize)
-    {
-        DEFAULT_CONFIG.setColumnValueSizeThreshold(sizeFromString(warnSize), sizeFromString(failSize));
-    }
-
-    @Override
-    @Nullable
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public String getCollectionSizeWarnThreshold()
     {
         return sizeToString(DEFAULT_CONFIG.getCollectionSizeWarnThreshold());
@@ -977,72 +866,6 @@ public final class Guardrails implements GuardrailsMBean
         DEFAULT_CONFIG.setMinimumReplicationFactorThreshold(warn, fail);
     }
 
-<<<<<<< HEAD
-=======
-    @Override
-    public boolean getZeroTTLOnTWCSEnabled()
-    {
-        return DEFAULT_CONFIG.getZeroTTLOnTWCSEnabled();
-    }
-
-    @Override
-    public void setZeroTTLOnTWCSEnabled(boolean value)
-    {
-        DEFAULT_CONFIG.setZeroTTLOnTWCSEnabled(value);
-    }
-
-    @Override
-    public boolean getZeroTTLOnTWCSWarned()
-    {
-        return DEFAULT_CONFIG.getZeroTTLOnTWCSWarned();
-    }
-
-    @Override
-    public void setZeroTTLOnTWCSWarned(boolean value)
-    {
-        DEFAULT_CONFIG.setZeroTTLOnTWCSWarned(value);
-    }
-
-    @Override
-    public String getMaximumTimestampWarnThreshold()
-    {
-        return durationToString(DEFAULT_CONFIG.getMaximumTimestampWarnThreshold());
-    }
-
-    @Override
-    public String getMaximumTimestampFailThreshold()
-    {
-        return durationToString(DEFAULT_CONFIG.getMaximumTimestampFailThreshold());
-    }
-
-    @Override
-    public void setMaximumTimestampThreshold(String warnSeconds, String failSeconds)
-    {
-        DEFAULT_CONFIG.setMaximumTimestampThreshold(durationFromString(warnSeconds), durationFromString(failSeconds));
-    }
-
-    @Override
-    public String getMinimumTimestampWarnThreshold()
-    {
-        return durationToString(DEFAULT_CONFIG.getMinimumTimestampWarnThreshold());
-    }
-
-    @Override
-    public String getMinimumTimestampFailThreshold()
-    {
-        return durationToString(DEFAULT_CONFIG.getMinimumTimestampFailThreshold());
-    }
-
-    @Override
-    public void setMinimumTimestampThreshold(String warnSeconds, String failSeconds)
-    {
-        DEFAULT_CONFIG.setMinimumTimestampThreshold(durationFromString(warnSeconds), durationFromString(failSeconds));
-    }
-
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static String toCSV(Set<String> values)
     {
         return values == null || values.isEmpty() ? "" : String.join(",", values);
@@ -1090,29 +913,5 @@ public final class Guardrails implements GuardrailsMBean
     private static DataStorageSpec.LongBytesBound sizeFromString(@Nullable String size)
     {
         return StringUtils.isEmpty(size) ? null : new DataStorageSpec.LongBytesBound(size);
-    }
-
-    private static String durationToString(@Nullable DurationSpec duration)
-    {
-        return duration == null ? null : duration.toString();
-    }
-
-    private static DurationSpec.LongMicrosecondsBound durationFromString(@Nullable String duration)
-    {
-        return StringUtils.isEmpty(duration) ? null : new DurationSpec.LongMicrosecondsBound(duration);
-    }
-
-    private static long maximumTimestampAsRelativeMicros(@Nullable DurationSpec.LongMicrosecondsBound duration)
-    {
-        return duration == null
-               ? Long.MAX_VALUE
-               : (ClientState.getLastTimestampMicros() + duration.toMicroseconds());
-    }
-
-    private static long minimumTimestampAsRelativeMicros(@Nullable DurationSpec.LongMicrosecondsBound duration)
-    {
-        return duration == null
-               ? Long.MIN_VALUE
-               : (ClientState.getLastTimestampMicros() - duration.toMicroseconds());
     }
 }

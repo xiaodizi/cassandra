@@ -31,12 +31,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cassandra.config.DatabaseDescriptor;
+import org.apache.cassandra.db.ConsistencyLevel;
+import org.apache.cassandra.db.Mutation;
 import org.apache.cassandra.exceptions.RequestFailureReason;
 import org.apache.cassandra.io.IVersionedAsymmetricSerializer;
 import org.apache.cassandra.locator.InetAddressAndPort;
 import org.apache.cassandra.locator.Replica;
 import org.apache.cassandra.metrics.InternodeOutboundMetrics;
 import org.apache.cassandra.service.AbstractWriteResponseHandler;
+import org.apache.cassandra.service.StorageProxy;
+import org.apache.cassandra.service.paxos.Commit;
+import org.apache.cassandra.utils.FBUtilities;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -94,18 +99,22 @@ public class RequestCallbacks implements OutboundMessageCallbacks
     /**
      * Register the provided {@link RequestCallback}, inferring expiry and id from the provided {@link Message}.
      */
-    public void addWithExpiration(RequestCallback<?> cb, Message<?> message, InetAddressAndPort to)
+    void addWithExpiration(RequestCallback cb, Message message, InetAddressAndPort to)
     {
-        // mutations need to call the overload
+        // mutations need to call the overload with a ConsistencyLevel
         assert message.verb() != Verb.MUTATION_REQ && message.verb() != Verb.COUNTER_MUTATION_REQ;
         CallbackInfo previous = callbacks.put(key(message.id(), to), new CallbackInfo(message, to, cb));
         assert previous == null : format("Callback already exists for id %d/%s! (%s)", message.id(), to, previous);
     }
 
-    public void addWithExpiration(AbstractWriteResponseHandler<?> cb, Message<?> message, Replica to)
+    public void addWithExpiration(AbstractWriteResponseHandler<?> cb,
+                                  Message<?> message,
+                                  Replica to,
+                                  ConsistencyLevel consistencyLevel,
+                                  boolean allowHints)
     {
         assert message.verb() == Verb.MUTATION_REQ || message.verb() == Verb.COUNTER_MUTATION_REQ || message.verb() == Verb.PAXOS_COMMIT_REQ;
-        CallbackInfo previous = callbacks.put(key(message.id(), to.endpoint()), new CallbackInfo(message, to.endpoint(), cb));
+        CallbackInfo previous = callbacks.put(key(message.id(), to.endpoint()), new WriteCallbackInfo(message, to, cb, consistencyLevel, allowHints));
         assert previous == null : format("Callback already exists for id %d/%s! (%s)", message.id(), to.endpoint(), previous);
     }
 
@@ -265,6 +274,11 @@ public class RequestCallbacks implements OutboundMessageCallbacks
             return atNano > expiresAtNanos;
         }
 
+        boolean shouldHint()
+        {
+            return false;
+        }
+
         boolean invokeOnFailure()
         {
             return callback.invokeOnFailure();
@@ -273,6 +287,53 @@ public class RequestCallbacks implements OutboundMessageCallbacks
         public String toString()
         {
             return "{peer:" + peer + ", callback:" + callback + ", invokeOnFailure:" + invokeOnFailure() + '}';
+        }
+    }
+
+    // FIXME: shouldn't need a specialized container for write callbacks; hinting should be part of
+    //        AbstractWriteResponseHandler implementation.
+    static class WriteCallbackInfo extends CallbackInfo
+    {
+        // either a Mutation, or a Paxos Commit (MessageOut)
+        private final Object mutation;
+        private final Replica replica;
+
+        @VisibleForTesting
+        WriteCallbackInfo(Message message, Replica replica, RequestCallback<?> callback, ConsistencyLevel consistencyLevel, boolean allowHints)
+        {
+            super(message, replica.endpoint(), callback);
+            this.mutation = shouldHint(allowHints, message, consistencyLevel) ? message.payload : null;
+            //Local writes shouldn't go through messaging service (https://issues.apache.org/jira/browse/CASSANDRA-10477)
+            //noinspection AssertWithSideEffects
+            assert !peer.equals(FBUtilities.getBroadcastAddressAndPort());
+            this.replica = replica;
+        }
+
+        public boolean shouldHint()
+        {
+            return mutation != null && StorageProxy.shouldHint(replica);
+        }
+
+        public Replica getReplica()
+        {
+            return replica;
+        }
+
+        public Mutation mutation()
+        {
+            return getMutation(mutation);
+        }
+
+        private static Mutation getMutation(Object object)
+        {
+            assert object instanceof Commit || object instanceof Mutation : object;
+            return object instanceof Commit ? ((Commit) object).makeMutation()
+                                            : (Mutation) object;
+        }
+
+        private static boolean shouldHint(boolean allowHints, Message sentMessage, ConsistencyLevel consistencyLevel)
+        {
+            return allowHints && sentMessage.verb() != Verb.COUNTER_MUTATION_REQ && consistencyLevel != ConsistencyLevel.ANY;
         }
     }
 

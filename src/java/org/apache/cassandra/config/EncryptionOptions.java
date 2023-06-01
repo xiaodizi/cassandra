@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
@@ -75,10 +73,8 @@ public class EncryptionOptions
      */
     public final ParameterizedClass ssl_context_factory;
     public final String keystore;
-    @Nullable
     public final String keystore_password;
     public final String truststore;
-    @Nullable
     public final String truststore_password;
     public final List<String> cipher_suites;
     protected String protocol;
@@ -150,9 +146,9 @@ public class EncryptionOptions
         ssl_context_factory = new ParameterizedClass("org.apache.cassandra.security.DefaultSslContextFactory",
                                                      new HashMap<>());
         keystore = "conf/.keystore";
-        keystore_password = null;
+        keystore_password = "cassandra";
         truststore = "conf/.truststore";
-        truststore_password = null;
+        truststore_password = "cassandra";
         cipher_suites = null;
         protocol = null;
         accepted_protocols = null;
@@ -607,12 +603,6 @@ public class EncryptionOptions
         public final InternodeEncryption internode_encryption;
         @Replaces(oldName = "enable_legacy_ssl_storage_port", deprecated = true)
         public final boolean legacy_ssl_storage_port_enabled;
-<<<<<<< HEAD
-=======
-        public final String outbound_keystore;
-        @Nullable
-        public final String outbound_keystore_password;
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         public ServerEncryptionOptions()
         {

@@ -102,7 +102,6 @@ import org.apache.cassandra.gms.Gossiper;
 import org.apache.cassandra.hints.Hint;
 import org.apache.cassandra.hints.HintsService;
 import org.apache.cassandra.locator.AbstractReplicationStrategy;
-import org.apache.cassandra.locator.DynamicEndpointSnitch;
 import org.apache.cassandra.locator.EndpointsForToken;
 import org.apache.cassandra.locator.IEndpointSnitch;
 import org.apache.cassandra.locator.InetAddressAndPort;
@@ -780,7 +779,7 @@ public class StorageProxy implements StorageProxyMBean
                     if (replica.isSelf())
                         commitPaxosLocal(replica, message, responseHandler);
                     else
-                        MessagingService.instance().sendWriteWithCallback(message, replica, responseHandler);
+                        MessagingService.instance().sendWriteWithCallback(message, replica, responseHandler, allowHints && shouldHint(replica));
                 }
                 else
                 {
@@ -1530,7 +1529,7 @@ public class StorageProxy implements StorageProxyMBean
         if (localDc != null)
         {
             for (Replica destination : localDc)
-                MessagingService.instance().sendWriteWithCallback(message, destination, responseHandler);
+                MessagingService.instance().sendWriteWithCallback(message, destination, responseHandler, true);
         }
         if (dcGroups != null)
         {
@@ -1567,12 +1566,12 @@ public class StorageProxy implements StorageProxyMBean
 
         if (targets.size() > 1)
         {
-            target = pickReplica(targets);
+            target = targets.get(ThreadLocalRandom.current().nextInt(0, targets.size()));
             EndpointsForToken forwardToReplicas = targets.filter(r -> r != target, targets.size());
 
             for (Replica replica : forwardToReplicas)
             {
-                MessagingService.instance().callbacks.addWithExpiration(handler, message, replica);
+                MessagingService.instance().callbacks.addWithExpiration(handler, message, replica, handler.replicaPlan.consistencyLevel(), true);
                 logger.trace("Adding FWD message to {}@{}", message.id(), replica);
             }
 
@@ -1587,26 +1586,11 @@ public class StorageProxy implements StorageProxyMBean
             target = targets.get(0);
         }
 
-        Tracing.trace("Sending mutation to remote replica {}", target);
-        MessagingService.instance().sendWriteWithCallback(message, target, handler);
+        MessagingService.instance().sendWriteWithCallback(message, target, handler, true);
         logger.trace("Sending message to {}@{}", message.id(), target);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     private static void performLocally(Stage stage, Replica localReplica, final Runnable runnable)
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    private static Replica pickReplica(EndpointsForToken targets)
-    {
-        EndpointsForToken healthy = targets.filter(r -> DynamicEndpointSnitch.getSeverity(r.endpoint()) == 0);
-        EndpointsForToken select = healthy.isEmpty() ? targets : healthy;
-        return select.get(ThreadLocalRandom.current().nextInt(0, select.size()));
-    }
-
-    private static void performLocally(Stage stage, Replica localReplica, final Runnable runnable, String description)
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         stage.maybeExecuteImmediately(new LocalMutationRunnable(localReplica)
         {
@@ -1700,7 +1684,7 @@ public class StorageProxy implements StorageProxyMBean
 
             Tracing.trace("Enqueuing counter update to {}", replica);
             Message message = Message.outWithFlag(Verb.COUNTER_MUTATION_REQ, cm, MessageFlag.CALL_BACK_ON_FAILURE);
-            MessagingService.instance().sendWriteWithCallback(message, replica, responseHandler);
+            MessagingService.instance().sendWriteWithCallback(message, replica, responseHandler, false);
             return responseHandler;
         }
     }

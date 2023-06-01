@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,14 +53,7 @@ import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.dht.Range;
 import org.apache.cassandra.dht.Token;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import org.apache.cassandra.gms.*;
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-import org.apache.cassandra.io.util.File;
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.locator.InetAddressAndPort;
 import org.apache.cassandra.locator.Replica;
 import org.apache.cassandra.metrics.StreamingMetrics;
@@ -73,7 +65,6 @@ import org.apache.cassandra.utils.JVMStabilityInspector;
 import org.apache.cassandra.utils.NoSpamLogger;
 
 import static com.google.common.collect.Iterables.all;
-import static org.apache.cassandra.config.CassandraRelevantProperties.CASSANDRA_STREAMING_DEBUG_STACKTRACE_LIMIT;
 import static org.apache.cassandra.utils.Clock.Global.nanoTime;
 import static org.apache.cassandra.locator.InetAddressAndPort.hostAddressAndPort;
 import static org.apache.cassandra.utils.FBUtilities.getBroadcastAddressAndPort;
@@ -153,10 +144,9 @@ import static org.apache.cassandra.utils.FBUtilities.getBroadcastAddressAndPort;
  * (via {@link org.apache.cassandra.net.MessagingService}, while the actual files themselves are sent by a special
  * "streaming" connection type. See {@link StreamingMultiplexedChannel} for details. Because of the asynchronous
  */
-public class StreamSession
+public class StreamSession implements IEndpointStateChangeSubscriber
 {
     private static final Logger logger = LoggerFactory.getLogger(StreamSession.class);
-    private static final int DEBUG_STACKTRACE_LIMIT = CASSANDRA_STREAMING_DEBUG_STACKTRACE_LIMIT.getInt();
 
     public enum PrepareDirection { SEND, ACK }
 
@@ -202,8 +192,6 @@ public class StreamSession
 
     private final TimeUUID pendingRepair;
     private final PreviewKind previewKind;
-
-    public String failureReason;
 
 /**
  * State Transition:
@@ -508,20 +496,13 @@ public class StreamSession
         }
     }
 
-    private Future<?> closeSession(State finalState)
-    {
-        return closeSession(finalState, null);
-    }
-
-    private synchronized Future<?> closeSession(State finalState, String failureReason)
+    private synchronized Future<?> closeSession(State finalState)
     {
         // it's session is already closed
         if (closeFuture != null)
             return closeFuture;
 
         state(finalState);
-        //this refers to StreamInfo
-        this.failureReason = failureReason;
 
         List<Future<?>> futures = new ArrayList<>();
 
@@ -674,6 +655,7 @@ public class StreamSession
             if (state.finalState)
             {
                 logger.debug("[Stream #{}] Socket closed after session completed with state {}", planId(), state);
+
                 return null;
             }
             else
@@ -682,7 +664,8 @@ public class StreamSession
                              planId(),
                              peer.getHostAddressAndPort(),
                              e);
-                return closeSession(State.FAILED, "Failed because there was an " + e.getClass().getCanonicalName() + " with state=" + state.name());
+
+                return closeSession(State.FAILED);
             }
         }
 
@@ -693,9 +676,8 @@ public class StreamSession
             state(State.FAILED); // make sure subsequent error handling sees the session in a final state 
             channel.sendControlMessage(new SessionFailedMessage()).awaitUninterruptibly();
         }
-        StringBuilder failureReason = new StringBuilder("Failed because of an unknown exception\n");
-        boundStackTrace(e, DEBUG_STACKTRACE_LIMIT, failureReason);
-        return closeSession(State.FAILED, failureReason.toString());
+
+        return closeSession(State.FAILED);
     }
 
     private void logError(Throwable e)
@@ -820,7 +802,7 @@ public class StreamSession
         StreamTransferTask task = transfers.get(message.header.tableId);
         if (task != null)
         {
-            task.scheduleTimeout(message.header.sequenceNumber, DatabaseDescriptor.getStreamTransferTaskTimeout().toMilliseconds(), TimeUnit.MILLISECONDS);
+            task.scheduleTimeout(message.header.sequenceNumber, 12, TimeUnit.HOURS);
         }
     }
 
@@ -946,9 +928,7 @@ public class StreamSession
     public synchronized void sessionFailed()
     {
         logger.error("[Stream #{}] Remote peer {} failed stream session.", planId(), peer.toString());
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Remote peer ").append(peer).append(" failed stream session");
-        closeSession(State.FAILED, stringBuilder.toString());
+        closeSession(State.FAILED);
     }
 
     /**
@@ -957,7 +937,7 @@ public class StreamSession
     public synchronized void sessionTimeout()
     {
         logger.error("[Stream #{}] timeout with {}.", planId(), peer.toString());
-        closeSession(State.FAILED, "Session timed out");
+        closeSession(State.FAILED);
     }
 
     /**
@@ -971,7 +951,7 @@ public class StreamSession
         List<StreamSummary> transferSummaries = Lists.newArrayList();
         for (StreamTask transfer : transfers.values())
             transferSummaries.add(transfer.getSummary());
-        return new SessionInfo(channel.peer(), index, channel.connectedTo(), receivingSummaries, transferSummaries, state, failureReason);
+        return new SessionInfo(channel.peer(), index, channel.connectedTo(), receivingSummaries, transferSummaries, state);
     }
 
     public synchronized void taskCompleted(StreamReceiveTask completedTask)
@@ -984,6 +964,18 @@ public class StreamSession
     {
         transfers.remove(completedTask.tableId);
         maybeCompleted();
+    }
+
+    public void onRemove(InetAddressAndPort endpoint)
+    {
+        logger.error("[Stream #{}] Session failed because remote peer {} has left.", planId(), peer.toString());
+        closeSession(State.FAILED);
+    }
+
+    public void onRestart(InetAddressAndPort endpoint, EndpointState epState)
+    {
+        logger.error("[Stream #{}] Session failed because remote peer {} was restarted.", planId(), peer.toString());
+        closeSession(State.FAILED);
     }
 
     private void completePreview()
@@ -1153,59 +1145,4 @@ public class StreamSession
             logger.error("[Stream #{}] Error aborting stream session with peer {}", planId(), peer);
         }
     }
-<<<<<<< HEAD
-=======
-
-    @Override
-    public String toString()
-    {
-        return "StreamSession{" +
-               "streamOperation=" + streamOperation +
-               ", peer=" + peer +
-               ", channel=" + channel +
-               ", requests=" + requests +
-               ", transfers=" + transfers +
-               ", isFollower=" + isFollower +
-               ", pendingRepair=" + pendingRepair +
-               ", previewKind=" + previewKind +
-               ", state=" + state +
-               '}';
-    }
-
-    public static StringBuilder boundStackTrace(Throwable e, int limit, StringBuilder out)
-    {
-        Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
-        return boundStackTrace(e, limit, limit, visited, out);
-    }
-
-    public static StringBuilder boundStackTrace(Throwable e, int limit, int counter, Set<Throwable> visited, StringBuilder out)
-    {
-        if (e == null)
-            return out;
-
-        if (!visited.add(e))
-            return out.append("[CIRCULAR REFERENCE: ").append(e.getClass().getName()).append(": ").append(e.getMessage()).append("]").append('\n');
-        visited.add(e);
-
-        StackTraceElement[] stackTrace = e.getStackTrace();
-        out.append(e.getClass().getName() + ": " + e.getMessage()).append('\n');
-
-        // When dealing with the leaf, ignore how many stack traces were already written, and allow the max.
-        // This is here as the leaf tends to show where the issue started, so tends to be impactful for debugging
-        if (e.getCause() == null)
-            counter = limit;
-
-        for (int i = 0, size = Math.min(e.getStackTrace().length, limit); i < size && counter > 0; i++)
-        {
-            out.append('\t').append(stackTrace[i]).append('\n');
-            counter--;
-        }
-
-        boundStackTrace(e.getCause(), limit, counter, visited, out);
-        return out;
-    }
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 }

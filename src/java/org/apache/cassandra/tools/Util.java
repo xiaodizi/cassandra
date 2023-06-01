@@ -54,6 +54,7 @@ import com.google.common.collect.Lists;
 @SuppressWarnings("serial")
 public final class Util
 {
+    public static final String ALLOW_TOOL_REINIT_FOR_TEST = Util.class.getName() + "ALLOW_TOOL_REINIT_FOR_TEST"; // Necessary for testing
     static final String RESET = "\u001B[0m";
     static final String BLUE = "\u001B[34m";
     static final String CYAN = "\u001B[36m";
@@ -309,16 +310,8 @@ public final class Util
      */
     public static TableMetadata metadataFromSSTable(Descriptor desc) throws IOException
     {
-<<<<<<< HEAD
         if (desc.version.getVersion().compareTo("ma") < 0)
             throw new IOException("pre-3.0 SSTable is not supported.");
-=======
-        if (!desc.version.isCompatible())
-            throw new IOException("Unsupported SSTable version " + desc.getFormat().name() + "/" + desc.version);
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         EnumSet<MetadataType> types = EnumSet.of(MetadataType.STATS, MetadataType.HEADER);
         Map<MetadataType, MetadataComponent> sstableMetadata = desc.getMetadataSerializer().deserialize(desc, types);

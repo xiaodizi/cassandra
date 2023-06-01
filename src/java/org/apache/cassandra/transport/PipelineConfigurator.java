@@ -48,15 +48,6 @@ import org.apache.cassandra.security.ISslContextFactory;
 import org.apache.cassandra.security.SSLFactory;
 import org.apache.cassandra.transport.messages.StartupMessage;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_UNSAFE_VERBOSE_DEBUG_CLIENT_PROTOCOL;
-import static org.apache.cassandra.net.SocketFactory.newSslHandler;
-
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 /**
  * Takes care of intializing a Netty Channel and Pipeline for client protocol connections.
  * The pipeline is first set up with some common handlers for connection limiting, dropping
@@ -70,7 +61,7 @@ public class PipelineConfigurator
 
     // Not to be used in production, this causes a Netty logging handler to be added to the pipeline,
     // which will throttle a system under any normal load.
-    private static final boolean DEBUG = TEST_UNSAFE_VERBOSE_DEBUG_CLIENT_PROTOCOL.getBoolean();
+    private static final boolean DEBUG = Boolean.getBoolean("cassandra.unsafe_verbose_debug_client_protocol");
 
     // Stateless handlers
     private static final ConnectionLimitHandler connectionLimitHandler = new ConnectionLimitHandler();

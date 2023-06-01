@@ -81,7 +81,7 @@ public interface Selectable extends AssignmentTestable
      */
     public default boolean processesSelection()
     {
-        // ColumnMetadata is the only case that returns false (if the column is not masked) and overrides this
+        // ColumnMetadata is the only case that returns false and override this
         return true;
     }
 
@@ -103,9 +103,9 @@ public interface Selectable extends AssignmentTestable
         return idx;
     }
 
-    default ColumnSpecification specForElementOrSlice(Selectable selected, ColumnSpecification receiver, CollectionType.Kind kind, String selectionType)
+    default ColumnSpecification specForElementOrSlice(Selectable selected, ColumnSpecification receiver, String selectionType)
     {
-        switch (kind)
+        switch (((CollectionType)receiver.type).kind)
         {
             case LIST: throw new InvalidRequestException(String.format("%s selection is only allowed on sets and maps, but %s is a list", selectionType, selected));
             case SET: return Sets.valueSpecOf(receiver);
@@ -152,7 +152,7 @@ public interface Selectable extends AssignmentTestable
             /*
              * expectedType will be null if we have no constraint on what the type should be. For instance, if this term is a bind marker:
              *   - it will be null if we do "SELECT ? FROM foo"
-             *   - it won't be null (and be LongType) if we do "SELECT bigint_as_blob(?) FROM foo" because the function constrain it.
+             *   - it won't be null (and be LongType) if we do "SELECT bigintAsBlob(?) FROM foo" because the function constrain it.
              *
              * In the first case, we have to error out: we need to infer the type of the metadata of a SELECT at preparation time, which we can't
              * here (users will have to do "SELECT (varint)? FROM foo" for instance).
@@ -281,15 +281,7 @@ public interface Selectable extends AssignmentTestable
             @Override
             public WritetimeOrTTL prepare(TableMetadata table)
             {
-<<<<<<< HEAD
-<<<<<<< HEAD
                 return new WritetimeOrTTL(id.prepare(table), isWritetime);
-=======
-                return new WritetimeOrTTL((ColumnMetadata) column.prepare(table), selected.prepare(table), kind);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
-                return new WritetimeOrTTL((ColumnMetadata) column.prepare(table), selected.prepare(table), kind);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
             }
         }
     }
@@ -1221,15 +1213,10 @@ public interface Selectable extends AssignmentTestable
             this.quoted = quoted;
         }
 
-        public ColumnMetadata columnMetadata(TableMetadata cfm)
+        @Override
+        public ColumnMetadata prepare(TableMetadata cfm)
         {
             return cfm.getExistingColumn(ColumnIdentifier.getInterned(text, quoted));
-        }
-
-        @Override
-        public Selectable prepare(TableMetadata cfm)
-        {
-            return columnMetadata(cfm);
         }
 
         public FieldIdentifier toFieldIdentifier()
@@ -1275,19 +1262,14 @@ public interface Selectable extends AssignmentTestable
             Selector.Factory factory = selected.newSelectorFactory(cfm, null, defs, boundNames);
             ColumnSpecification receiver = factory.getColumnSpecification(cfm);
 
-            AbstractType<?> type = receiver.type;
-            if (receiver.isReversedType())
-            {
-                type = ((ReversedType<?>) type).baseType;
-            }
-            if (!(type instanceof CollectionType))
-                throw new InvalidRequestException(String.format("Invalid element selection: %s is of type %s is not a collection", selected, type.asCQL3Type()));
+            if (!(receiver.type instanceof CollectionType))
+                throw new InvalidRequestException(String.format("Invalid element selection: %s is of type %s is not a collection", selected, receiver.type.asCQL3Type()));
 
-            ColumnSpecification boundSpec = specForElementOrSlice(selected, receiver, ((CollectionType) type).kind, "Element");
+            ColumnSpecification boundSpec = specForElementOrSlice(selected, receiver, "Element");
 
             Term elt = element.prepare(cfm.keyspace, boundSpec);
             elt.collectMarkerSpecification(boundNames);
-            return ElementsSelector.newElementFactory(toString(), factory, (CollectionType)type, elt);
+            return ElementsSelector.newElementFactory(toString(), factory, (CollectionType)receiver.type, elt);
         }
 
         public AbstractType<?> getExactTypeIfKnown(String keyspace)
@@ -1362,15 +1344,10 @@ public interface Selectable extends AssignmentTestable
             Selector.Factory factory = selected.newSelectorFactory(cfm, expectedType, defs, boundNames);
             ColumnSpecification receiver = factory.getColumnSpecification(cfm);
 
-            AbstractType<?> type = receiver.type;
-            if (receiver.isReversedType())
-            {
-                type = ((ReversedType<?>) type).baseType;
-            }
-            if (!(type instanceof CollectionType))
-                throw new InvalidRequestException(String.format("Invalid slice selection: %s of type %s is not a collection", selected, type.asCQL3Type()));
+            if (!(receiver.type instanceof CollectionType))
+                throw new InvalidRequestException(String.format("Invalid slice selection: %s of type %s is not a collection", selected, receiver.type.asCQL3Type()));
 
-            ColumnSpecification boundSpec = specForElementOrSlice(selected, receiver, ((CollectionType) type).kind, "Slice");
+            ColumnSpecification boundSpec = specForElementOrSlice(selected, receiver, "Slice");
 
             // If from or to are null, this means the user didn't provide on in the syntax (we had c[x..] or c[..x]).
             // The equivalent of doing this when preparing values would be to use UNSET.
@@ -1378,7 +1355,7 @@ public interface Selectable extends AssignmentTestable
             Term t = to == null ? Constants.UNSET_VALUE : to.prepare(cfm.keyspace, boundSpec);
             f.collectMarkerSpecification(boundNames);
             t.collectMarkerSpecification(boundNames);
-            return ElementsSelector.newSliceFactory(toString(), factory, (CollectionType)type, f, t);
+            return ElementsSelector.newSliceFactory(toString(), factory, (CollectionType)receiver.type, f, t);
         }
 
         public AbstractType<?> getExactTypeIfKnown(String keyspace)

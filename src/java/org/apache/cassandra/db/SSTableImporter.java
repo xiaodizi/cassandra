@@ -40,14 +40,6 @@ import org.apache.cassandra.io.sstable.KeyIterator;
 import org.apache.cassandra.io.sstable.format.SSTableReader;
 import org.apache.cassandra.io.sstable.format.SSTableWriter;
 import org.apache.cassandra.service.ActiveRepairService;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-import org.apache.cassandra.service.StorageService;
-import org.apache.cassandra.utils.OutputHandler;
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.utils.Pair;
 import org.apache.cassandra.utils.concurrent.Refs;
 
@@ -101,38 +93,19 @@ public class SSTableImporter
                     {
                         try
                         {
-                            abortIfDraining();
                             verifySSTableForImport(descriptor, entry.getValue(), options.verifyTokens, options.verifySSTables, options.extendedVerify);
                         }
                         catch (Throwable t)
                         {
                             if (dir != null)
                             {
-<<<<<<< HEAD
-<<<<<<< HEAD
                                 logger.error("Failed verifying sstable {} in directory {}", descriptor, dir, t);
-=======
-                                logger.error("[{}] Failed verifying SSTable {} in directory {}", importID, descriptor, dir, t);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
-                                logger.error("[{}] Failed verifying SSTable {} in directory {}", importID, descriptor, dir, t);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                                 failedDirectories.add(dir);
                             }
                             else
                             {
-<<<<<<< HEAD
-<<<<<<< HEAD
                                 logger.error("Failed verifying sstable {}", descriptor, t);
                                 throw new RuntimeException("Failed verifying sstable "+descriptor, t);
-=======
-                                logger.error("[{}] Failed verifying SSTable {}", importID, descriptor, t);
-                                throw new RuntimeException("Failed verifying SSTable " + descriptor, t);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
-                                logger.error("[{}] Failed verifying SSTable {}", importID, descriptor, t);
-                                throw new RuntimeException("Failed verifying SSTable " + descriptor, t);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                             }
                             break;
                         }
@@ -155,7 +128,6 @@ public class SSTableImporter
             {
                 try
                 {
-                    abortIfDraining();
                     Descriptor oldDescriptor = entry.getKey();
                     if (currentDescriptors.contains(oldDescriptor))
                         continue;
@@ -188,18 +160,8 @@ public class SSTableImporter
                     }
                     else
                     {
-<<<<<<< HEAD
-<<<<<<< HEAD
                         logger.error("Failed importing sstables from data directory - renamed sstables are: {}", movedSSTables);
                         throw new RuntimeException("Failed importing sstables", t);
-=======
-                        logger.error("[{}] Failed importing sstables from data directory - renamed SSTables are: {}", importID, movedSSTables, t);
-                        throw new RuntimeException("Failed importing SSTables", t);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
-                        logger.error("[{}] Failed importing sstables from data directory - renamed SSTables are: {}", importID, movedSSTables, t);
-                        throw new RuntimeException("Failed importing SSTables", t);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                     }
                 }
             }
@@ -216,63 +178,19 @@ public class SSTableImporter
 
         try (Refs<SSTableReader> refs = Refs.ref(newSSTables))
         {
-            abortIfDraining();
             cfs.getTracker().addSSTables(newSSTables);
             for (SSTableReader reader : newSSTables)
             {
                 if (options.invalidateCaches && cfs.isRowCacheEnabled())
                     invalidateCachesForSSTable(reader.descriptor);
             }
-        }
-        catch (Throwable t)
-        {
-            logger.error("[{}] Failed adding SSTables", importID, t);
-            throw new RuntimeException("Failed adding SSTables", t);
+
         }
 
         logger.info("Done loading load new SSTables for {}/{}", cfs.keyspace.getName(), cfs.getTableName());
         return failedDirectories;
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    /**
-     * Check the state of this node and throws an {@link InterruptedException} if it is currently draining
-     *
-     * @throws InterruptedException if the node is draining
-     */
-    private static void abortIfDraining() throws InterruptedException
-    {
-        if (StorageService.instance.isDraining())
-            throw new InterruptedException("SSTables import has been aborted");
-    }
-
-    private void logLeveling(UUID importID, Set<SSTableReader> newSSTables)
-    {
-        StringBuilder sb = new StringBuilder();
-        for (SSTableReader sstable : cfs.getSSTables(SSTableSet.CANONICAL))
-            sb.append(formatMetadata(sstable));
-        logger.debug("[{}] Current sstables: {}", importID, sb);
-        sb = new StringBuilder();
-        for (SSTableReader sstable : newSSTables)
-            sb.append(formatMetadata(sstable));
-        logger.debug("[{}] New sstables: {}", importID, sb);
-    }
-
-    private static String formatMetadata(SSTableReader sstable)
-    {
-        return String.format("{[%s, %s], %d, %s, %d}",
-                             sstable.getFirst().getToken(),
-                             sstable.getLast().getToken(),
-                             sstable.getSSTableLevel(),
-                             sstable.isRepaired(),
-                             sstable.onDiskLength());
-    }
-
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /**
      * Opens the sstablereader described by descriptor and figures out the correct directory for it based
      * on the first token

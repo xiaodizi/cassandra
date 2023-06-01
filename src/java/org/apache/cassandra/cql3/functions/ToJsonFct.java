@@ -28,81 +28,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.lang.String.format;
-
 public class ToJsonFct extends NativeScalarFunction
 {
     public static final FunctionName NAME = FunctionName.nativeFunction("tojson");
 
     private static final Map<AbstractType<?>, ToJsonFct> instances = new ConcurrentHashMap<>();
 
-    public static ToJsonFct getInstance(String name, List<AbstractType<?>> argTypes) throws InvalidRequestException
+    public static ToJsonFct getInstance(List<AbstractType<?>> argTypes) throws InvalidRequestException
     {
         if (argTypes.size() != 1)
-            throw new InvalidRequestException(format("%s() only accepts one argument (got %d)", name, argTypes.size()));
+            throw new InvalidRequestException(String.format("toJson() only accepts one argument (got %d)", argTypes.size()));
 
         AbstractType<?> fromType = argTypes.get(0);
         ToJsonFct func = instances.get(fromType);
         if (func == null)
         {
-            func = new ToJsonFct(name, fromType);
+            func = new ToJsonFct(fromType);
             instances.put(fromType, func);
         }
         return func;
     }
 
-    private ToJsonFct(String name, AbstractType<?> argType)
+    private ToJsonFct(AbstractType<?> argType)
     {
-        super(name, UTF8Type.instance, argType);
+        super("tojson", UTF8Type.instance, argType);
     }
 
     public ByteBuffer execute(ProtocolVersion protocolVersion, List<ByteBuffer> parameters) throws InvalidRequestException
     {
-        assert parameters.size() == 1 : format("Expected 1 argument for %s(), but got %d", name.name, parameters.size());
+        assert parameters.size() == 1 : "Expected 1 argument for toJson(), but got " + parameters.size();
         ByteBuffer parameter = parameters.get(0);
         if (parameter == null)
             return ByteBufferUtil.bytes("null");
 
         return ByteBufferUtil.bytes(argTypes.get(0).toJSONString(parameter, protocolVersion));
     }
-<<<<<<< HEAD
-=======
-
-    public static void addFunctionsTo(NativeFunctions functions)
-    {
-        functions.add(new Factory("to_json"));
-        functions.add(new Factory("tojson")); // deprecated pre-5.0 name
-<<<<<<< HEAD
-=======
-    }
-
-    private static class Factory extends FunctionFactory
-    {
-        public Factory(String name)
-        {
-            super(name, FunctionParameter.anyType(false));
-        }
-
-        @Override
-        protected NativeFunction doGetOrCreateFunction(List<AbstractType<?>> argTypes, AbstractType<?> receiverType)
-        {
-            return ToJsonFct.getInstance(name.name, argTypes);
-        }
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    }
-
-    private static class Factory extends FunctionFactory
-    {
-        public Factory(String name)
-        {
-            super(name, FunctionParameter.anyType(false));
-        }
-
-        @Override
-        protected NativeFunction doGetOrCreateFunction(List<AbstractType<?>> argTypes, AbstractType<?> receiverType)
-        {
-            return ToJsonFct.getInstance(name.name, argTypes);
-        }
-    }
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 }

@@ -37,19 +37,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-<<<<<<< HEAD
-=======
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.Timer;
-import org.apache.cassandra.config.DatabaseDescriptor;
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.memtable.Memtable;
@@ -289,14 +276,6 @@ public class TableMetrics
     public final TableMeter rowIndexSizeAborts;
     public final TableHistogram rowIndexSize;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    public final ImmutableMap<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> formatSpecificGauges;
-
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static Pair<Long, Long> totalNonSystemTablesSize(Predicate<SSTableReader> predicate)
     {
         long total = 0;
@@ -625,38 +604,6 @@ public class TableMetrics
                 return count;
             }
         });
-<<<<<<< HEAD
-=======
-        maxSSTableDuration = createTableGauge("MaxSSTableDuration", new Gauge<Long>()
-        {
-            @Override
-            public Long getValue()
-            {
-                return cfs.getTracker()
-                          .getView()
-                          .liveSSTables()
-                          .stream()
-                          .filter(sstable -> sstable.getMinTimestamp() != Long.MAX_VALUE && sstable.getMaxTimestamp() != Long.MAX_VALUE)
-                          .map(ssTableReader -> ssTableReader.getMaxTimestamp() - ssTableReader.getMinTimestamp())
-                          .max(Long::compare)
-                          .orElse(0L) / 1000;
-            }
-        });
-        maxSSTableSize = createTableGauge("MaxSSTableSize", new Gauge<Long>()
-        {
-            @Override
-            public Long getValue()
-            {
-                return cfs.getTracker()
-                          .getView()
-                          .liveSSTables()
-                          .stream()
-                          .map(SSTableReader::bytesOnDisk)
-                          .max(Long::compare)
-                          .orElse(0L);
-            }
-        });
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         liveDiskSpaceUsed = createTableCounter("LiveDiskSpaceUsed");
         totalDiskSpaceUsed = createTableCounter("TotalDiskSpaceUsed");
         minPartitionSize = createTableGauge("MinPartitionSize", "MinRowSize", new Gauge<Long>()
@@ -1024,28 +971,6 @@ public class TableMetrics
         }
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    private ImmutableMap<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> createFormatSpecificGauges(ColumnFamilyStore cfs)
-    {
-        ImmutableMap.Builder<SSTableFormat<?, ?>, ImmutableMap<String, Gauge<? extends Number>>> builder = ImmutableMap.builder();
-        for (SSTableFormat<?, ?> format : DatabaseDescriptor.getSSTableFormats().values())
-        {
-            ImmutableMap.Builder<String, Gauge<? extends Number>> gauges = ImmutableMap.builder();
-            for (GaugeProvider<?> gaugeProvider : format.getFormatSpecificMetricsProviders().getGaugeProviders())
-            {
-                Gauge<? extends Number> gauge = createTableGauge(gaugeProvider.name, gaugeProvider.getTableGauge(cfs), gaugeProvider.getGlobalGauge());
-                gauges.put(gaugeProvider.name, gauge);
-            }
-            builder.put(format, gauges.build());
-        }
-        return builder.build();
-    }
-
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     /**
      * Create a gauge that will be part of a merged version of all column families.  The global gauge
      * will merge each CF gauge by adding their values

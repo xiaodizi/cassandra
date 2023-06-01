@@ -73,7 +73,6 @@ import org.apache.cassandra.utils.JVMStabilityInspector;
 import org.apache.cassandra.utils.concurrent.*;
 
 import static org.apache.cassandra.concurrent.ExecutorFactory.Global.executorFactory;
-import static org.apache.cassandra.config.CassandraRelevantProperties.FORCE_DEFAULT_INDEXING_PAGE_SIZE;
 import static org.apache.cassandra.utils.ExecutorUtils.awaitTermination;
 import static org.apache.cassandra.utils.ExecutorUtils.shutdown;
 
@@ -992,7 +991,7 @@ public class SecondaryIndexManager implements IndexRegistry, INotificationConsum
      */
     public int calculateIndexingPageSize()
     {
-        if (FORCE_DEFAULT_INDEXING_PAGE_SIZE.getBoolean())
+        if (Boolean.getBoolean("cassandra.force_default_indexing_page_size"))
             return DEFAULT_PAGE_SIZE;
 
         double targetPageSizeInBytes = 32 * 1024 * 1024;

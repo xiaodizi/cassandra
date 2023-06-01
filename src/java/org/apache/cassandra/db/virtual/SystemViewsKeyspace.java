@@ -47,15 +47,6 @@ public final class SystemViewsKeyspace extends VirtualKeyspace
                     .add(new BatchMetricsTable(VIRTUAL_VIEWS))
                     .add(new StreamingVirtualTable(VIRTUAL_VIEWS))
                     .add(new GossipInfoTable(VIRTUAL_VIEWS))
-<<<<<<< HEAD
-=======
-                    .add(new QueriesTable(VIRTUAL_VIEWS))
-                    .add(new LogMessagesTable(VIRTUAL_VIEWS))
-                    .add(new SnapshotsTable(VIRTUAL_VIEWS))
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
                     .addAll(LocalRepairTables.getAll(VIRTUAL_VIEWS))
                     .build());
     }

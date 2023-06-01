@@ -18,62 +18,42 @@
 package org.apache.cassandra.cql3.functions;
 
 import java.nio.ByteBuffer;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import java.util.List;
+import java.util.Set;
 
 import org.apache.cassandra.cql3.CQL3Type;
+import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.BytesType;
-import org.apache.cassandra.exceptions.InvalidRequestException;
-import org.apache.cassandra.serializers.MarshalException;
+import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.transport.ProtocolVersion;
 import org.apache.cassandra.utils.ByteBufferUtil;
+import org.apache.cassandra.exceptions.InvalidRequestException;
+import org.apache.cassandra.serializers.MarshalException;
 
 public abstract class BytesConversionFcts
 {
     public static Collection<Function> all()
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         Collection<Function> functions = new ArrayList<>();
 
         // because text and varchar ends up being synonymous, our automatic makeToBlobFunction doesn't work
         // for varchar, so we special case it below. We also skip blob for obvious reasons.
         Set<AbstractType<?>> types = new HashSet<>();
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         for (CQL3Type type : CQL3Type.Native.values())
         {
             if (type == CQL3Type.Native.BLOB)
                 continue;
+            AbstractType<?> udfType = type.getType().udfType();
+            if (!types.add(udfType))
+                continue;
 
-            functions.add(new ToBlobFunction(type));
-            functions.add(new FromBlobFunction(type));
-        }
-    }
-
-    // Most of the X_as_blob and blob_as_X functions are basically no-op since everything is
-    // bytes internally. They only "trick" the type system.
-    public static class ToBlobFunction extends NativeScalarFunction
-    {
-        private final CQL3Type fromType;
-
-        public ToBlobFunction(CQL3Type fromType)
-        {
-            this(fromType, false);
+            functions.add(makeToBlobFunction(type.getType().udfType()));
+            functions.add(makeFromBlobFunction(type.getType().udfType()));
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         functions.add(VarcharAsBlobFct);
         functions.add(BlobAsVarcharFct);
 
@@ -83,111 +63,39 @@ public abstract class BytesConversionFcts
     // Most of the XAsBlob and blobAsX functions are basically no-op since everything is
     // bytes internally. They only "trick" the type system.
     public static Function makeToBlobFunction(AbstractType<?> fromType)
-=======
-        private ToBlobFunction(CQL3Type fromType, boolean useLegacyName)
+    {
+        String name = fromType.asCQL3Type() + "asblob";
+        return new NativeScalarFunction(name, BytesType.instance, fromType)
         {
-            super(fromType + (useLegacyName ? "asblob" : "_as_blob"),
-                  BytesType.instance,
-                  fromType.getType().udfType());
-            this.fromType = fromType;
-        }
-
-        @Override
-        public ByteBuffer execute(ProtocolVersion protocolVersion, List<ByteBuffer> parameters)
-        {
-            return parameters.get(0);
-        }
-
-        @Override
-        public NativeFunction withLegacyName()
-        {
-            return new ToBlobFunction(fromType, true);
-        }
+            public ByteBuffer execute(ProtocolVersion protocolVersion, List<ByteBuffer> parameters)
+            {
+                return parameters.get(0);
+            }
+        };
     }
 
-    public static class FromBlobFunction extends NativeScalarFunction
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    {
-        private final CQL3Type toType;
-
-<<<<<<< HEAD
     public static Function makeFromBlobFunction(final AbstractType<?> toType)
     {
         final String name = "blobas" + toType.asCQL3Type();
         return new NativeScalarFunction(name, toType, BytesType.instance)
-=======
-        public FromBlobFunction(CQL3Type toType)
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
-        private ToBlobFunction(CQL3Type fromType, boolean useLegacyName)
         {
-            super(fromType + (useLegacyName ? "asblob" : "_as_blob"),
-                  BytesType.instance,
-                  fromType.getType().udfType());
-            this.fromType = fromType;
-        }
-
-        @Override
-        public ByteBuffer execute(ProtocolVersion protocolVersion, List<ByteBuffer> parameters)
-        {
-            return parameters.get(0);
-        }
-
-        @Override
-        public NativeFunction withLegacyName()
-        {
-            return new ToBlobFunction(fromType, true);
-        }
-    }
-
-    public static class FromBlobFunction extends NativeScalarFunction
-    {
-        private final CQL3Type toType;
-
-        public FromBlobFunction(CQL3Type toType)
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-        {
-            this(toType, false);
-        }
-
-        private FromBlobFunction(CQL3Type toType, boolean useLegacyName)
-        {
-            super((useLegacyName ? "blobas" : "blob_as_") + toType,
-                  toType.getType().udfType(),
-                  BytesType.instance);
-            this.toType = toType;
-        }
-
-        @Override
-        public ByteBuffer execute(ProtocolVersion protocolVersion, List<ByteBuffer> parameters)
-        {
-            ByteBuffer val = parameters.get(0);
-
-            if (val != null)
+            public ByteBuffer execute(ProtocolVersion protocolVersion, List<ByteBuffer> parameters) throws InvalidRequestException
             {
+                ByteBuffer val = parameters.get(0);
                 try
                 {
-                    toType.getType().validate(val);
+                    if (val != null)
+                        toType.validate(val);
+                    return val;
                 }
                 catch (MarshalException e)
                 {
-                    throw new InvalidRequestException(String.format("In call to function %s, value 0x%s is not a " +
-                                                                    "valid binary representation for type %s",
-                                                                    name, ByteBufferUtil.bytesToHex(val), toType));
+                    throw new InvalidRequestException(String.format("In call to function %s, value 0x%s is not a valid binary representation for type %s",
+                                                                    name, ByteBufferUtil.bytesToHex(val), toType.asCQL3Type()));
                 }
             }
-
-            return val;
-        }
-
-        @Override
-        public NativeFunction withLegacyName()
-        {
-            return new FromBlobFunction(toType, true);
-        }
+        };
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     public static final Function VarcharAsBlobFct = new NativeScalarFunction("varcharasblob", BytesType.instance, UTF8Type.instance)
     {
@@ -204,8 +112,4 @@ public abstract class BytesConversionFcts
             return parameters.get(0);
         }
     };
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 }

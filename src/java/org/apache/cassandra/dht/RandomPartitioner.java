@@ -293,7 +293,7 @@ public class RandomPartitioner implements IPartitioner
         // 1-case
         if (sortedTokens.size() == 1)
         {
-            ownerships.put(i.next(), 1.0F);
+            ownerships.put(i.next(), new Float(1.0));
         }
         // n-case
         else

@@ -17,37 +17,8 @@
  */
 package org.apache.cassandra.io.sstable.format.big;
 
-<<<<<<< HEAD
 import java.util.Collection;
 
-=======
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.cassandra.cache.KeyCacheKey;
-import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.db.ColumnFamilyStore;
-import org.apache.cassandra.db.DecoratedKey;
-import org.apache.cassandra.db.lifecycle.LifecycleTransaction;
-import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.io.sstable.Component;
-import org.apache.cassandra.io.sstable.Descriptor;
-import org.apache.cassandra.io.sstable.GaugeProvider;
-import org.apache.cassandra.io.sstable.IScrubber;
-import org.apache.cassandra.io.sstable.MetricsProviders;
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 import org.apache.cassandra.io.sstable.SSTable;
 import org.apache.cassandra.schema.TableMetadata;
 import org.apache.cassandra.schema.TableMetadataRef;
@@ -65,117 +36,16 @@ import org.apache.cassandra.utils.TimeUUID;
  */
 public class BigFormat implements SSTableFormat
 {
-<<<<<<< HEAD
     public static final BigFormat instance = new BigFormat();
     public static final Version latestVersion = new BigVersion(BigVersion.current_version);
     private static final SSTableReader.Factory readerFactory = new ReaderFactory();
     private static final SSTableWriter.Factory writerFactory = new WriterFactory();
-=======
-    private final static Logger logger = LoggerFactory.getLogger(BigFormat.class);
 
-    public static final String NAME = "big";
-
-    private final Version latestVersion = new BigVersion(this, BigVersion.current_version);
-    private final BigTableReaderFactory readerFactory = new BigTableReaderFactory();
-    private final BigTableWriterFactory writerFactory = new BigTableWriterFactory();
-
-    public static class Components extends SSTableFormat.Components
+    private BigFormat()
     {
-        public static class Types extends SSTableFormat.Components.Types
-        {
-            // index of the row keys with pointers to their positions in the data file
-            public static final Component.Type PRIMARY_INDEX = Component.Type.createSingleton("PRIMARY_INDEX", "Index.db", BigFormat.class);
-            // holds SSTable Index Summary (sampling of Index component)
-            public static final Component.Type SUMMARY = Component.Type.createSingleton("SUMMARY", "Summary.db", BigFormat.class);
-        }
 
-        public final static Component PRIMARY_INDEX = Types.PRIMARY_INDEX.getSingleton();
-        public final static Component SUMMARY = Types.SUMMARY.getSingleton();
-
-        private static final Set<Component> BATCH_COMPONENTS = ImmutableSet.of(DATA,
-                                                                               PRIMARY_INDEX,
-                                                                               COMPRESSION_INFO,
-                                                                               FILTER,
-                                                                               STATS);
-
-        private static final Set<Component> PRIMARY_COMPONENTS = ImmutableSet.of(DATA,
-                                                                                 PRIMARY_INDEX);
-
-        private static final Set<Component> GENERATED_ON_LOAD_COMPONENTS = ImmutableSet.of(FILTER, SUMMARY);
-
-        private static final Set<Component> MUTABLE_COMPONENTS = ImmutableSet.of(STATS,
-                                                                                 SUMMARY);
-
-        private static final Set<Component> UPLOAD_COMPONENTS = ImmutableSet.of(DATA,
-                                                                                PRIMARY_INDEX,
-                                                                                SUMMARY,
-                                                                                COMPRESSION_INFO,
-                                                                                STATS);
-
-        private static final Set<Component> STREAM_COMPONENTS = ImmutableSet.of(DATA,
-                                                                                PRIMARY_INDEX,
-                                                                                STATS,
-                                                                                COMPRESSION_INFO,
-                                                                                FILTER,
-                                                                                SUMMARY,
-                                                                                DIGEST,
-                                                                                CRC);
-
-        private static final Set<Component> ALL_COMPONENTS = ImmutableSet.of(DATA,
-                                                                             PRIMARY_INDEX,
-                                                                             STATS,
-                                                                             COMPRESSION_INFO,
-                                                                             FILTER,
-                                                                             SUMMARY,
-                                                                             DIGEST,
-                                                                             CRC,
-                                                                             TOC);
-    }
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-
-    public BigFormat(Map<String, String> options)
-    {
-        super(NAME, options);
-<<<<<<< HEAD
-=======
     }
 
-    @Override
-    public String name()
-    {
-        return NAME;
-    }
-
-    public static boolean is(SSTableFormat<?, ?> format)
-    {
-        return format.name().equals(NAME);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    }
-
-    @Override
-    public String name()
-    {
-        return NAME;
-    }
-
-    public static boolean is(SSTableFormat<?, ?> format)
-    {
-        return format.name().equals(NAME);
-    }
-
-<<<<<<< HEAD
-=======
-    public static BigFormat getInstance()
-    {
-        return (BigFormat) Objects.requireNonNull(DatabaseDescriptor.getSSTableFormats().get(NAME), "Unknown SSTable format: " + NAME);
-    }
-
-    public static boolean isDefault() // TODO rename to isSelected
-    {
-        return DatabaseDescriptor.getSelectedSSTableFormat().getClass().equals(BigFormat.class);
-    }
-
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     @Override
     public Version getLatestVersion()
     {
@@ -374,38 +244,6 @@ public class BigFormat implements SSTableFormat
         public boolean hasOldBfFormat()
         {
             return hasOldBfFormat;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static class BigFormatFactory implements Factory
-    {
-        @Override
-        public String name()
-        {
-            return NAME;
-        }
-
-        @Override
-        public SSTableFormat<?, ?> getInstance(Map<String, String> options)
-        {
-            return new BigFormat(options);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static class BigFormatFactory implements Factory
-    {
-        @Override
-        public String name()
-        {
-            return NAME;
-        }
-
-        @Override
-        public SSTableFormat<?, ?> getInstance(Map<String, String> options)
-        {
-            return new BigFormat(options);
         }
     }
 }

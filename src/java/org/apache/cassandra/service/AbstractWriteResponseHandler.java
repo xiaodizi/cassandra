@@ -282,7 +282,7 @@ public abstract class AbstractWriteResponseHandler<T> implements RequestCallback
         if (blockFor() + n > candidateReplicaCount())
             signal();
 
-        if (hintOnFailure != null && StorageProxy.shouldHint(replicaPlan.lookup(from)))
+        if (hintOnFailure != null)
             StorageProxy.submitHint(hintOnFailure.get(), replicaPlan.lookup(from), null);
     }
 

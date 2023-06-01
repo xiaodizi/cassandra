@@ -116,7 +116,7 @@ public class LocalPartitioner implements IPartitioner
 
     public Map<Token, Float> describeOwnership(List<Token> sortedTokens)
     {
-        return Collections.singletonMap((Token)getMinimumToken(), 1.0F);
+        return Collections.singletonMap((Token)getMinimumToken(), new Float(1.0));
     }
 
     public AbstractType<?> getTokenValidator()

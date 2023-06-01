@@ -28,7 +28,6 @@ import org.apache.cassandra.cql3.ColumnSpecification;
 import org.apache.cassandra.schema.Schema;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.exceptions.InvalidRequestException;
-import org.apache.cassandra.schema.UserFunctions;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.cassandra.cql3.statements.RequestValidations.invalidRequest;
@@ -70,63 +69,7 @@ public final class FunctionResolver
                                AbstractType<?> receiverType)
     throws InvalidRequestException
     {
-<<<<<<< HEAD
         Collection<Function> candidates = collectCandidates(keyspace, name, receiverKs, receiverCf, receiverType);
-=======
-        return get(keyspace, name, providedArgs, receiverKeyspace, receiverTable, receiverType, UserFunctions.none());
-    }
-
-    /**
-     * @param keyspace the current keyspace
-     * @param name the name of the function
-     * @param providedArgs the arguments provided for the function call
-     * @param receiverKeyspace the receiver's keyspace
-     * @param receiverTable the receiver's table
-     * @param receiverType if the receiver type is known (during inserts, for example), this should be the type of
-     *                     the receiver
-     * @param functions a set of user functions that is not yet available in the schema, used during startup when those
-     *                  functions might not be yet available
-     */
-    @Nullable
-    public static Function get(String keyspace,
-                               FunctionName name,
-                               List<? extends AssignmentTestable> providedArgs,
-                               String receiverKeyspace,
-                               String receiverTable,
-                               AbstractType<?> receiverType,
-                               UserFunctions functions)
-    throws InvalidRequestException
-    {
-<<<<<<< HEAD
-        Collection<Function> candidates = collectCandidates(keyspace, name, receiverKeyspace, receiverTable, providedArgs, receiverType, functions);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
-        return get(keyspace, name, providedArgs, receiverKeyspace, receiverTable, receiverType, UserFunctions.none());
-    }
-
-    /**
-     * @param keyspace the current keyspace
-     * @param name the name of the function
-     * @param providedArgs the arguments provided for the function call
-     * @param receiverKeyspace the receiver's keyspace
-     * @param receiverTable the receiver's table
-     * @param receiverType if the receiver type is known (during inserts, for example), this should be the type of
-     *                     the receiver
-     * @param functions a set of user functions that is not yet available in the schema, used during startup when those
-     *                  functions might not be yet available
-     */
-    @Nullable
-    public static Function get(String keyspace,
-                               FunctionName name,
-                               List<? extends AssignmentTestable> providedArgs,
-                               String receiverKeyspace,
-                               String receiverTable,
-                               AbstractType<?> receiverType,
-                               UserFunctions functions)
-    throws InvalidRequestException
-    {
-        Collection<Function> candidates = collectCandidates(keyspace, name, receiverKeyspace, receiverTable, providedArgs, receiverType, functions);
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
 
         if (candidates.isEmpty())
             return null;
@@ -144,20 +87,9 @@ public final class FunctionResolver
 
     private static Collection<Function> collectCandidates(String keyspace,
                                                           FunctionName name,
-<<<<<<< HEAD
                                                           String receiverKs,
                                                           String receiverCf,
                                                           AbstractType<?> receiverType)
-=======
-                                                          String receiverKeyspace,
-                                                          String receiverTable,
-                                                          List<? extends AssignmentTestable> providedArgs,
-                                                          AbstractType<?> receiverType,
-                                                          UserFunctions functions)
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     {
         Collection<Function> candidates = new ArrayList<>();
 
@@ -173,7 +105,6 @@ public final class FunctionResolver
         // Similarly, we can only use fromJson when we know the receiver type (such as inserts)
         if (name.equalsNativeFunction(FromJsonFct.NAME))
         {
-<<<<<<< HEAD
             if (receiverType == null)
                 throw new InvalidRequestException("fromJson() cannot be used in the selection clause of a SELECT statement");
             candidates.add(FromJsonFct.getInstance(receiverType));
@@ -190,35 +121,7 @@ public final class FunctionResolver
         else
         {
             // function name is fully qualified (keyspace + name)
-<<<<<<< HEAD
             candidates.addAll(Schema.instance.getFunctions(name));
-=======
-            // function name is fully qualified (keyspace + name)
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-            candidates.addAll(functions.get(name));
-            candidates.addAll(Schema.instance.getUserFunctions(name));
-            candidates.addAll(NativeFunctions.instance.getFunctions(name));
-            candidates.addAll(NativeFunctions.instance.getFactories(name).stream()
-                                            .map(f -> f.getOrCreateFunction(providedArgs, receiverType, receiverKeyspace, receiverTable))
-                                            .filter(Objects::nonNull)
-                                            .collect(Collectors.toList()));
-        }
-        else
-        {
-            // function name is not fully qualified
-            // add 'current keyspace' candidates
-            FunctionName userName = new FunctionName(keyspace, name.name);
-            candidates.addAll(functions.get(userName));
-            candidates.addAll(Schema.instance.getUserFunctions(userName));
-            // add 'SYSTEM' (native) candidates
-            FunctionName nativeName = name.asNativeFunction();
-            candidates.addAll(NativeFunctions.instance.getFunctions(nativeName));
-            candidates.addAll(NativeFunctions.instance.getFactories(nativeName).stream()
-                                            .map(f -> f.getOrCreateFunction(providedArgs, receiverType, receiverKeyspace, receiverTable))
-                                            .filter(Objects::nonNull)
-                                            .collect(Collectors.toList()));
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         }
 
         return candidates;

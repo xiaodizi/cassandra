@@ -254,11 +254,10 @@ public class MigrationCoordinator
 
     void start()
     {
-        long interval = SCHEMA_PULL_INTERVAL_MS.getLong();
-        logger.info("Starting migration coordinator and scheduling pulling schema versions every {}", Duration.ofMillis(interval));
+        logger.info("Starting migration coordinator and scheduling pulling schema versions every {}", Duration.ofMillis(SCHEMA_PULL_INTERVAL_MS.getLong()));
         announce(schemaVersion.get());
         periodicPullTask.updateAndGet(curTask -> curTask == null
-                                                 ? periodicCheckExecutor.scheduleWithFixedDelay(this::pullUnreceivedSchemaVersions, interval, interval, TimeUnit.MILLISECONDS)
+                                                 ? periodicCheckExecutor.scheduleWithFixedDelay(this::pullUnreceivedSchemaVersions, SCHEMA_PULL_INTERVAL_MS.getLong(), SCHEMA_PULL_INTERVAL_MS.getLong(), TimeUnit.MILLISECONDS)
                                                  : curTask);
     }
 

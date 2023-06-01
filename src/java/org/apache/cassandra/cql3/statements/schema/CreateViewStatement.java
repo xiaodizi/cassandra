@@ -50,7 +50,6 @@ import static java.lang.String.join;
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
-import static org.apache.cassandra.config.CassandraRelevantProperties.MV_ALLOW_FILTERING_NONKEY_COLUMNS_UNSAFE;
 
 public final class CreateViewStatement extends AlterSchemaStatement
 {
@@ -189,8 +188,7 @@ public final class CreateViewStatement extends AlterSchemaStatement
                 throw ire("Can only select columns by name when defining a materialized view (got %s)", selector.selectable);
 
             // will throw IRE if the column doesn't exist in the base table
-            Selectable.RawIdentifier rawIdentifier = (Selectable.RawIdentifier) selector.selectable;
-            ColumnMetadata column = rawIdentifier.columnMetadata(table);
+            ColumnMetadata column = (ColumnMetadata) selector.selectable.prepare(table);
 
             selectedColumns.add(column.name);
         });
@@ -294,7 +292,7 @@ public final class CreateViewStatement extends AlterSchemaStatement
 
         // See CASSANDRA-13798
         Set<ColumnMetadata> restrictedNonPrimaryKeyColumns = restrictions.nonPKRestrictedColumns(false);
-        if (!restrictedNonPrimaryKeyColumns.isEmpty() && !MV_ALLOW_FILTERING_NONKEY_COLUMNS_UNSAFE.getBoolean())
+        if (!restrictedNonPrimaryKeyColumns.isEmpty() && !Boolean.getBoolean("cassandra.mv.allow_filtering_nonkey_columns_unsafe"))
         {
             throw ire("Non-primary key columns can only be restricted with 'IS NOT NULL' (got: %s restricted illegally)",
                       join(",", transform(restrictedNonPrimaryKeyColumns, ColumnMetadata::toString)));
@@ -326,18 +324,12 @@ public final class CreateViewStatement extends AlterSchemaStatement
         builder.params(attrs.asNewTableParams())
                .kind(TableMetadata.Kind.VIEW);
 
-        partitionKeyColumns.stream()
-                           .map(table::getColumn)
-                           .forEach(column -> builder.addPartitionKeyColumn(column.name, getType(column), column.getMask()));
-
-        clusteringColumns.stream()
-                         .map(table::getColumn)
-                         .forEach(column -> builder.addClusteringColumn(column.name, getType(column), column.getMask()));
+        partitionKeyColumns.forEach(name -> builder.addPartitionKeyColumn(name, getType(table, name)));
+        clusteringColumns.forEach(name -> builder.addClusteringColumn(name, getType(table, name)));
 
         selectedColumns.stream()
                        .filter(name -> !primaryKeyColumns.contains(name))
-                       .map(table::getColumn)
-                       .forEach(column -> builder.addRegularColumn(column.name, getType(column), column.getMask()));
+                       .forEach(name -> builder.addRegularColumn(name, getType(table, name)));
 
         ViewMetadata view = new ViewMetadata(table.id, table.name, rawColumns.isEmpty(), whereClause, builder.build());
         view.metadata.validate();
@@ -355,15 +347,15 @@ public final class CreateViewStatement extends AlterSchemaStatement
         client.ensureTablePermission(keyspaceName, tableName, Permission.ALTER);
     }
 
-    private AbstractType<?> getType(ColumnMetadata column)
+    private AbstractType<?> getType(TableMetadata table, ColumnIdentifier name)
     {
-        AbstractType<?> type = column.type;
-        if (clusteringOrder.containsKey(column.name))
+        AbstractType<?> type = table.getColumn(name).type;
+        if (clusteringOrder.containsKey(name))
         {
-            boolean reverse = !clusteringOrder.get(column.name);
+            boolean reverse = !clusteringOrder.get(name);
 
             if (type.isReversed() && !reverse)
-                return ((ReversedType<?>) type).baseType;
+                return ((ReversedType) type).baseType;
 
             if (!type.isReversed() && reverse)
                 return ReversedType.getInstance(type);

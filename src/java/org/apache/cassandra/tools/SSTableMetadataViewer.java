@@ -332,7 +332,7 @@ public class SSTableMetadataViewer
                 .get(MetadataType.HEADER);
 
         field("SSTable", descriptor);
-        if (scan && descriptor.version.version.compareTo("ma") >= 0)
+        if (scan && descriptor.version.getVersion().compareTo("ma") >= 0)
         {
             printScannedOverview(descriptor, stats);
         }
@@ -375,7 +375,6 @@ public class SSTableMetadataViewer
                   stats.getEstimatedDroppableTombstoneRatio((int) (currentTimeMillis() / 1000) - this.gc));
             field("SSTable Level", stats.sstableLevel);
             field("Repaired at", stats.repairedAt, toDateString(stats.repairedAt, TimeUnit.MILLISECONDS));
-            field("Originating host id", stats.originatingHostId);
             field("Pending repair", stats.pendingRepair);
             field("Replay positions covered", stats.commitLogIntervals);
             field("totalColumnsSet", stats.totalColumnsSet);

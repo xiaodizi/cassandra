@@ -357,10 +357,10 @@ public class MessagingService extends MessagingServiceMBeanImpl
      * @param handler callback interface which is used to pass the responses or
      *                suggest that a timeout occurred to the invoker of the send().
      */
-    public void sendWriteWithCallback(Message message, Replica to, AbstractWriteResponseHandler<?> handler)
+    public void sendWriteWithCallback(Message message, Replica to, AbstractWriteResponseHandler<?> handler, boolean allowHints)
     {
         assert message.callBackOnFailure();
-        callbacks.addWithExpiration(handler, message, to);
+        callbacks.addWithExpiration(handler, message, to, handler.consistencyLevel(), allowHints);
         send(message, to.endpoint(), null);
     }
 
@@ -446,13 +446,6 @@ public class MessagingService extends MessagingServiceMBeanImpl
         if (pool != null)
             pool.scheduleClose(5L, MINUTES, true)
                 .addListener(future -> channelManagers.remove(to, pool));
-    }
-
-    public void closeOutboundNow(InetAddressAndPort to)
-    {
-        OutboundConnections pool = channelManagers.get(to);
-        if (pool != null)
-            closeOutboundNow(pool);
     }
 
     /**

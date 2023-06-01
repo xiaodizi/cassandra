@@ -66,15 +66,15 @@ import org.apache.cassandra.utils.CassandraVersion;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.Pair;
 
-import static org.apache.cassandra.config.CassandraRelevantProperties.CASSANDRA_SKIP_AUTOMATIC_UDT_FIX;
-
 /**
  * Validates and fixes type issues in the serialization-header of sstables.
  */
 public abstract class SSTableHeaderFix
 {
     // C* 3.0 upgrade code
-    private static final boolean SKIP_AUTOMATIC_FIX_ON_UPGRADE = CASSANDRA_SKIP_AUTOMATIC_UDT_FIX.getBoolean();
+
+    private static final String SKIPAUTOMATICUDTFIX = "cassandra.skipautomaticudtfix";
+    private static final boolean SKIP_AUTOMATIC_FIX_ON_UPGRADE = Boolean.getBoolean(SKIPAUTOMATICUDTFIX);
 
     public static void fixNonFrozenUDTIfUpgradeFrom30()
     {
@@ -94,7 +94,7 @@ public abstract class SSTableHeaderFix
                         "sstable metadata serialization-headers",
                         previousVersionString,
                         FBUtilities.getReleaseVersionString(),
-                        CASSANDRA_SKIP_AUTOMATIC_UDT_FIX.getKey());
+                        SKIPAUTOMATICUDTFIX);
             return;
         }
 

@@ -76,30 +76,12 @@ public class GuardrailsOptions implements GuardrailsConfig
         config.read_consistency_levels_disallowed = validateConsistencyLevels(config.read_consistency_levels_disallowed, "read_consistency_levels_disallowed");
         config.write_consistency_levels_warned = validateConsistencyLevels(config.write_consistency_levels_warned, "write_consistency_levels_warned");
         config.write_consistency_levels_disallowed = validateConsistencyLevels(config.write_consistency_levels_disallowed, "write_consistency_levels_disallowed");
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-        validateSizeThreshold(config.partition_size_warn_threshold, config.partition_size_fail_threshold, false, "partition_size");
-        validateSizeThreshold(config.column_value_size_warn_threshold, config.column_value_size_fail_threshold, false, "column_value_size");
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         validateSizeThreshold(config.collection_size_warn_threshold, config.collection_size_fail_threshold, false, "collection_size");
         validateMaxIntThreshold(config.items_per_collection_warn_threshold, config.items_per_collection_fail_threshold, "items_per_collection");
         validateMaxIntThreshold(config.fields_per_udt_warn_threshold, config.fields_per_udt_fail_threshold, "fields_per_udt");
         validatePercentageThreshold(config.data_disk_usage_percentage_warn_threshold, config.data_disk_usage_percentage_fail_threshold, "data_disk_usage_percentage");
         validateDataDiskUsageMaxDiskSize(config.data_disk_usage_max_disk_size);
-<<<<<<< HEAD
         validateMinRFThreshold(config.minimum_replication_factor_warn_threshold, config.minimum_replication_factor_fail_threshold, "minimum_replication_factor");
-=======
-        validateMinRFThreshold(config.minimum_replication_factor_warn_threshold, config.minimum_replication_factor_fail_threshold);
-        validateMaxRFThreshold(config.maximum_replication_factor_warn_threshold, config.maximum_replication_factor_fail_threshold);
-        validateTimestampThreshold(config.maximum_timestamp_warn_threshold, config.maximum_timestamp_fail_threshold, "maximum_timestamp");
-        validateTimestampThreshold(config.minimum_timestamp_warn_threshold, config.minimum_timestamp_fail_threshold, "minimum_timestamp");
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     }
 
     @Override
@@ -513,66 +495,6 @@ public class GuardrailsOptions implements GuardrailsConfig
 
     @Override
     @Nullable
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-    public DataStorageSpec.LongBytesBound getPartitionSizeWarnThreshold()
-    {
-        return config.partition_size_warn_threshold;
-    }
-
-    @Override
-    @Nullable
-    public DataStorageSpec.LongBytesBound getPartitionSizeFailThreshold()
-    {
-        return config.partition_size_fail_threshold;
-    }
-
-    public void setPartitionSizeThreshold(@Nullable DataStorageSpec.LongBytesBound warn, @Nullable DataStorageSpec.LongBytesBound fail)
-    {
-        validateSizeThreshold(warn, fail, false, "partition_size");
-        updatePropertyWithLogging("partition_size_warn_threshold",
-                                  warn,
-                                  () -> config.partition_size_warn_threshold,
-                                  x -> config.partition_size_warn_threshold = x);
-        updatePropertyWithLogging("partition_size_fail_threshold",
-                                  fail,
-                                  () -> config.partition_size_fail_threshold,
-                                  x -> config.partition_size_fail_threshold = x);
-    }
-
-    @Override
-    @Nullable
-    public DataStorageSpec.LongBytesBound getColumnValueSizeWarnThreshold()
-    {
-        return config.column_value_size_warn_threshold;
-    }
-
-    @Override
-    @Nullable
-    public DataStorageSpec.LongBytesBound getColumnValueSizeFailThreshold()
-    {
-        return config.column_value_size_fail_threshold;
-    }
-
-    public void setColumnValueSizeThreshold(@Nullable DataStorageSpec.LongBytesBound warn, @Nullable DataStorageSpec.LongBytesBound fail)
-    {
-        validateSizeThreshold(warn, fail, false, "column_value_size");
-        updatePropertyWithLogging("column_value_size_warn_threshold",
-                                  warn,
-                                  () -> config.column_value_size_warn_threshold,
-                                  x -> config.column_value_size_warn_threshold = x);
-        updatePropertyWithLogging("column_value_size_fail_threshold",
-                                  fail,
-                                  () -> config.column_value_size_fail_threshold,
-                                  x -> config.column_value_size_fail_threshold = x);
-    }
-
-    @Override
-    @Nullable
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     public DataStorageSpec.LongBytesBound getCollectionSizeWarnThreshold()
     {
         return config.collection_size_warn_threshold;
@@ -712,125 +634,6 @@ public class GuardrailsOptions implements GuardrailsConfig
                                   x -> config.minimum_replication_factor_fail_threshold = x);
     }
 
-<<<<<<< HEAD
-=======
-    @Override
-    public int getMaximumReplicationFactorWarnThreshold()
-    {
-        return config.maximum_replication_factor_warn_threshold;
-    }
-
-    @Override
-    public int getMaximumReplicationFactorFailThreshold()
-    {
-        return config.maximum_replication_factor_fail_threshold;
-    }
-
-    public void setMaximumReplicationFactorThreshold(int warn, int fail)
-    {
-        validateMaxRFThreshold(warn, fail);
-        updatePropertyWithLogging("maximum_replication_factor_warn_threshold",
-                                  warn,
-                                  () -> config.maximum_replication_factor_warn_threshold,
-                                  x -> config.maximum_replication_factor_warn_threshold = x);
-        updatePropertyWithLogging("maximum_replication_factor_fail_threshold",
-                                  fail,
-                                  () -> config.maximum_replication_factor_fail_threshold,
-                                  x -> config.maximum_replication_factor_fail_threshold = x);
-    }
-
-    @Override
-    public boolean getZeroTTLOnTWCSWarned()
-    {
-        return config.zero_ttl_on_twcs_warned;
-    }
-
-    @Override
-    public void setZeroTTLOnTWCSWarned(boolean value)
-    {
-        updatePropertyWithLogging("zero_ttl_on_twcs_warned",
-                                  value,
-                                  () -> config.zero_ttl_on_twcs_warned,
-                                  x -> config.zero_ttl_on_twcs_warned = x);
-    }
-
-    @Override
-    public boolean getZeroTTLOnTWCSEnabled()
-    {
-        return config.zero_ttl_on_twcs_enabled;
-    }
-
-    @Override
-    public void setZeroTTLOnTWCSEnabled(boolean value)
-    {
-        updatePropertyWithLogging("zero_ttl_on_twcs_enabled",
-                                  value,
-                                  () -> config.zero_ttl_on_twcs_enabled,
-                                  x -> config.zero_ttl_on_twcs_enabled = x);
-    }
-
-    @Override
-    public  DurationSpec.LongMicrosecondsBound getMaximumTimestampWarnThreshold()
-    {
-        return config.maximum_timestamp_warn_threshold;
-    }
-
-    @Override
-    public DurationSpec.LongMicrosecondsBound getMaximumTimestampFailThreshold()
-    {
-        return config.maximum_timestamp_fail_threshold;
-    }
-
-    @Override
-    public void setMaximumTimestampThreshold(@Nullable DurationSpec.LongMicrosecondsBound warn,
-                                             @Nullable DurationSpec.LongMicrosecondsBound fail)
-    {
-        validateTimestampThreshold(warn, fail, "maximum_timestamp");
-
-        updatePropertyWithLogging("maximum_timestamp_warn_threshold",
-                                  warn,
-                                  () -> config.maximum_timestamp_warn_threshold,
-                                  x -> config.maximum_timestamp_warn_threshold = x);
-
-        updatePropertyWithLogging("maximum_timestamp_fail_threshold",
-                                  fail,
-                                  () -> config.maximum_timestamp_fail_threshold,
-                                  x -> config.maximum_timestamp_fail_threshold = x);
-    }
-
-    @Override
-    public  DurationSpec.LongMicrosecondsBound getMinimumTimestampWarnThreshold()
-    {
-        return config.minimum_timestamp_warn_threshold;
-    }
-
-    @Override
-    public DurationSpec.LongMicrosecondsBound getMinimumTimestampFailThreshold()
-    {
-        return config.minimum_timestamp_fail_threshold;
-    }
-
-    @Override
-    public void setMinimumTimestampThreshold(@Nullable DurationSpec.LongMicrosecondsBound warn,
-                                             @Nullable DurationSpec.LongMicrosecondsBound fail)
-    {
-        validateTimestampThreshold(warn, fail, "minimum_timestamp");
-
-        updatePropertyWithLogging("minimum_timestamp_warn_threshold",
-                                  warn,
-                                  () -> config.minimum_timestamp_warn_threshold,
-                                  x -> config.minimum_timestamp_warn_threshold = x);
-
-        updatePropertyWithLogging("minimum_timestamp_fail_threshold",
-                                  fail,
-                                  () -> config.minimum_timestamp_fail_threshold,
-                                  x -> config.minimum_timestamp_fail_threshold = x);
-    }
-
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
     private static <T> void updatePropertyWithLogging(String propertyName, T newValue, Supplier<T> getter, Consumer<T> setter)
     {
         T oldValue = getter.get();
@@ -843,11 +646,6 @@ public class GuardrailsOptions implements GuardrailsConfig
 
     private static void validatePositiveNumeric(long value, long maxValue, String name)
     {
-        validatePositiveNumeric(value, maxValue, name, false);
-    }
-
-    private static void validatePositiveNumeric(long value, long maxValue, String name, boolean allowZero)
-    {
         if (value == -1)
             return;
 
@@ -855,12 +653,12 @@ public class GuardrailsOptions implements GuardrailsConfig
             throw new IllegalArgumentException(format("Invalid value %d for %s: maximum allowed value is %d",
                                                       value, name, maxValue));
 
-        if (!allowZero && value == 0)
+        if (value == 0)
             throw new IllegalArgumentException(format("Invalid value for %s: 0 is not allowed; " +
                                                       "if attempting to disable use -1", name));
 
         // We allow -1 as a general "disabling" flag. But reject anything lower to avoid mistakes.
-        if (value < 0)
+        if (value <= 0)
             throw new IllegalArgumentException(format("Invalid value %d for %s: negative values are not allowed, " +
                                                       "outside of -1 which disables the guardrail", value, name));
     }
@@ -884,13 +682,6 @@ public class GuardrailsOptions implements GuardrailsConfig
         validateWarnLowerThanFail(warn, fail, name);
     }
 
-    private static void validateMaxLongThreshold(long warn, long fail, String name, boolean allowZero)
-    {
-        validatePositiveNumeric(warn, Long.MAX_VALUE, name + "_warn_threshold", allowZero);
-        validatePositiveNumeric(fail, Long.MAX_VALUE, name + "_fail_threshold", allowZero);
-        validateWarnLowerThanFail(warn, fail, name);
-    }
-
     private static void validateMinIntThreshold(int warn, int fail, String name)
     {
         validatePositiveNumeric(warn, Integer.MAX_VALUE, name + "_warn_threshold");
@@ -902,30 +693,6 @@ public class GuardrailsOptions implements GuardrailsConfig
     {
         validateMinIntThreshold(warn, fail, name);
         validateMinRFVersusDefaultRF(fail, name);
-    }
-
-    public static void validateTimestampThreshold(DurationSpec.LongMicrosecondsBound warn,
-                                                  DurationSpec.LongMicrosecondsBound fail,
-                                                  String name)
-    {
-        // this function is used for both upper and lower thresholds because lower threshold is relative
-        // despite using MinThreshold we still want the warn threshold to be less than or equal to
-        // the fail threshold.
-        validateMaxLongThreshold(warn == null ? -1 : warn.toMicroseconds(),
-                                 fail == null ? -1 : fail.toMicroseconds(),
-                                 name, true);
-    }
-
-    public static void validateTimestampThreshold(DurationSpec.LongMicrosecondsBound warn,
-                                                  DurationSpec.LongMicrosecondsBound fail,
-                                                  String name)
-    {
-        // this function is used for both upper and lower thresholds because lower threshold is relative
-        // despite using MinThreshold we still want the warn threshold to be less than or equal to
-        // the fail threshold.
-        validateMaxLongThreshold(warn == null ? -1 : warn.toMicroseconds(),
-                                 fail == null ? -1 : fail.toMicroseconds(),
-                                 name, true);
     }
 
     private static void validateWarnLowerThanFail(long warn, long fail, String name)

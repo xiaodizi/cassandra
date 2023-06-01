@@ -18,31 +18,44 @@
 package org.apache.cassandra.cql3;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.fasterxml.jackson.core.util.BufferRecyclers;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.cassandra.schema.ColumnMetadata;
+import org.apache.cassandra.schema.TableMetadata;
 import org.apache.cassandra.cql3.functions.Function;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.exceptions.InvalidRequestException;
-import org.apache.cassandra.schema.ColumnMetadata;
-import org.apache.cassandra.schema.TableMetadata;
 import org.apache.cassandra.serializers.MarshalException;
-import org.apache.cassandra.utils.JsonUtils;
 
-import static java.lang.String.format;
-
-/**
- * Term-related classes for INSERT JSON support.
- */
-public final class Json
+/** Term-related classes for INSERT JSON support. */
+public class Json
 {
+    public static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
+
     public static final ColumnIdentifier JSON_COLUMN_ID = new ColumnIdentifier("[json]", true);
 
-    private Json()
+    /**
+     * Quotes string contents using standard JSON quoting.
+     */
+    public static String quoteAsJsonString(String s)
     {
+        // In future should update to directly use `JsonStringEncoder.getInstance()` but for now:
+        return new String(BufferRecyclers.getJsonStringEncoder().quoteAsString(s));
+    }
+
+    public static Object decodeJson(String json)
+    {
+        try
+        {
+            return JSON_OBJECT_MAPPER.readValue(json, Object.class);
+        }
+        catch (IOException exc)
+        {
+            throw new MarshalException("Error decoding JSON string: " + exc.getMessage());
+        }
     }
 
     public interface Raw
@@ -118,13 +131,13 @@ public final class Json
         {
             Term value = columnMap.get(def.name);
             return value == null
-                   ? (defaultUnset ? Constants.UNSET_LITERAL : Constants.NULL_LITERAL)
-                   : new ColumnValue(value);
+                 ? (defaultUnset ? Constants.UNSET_LITERAL : Constants.NULL_LITERAL)
+                 : new ColumnValue(value);
         }
     }
 
     /**
-     * A prepared bind marker for a set of JSON values
+     *  A prepared bind marker for a set of JSON values
      */
     private static class PreparedMarker extends Prepared
     {
@@ -145,7 +158,7 @@ public final class Json
 
     /**
      * A Terminal for a single column.
-     * <p>
+     *
      * Note that this is intrinsically an already prepared term, but this still implements Term.Raw so that we can
      * easily use it to create raw operations.
      */
@@ -253,8 +266,8 @@ public final class Json
         {
             Term term = options.getJsonColumnValue(marker.bindIndex, column.name, marker.columns);
             return term == null
-                   ? (defaultUnset ? Constants.UNSET_VALUE : null)
-                   : term.bind(options);
+                 ? (defaultUnset ? Constants.UNSET_VALUE : null)
+                 : term.bind(options);
         }
 
         @Override
@@ -266,16 +279,16 @@ public final class Json
     /**
      * Given a JSON string, return a map of columns to their values for the insert.
      */
-    static Map<ColumnIdentifier, Term> parseJson(String jsonString, Collection<ColumnMetadata> expectedReceivers)
+    public static Map<ColumnIdentifier, Term> parseJson(String jsonString, Collection<ColumnMetadata> expectedReceivers)
     {
         try
         {
-            Map<String, Object> valueMap = JsonUtils.JSON_OBJECT_MAPPER.readValue(jsonString, Map.class);
+            Map<String, Object> valueMap = JSON_OBJECT_MAPPER.readValue(jsonString, Map.class);
 
             if (valueMap == null)
                 throw new InvalidRequestException("Got null for INSERT JSON values");
 
-            JsonUtils.handleCaseSensitivity(valueMap);
+            handleCaseSensitivity(valueMap);
 
             Map<ColumnIdentifier, Term> columnMap = new HashMap<>(expectedReceivers.size());
             for (ColumnSpecification spec : expectedReceivers)
@@ -297,28 +310,49 @@ public final class Json
                     {
                         columnMap.put(spec.name, spec.type.fromJSONObject(parsedJsonObject));
                     }
-                    catch (MarshalException exc)
+                    catch(MarshalException exc)
                     {
-                        throw new InvalidRequestException(format("Error decoding JSON value for %s: %s", spec.name, exc.getMessage()));
+                        throw new InvalidRequestException(String.format("Error decoding JSON value for %s: %s", spec.name, exc.getMessage()));
                     }
                 }
             }
 
             if (!valueMap.isEmpty())
             {
-                throw new InvalidRequestException(format("JSON values map contains unrecognized column: %s",
-                                                         valueMap.keySet().iterator().next()));
+                throw new InvalidRequestException(String.format(
+                        "JSON values map contains unrecognized column: %s", valueMap.keySet().iterator().next()));
             }
 
             return columnMap;
         }
         catch (IOException exc)
         {
-            throw new InvalidRequestException(format("Could not decode JSON string as a map: %s. (String was: %s)", exc.toString(), jsonString));
+            throw new InvalidRequestException(String.format("Could not decode JSON string as a map: %s. (String was: %s)", exc.toString(), jsonString));
         }
         catch (MarshalException exc)
         {
             throw new InvalidRequestException(exc.getMessage());
+        }
+    }
+
+    /**
+     * Handles unquoting and case-insensitivity in map keys.
+     */
+    public static void handleCaseSensitivity(Map<String, Object> valueMap)
+    {
+        for (String mapKey : new ArrayList<>(valueMap.keySet()))
+        {
+            // if it's surrounded by quotes, remove them and preserve the case
+            if (mapKey.startsWith("\"") && mapKey.endsWith("\""))
+            {
+                valueMap.put(mapKey.substring(1, mapKey.length() - 1), valueMap.remove(mapKey));
+                continue;
+            }
+
+            // otherwise, lowercase it if needed
+            String lowered = mapKey.toLowerCase(Locale.US);
+            if (!mapKey.equals(lowered))
+                valueMap.put(lowered, valueMap.remove(mapKey));
         }
     }
 }

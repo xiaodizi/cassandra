@@ -55,7 +55,6 @@ import static java.util.Collections.emptyList;
 
 import static org.apache.cassandra.concurrent.ExecutorFactory.Global.executorFactory;
 import static org.apache.cassandra.concurrent.InfiniteLoopExecutor.SimulatorSafe.UNSAFE;
-import static org.apache.cassandra.config.CassandraRelevantProperties.TEST_DEBUG_REF_COUNT;
 import static org.apache.cassandra.utils.Shared.Scope.SIMULATION;
 import static org.apache.cassandra.utils.Throwables.maybeFail;
 import static org.apache.cassandra.utils.Throwables.merge;
@@ -94,7 +93,7 @@ import static org.apache.cassandra.utils.Throwables.merge;
 public final class Ref<T> implements RefCounted<T>
 {
     static final Logger logger = LoggerFactory.getLogger(Ref.class);
-    public static final boolean DEBUG_ENABLED = TEST_DEBUG_REF_COUNT.getBoolean();
+    public static final boolean DEBUG_ENABLED = System.getProperty("cassandra.debugrefcount", "false").equalsIgnoreCase("true");
     static OnLeak ON_LEAK;
 
     @Shared(scope = SIMULATION)
@@ -709,7 +708,7 @@ public final class Ref<T> implements RefCounted<T>
                 List<String> names = new ArrayList<>(this.candidates.size());
                 for (Tidy tidy : this.candidates)
                     names.add(tidy.name());
-                logger.error("Strong reference leak candidates detected: {}", names);
+                logger.warn("Strong reference leak candidates detected: {}", names);
             }
             this.candidates = candidates;
         }

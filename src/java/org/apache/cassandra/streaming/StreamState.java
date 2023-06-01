@@ -56,8 +56,4 @@ public class StreamState implements Serializable
     {
         return Lists.newArrayList(Iterables.transform(sessions, SessionInfo::createSummary));
     }
-
-    public Set<SessionInfo> sessions() {
-        return sessions;
-    }
 }

@@ -35,8 +35,7 @@ import io.netty.handler.ssl.OpenSsl;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
-
-import static org.apache.cassandra.config.CassandraRelevantProperties.DISABLE_TCACTIVE_OPENSSL;
+import org.apache.cassandra.config.Config;
 
 /**
  * Abstract class implementing {@code ISslContextFacotry} to provide most of the functionality that any
@@ -110,13 +109,12 @@ abstract public class AbstractSslContextFactory implements ISslContextFactory
 
     /**
      * Dervies if {@code OpenSSL} is available. It allows in-jvm dtests to disable tcnative openssl support by
-     * setting {@link  org.apache.cassandra.config.CassandraRelevantProperties#DISABLE_TCACTIVE_OPENSSL}
-     * system property as {@code true}. Otherwise, it creates a circular reference that prevents the instance
-     * class loader from being garbage collected.
+     * setting {@code cassandra.disable_tcactive_openssl} system property as {@code true}. Otherwise, it creates a
+     * circular reference that prevents the instance class loader from being garbage collected.
      */
     protected void deriveIfOpenSslAvailable()
     {
-        if (DISABLE_TCACTIVE_OPENSSL.getBoolean())
+        if (Boolean.getBoolean(Config.PROPERTY_PREFIX + "disable_tcactive_openssl"))
             openSslIsAvailable = false;
         else
             openSslIsAvailable = OpenSsl.isAvailable();

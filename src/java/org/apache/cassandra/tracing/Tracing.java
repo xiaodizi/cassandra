@@ -42,7 +42,6 @@ import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.JVMStabilityInspector;
 import org.apache.cassandra.utils.TimeUUID;
 
-import static org.apache.cassandra.config.CassandraRelevantProperties.CUSTOM_TRACING_CLASS;
 import static org.apache.cassandra.utils.TimeUUID.Generator.nextTimeUUID;
 
 /**
@@ -111,14 +110,13 @@ public abstract class Tracing extends ExecutorLocals.Impl
     static
     {
         Tracing tracing = null;
-        String customTracingClass = CUSTOM_TRACING_CLASS.getString();
+        String customTracingClass = System.getProperty("cassandra.custom_tracing_class");
         if (null != customTracingClass)
         {
             try
             {
                 tracing = FBUtilities.construct(customTracingClass, "Tracing");
-                logger.info("Using the {} class to trace queries (as requested by the {} system property)",
-                            customTracingClass, CUSTOM_TRACING_CLASS.getKey());
+                logger.info("Using {} as tracing queries (as requested with -Dcassandra.custom_tracing_class)", customTracingClass);
             }
             catch (Exception e)
             {

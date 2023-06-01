@@ -141,7 +141,7 @@ final class SelectorFactories implements Iterable<Selector.Factory>
      */
     public void addSelectorForOrdering(ColumnMetadata def, int index)
     {
-        factories.add(SimpleSelector.newFactory(def, index, true));
+        factories.add(SimpleSelector.newFactory(def, index));
     }
 
     /**

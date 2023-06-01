@@ -61,13 +61,9 @@ public enum Permission
     DESCRIBE, // required on the root-level RoleResource to list all Roles
 
     // UDF permissions
-    EXECUTE,  // required to invoke any user defined function or aggregate
-
-    UNMASK, // required to see masked data
-
-    SELECT_MASKED; // required for SELECT on a table with restictions on masked columns
+    EXECUTE;  // required to invoke any user defined function or aggregate
 
     public static final Set<Permission> ALL =
-            Sets.immutableEnumSet(EnumSet.range(Permission.CREATE, Permission.SELECT_MASKED));
+            Sets.immutableEnumSet(EnumSet.range(Permission.CREATE, Permission.EXECUTE));
     public static final Set<Permission> NONE = ImmutableSet.of();
 }

@@ -75,10 +75,7 @@ public enum ProtocolVersion implements Comparable<ProtocolVersion>
     /** Old unsupported versions, this is OK as long as we never add newer unsupported versions */
     public final static EnumSet<ProtocolVersion> UNSUPPORTED = EnumSet.complementOf(SUPPORTED);
 
-    /** The preferred version.
-     *
-     * When updating this remember to also update the MULTI_UPGRADES in cassandra-dtest/upgrade_tests/upgrade_through_versions_test.py
-     */
+    /** The preferred versions */
     public final static ProtocolVersion CURRENT = V5;
     public final static Optional<ProtocolVersion> BETA = Optional.of(V6);
 

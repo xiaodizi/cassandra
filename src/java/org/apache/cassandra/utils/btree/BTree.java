@@ -37,7 +37,6 @@ import org.apache.cassandra.utils.caching.TinyThreadLocalPool;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static org.apache.cassandra.config.CassandraRelevantProperties.BTREE_BRANCH_SHIFT;
 
 public class BTree
 {
@@ -63,7 +62,7 @@ public class BTree
      * subtrees when modifying the tree, since the modified tree would need new parent references).
      * Instead, we store these references in a Path as needed when navigating the tree.
      */
-    public static final int BRANCH_SHIFT = BTREE_BRANCH_SHIFT.getInt();
+    public static final int BRANCH_SHIFT = Integer.getInteger("cassandra.btree.branchshift", 5);
 
     private static final int BRANCH_FACTOR = 1 << BRANCH_SHIFT;
     public static final int MIN_KEYS = BRANCH_FACTOR / 2 - 1;

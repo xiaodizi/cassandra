@@ -49,9 +49,6 @@ import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.service.paxos.cleanup.PaxosTableRepairs;
 import org.apache.cassandra.utils.CloseableIterator;
 
-import static org.apache.cassandra.config.CassandraRelevantProperties.AUTO_REPAIR_FREQUENCY_SECONDS;
-import static org.apache.cassandra.config.CassandraRelevantProperties.DISABLE_PAXOS_AUTO_REPAIRS;
-import static org.apache.cassandra.config.CassandraRelevantProperties.DISABLE_PAXOS_STATE_FLUSH;
 import static org.apache.cassandra.config.DatabaseDescriptor.paxosRepairEnabled;
 import static org.apache.cassandra.service.paxos.uncommitted.PaxosKeyState.mergeUncommitted;
 
@@ -72,8 +69,8 @@ public class PaxosUncommittedTracker
 
     private static volatile UpdateSupplier updateSupplier;
 
-    private volatile boolean autoRepairsEnabled = !DISABLE_PAXOS_AUTO_REPAIRS.getBoolean();
-    private volatile boolean stateFlushEnabled = !DISABLE_PAXOS_STATE_FLUSH.getBoolean();
+    private volatile boolean autoRepairsEnabled = !Boolean.getBoolean("cassandra.disable_paxos_auto_repairs");
+    private volatile boolean stateFlushEnabled = !Boolean.getBoolean("cassandra.disable_paxos_state_flush");
 
     private boolean started = false;
     private boolean autoRepairStarted = false;
@@ -330,7 +327,7 @@ public class PaxosUncommittedTracker
     {
         if (autoRepairStarted)
             return;
-        int seconds = AUTO_REPAIR_FREQUENCY_SECONDS.getInt();
+        int seconds = Integer.getInteger("cassandra.auto_repair_frequency_seconds", (int) TimeUnit.MINUTES.toSeconds(5));
         ScheduledExecutors.scheduledTasks.scheduleAtFixedRate(this::maintenance, seconds, seconds, TimeUnit.SECONDS);
         autoRepairStarted = true;
     }

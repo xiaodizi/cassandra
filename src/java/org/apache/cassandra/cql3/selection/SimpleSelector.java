@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 
 import com.google.common.base.Objects;
 
-import org.apache.cassandra.cql3.functions.masking.ColumnMask;
 import org.apache.cassandra.schema.ColumnMetadata;
 import org.apache.cassandra.schema.TableMetadata;
 import org.apache.cassandra.cql3.ColumnSpecification;
@@ -46,7 +45,7 @@ public final class SimpleSelector extends Selector
             ByteBuffer columnName = ByteBufferUtil.readWithVIntLength(in);
             ColumnMetadata column = metadata.getColumn(columnName);
             int idx = in.readInt();
-            return new SimpleSelector(column, idx, false);
+            return new SimpleSelector(column, idx);
         }
     };
 
@@ -56,14 +55,13 @@ public final class SimpleSelector extends Selector
     public static final class SimpleSelectorFactory extends Factory
     {
         private final int idx;
-        private final ColumnMetadata column;
-        private final boolean useForPostOrdering;
 
-        private SimpleSelectorFactory(int idx, ColumnMetadata def, boolean useForPostOrdering)
+        private final ColumnMetadata column;
+
+        private SimpleSelectorFactory(int idx, ColumnMetadata def)
         {
             this.idx = idx;
             this.column = def;
-            this.useForPostOrdering = useForPostOrdering;
         }
 
         @Override
@@ -86,7 +84,7 @@ public final class SimpleSelector extends Selector
         @Override
         public Selector newInstance(QueryOptions options)
         {
-            return new SimpleSelector(column, idx, useForPostOrdering);
+            return new SimpleSelector(column, idx);
         }
 
         @Override
@@ -119,13 +117,12 @@ public final class SimpleSelector extends Selector
 
     public final ColumnMetadata column;
     private final int idx;
-    private final boolean useForPostOrdering;
     private ByteBuffer current;
     private boolean isSet;
 
-    public static Factory newFactory(final ColumnMetadata def, final int idx, boolean useForPostOrdering)
+    public static Factory newFactory(final ColumnMetadata def, final int idx)
     {
-        return new SimpleSelectorFactory(idx, def, useForPostOrdering);
+        return new SimpleSelectorFactory(idx, def);
     }
 
     @Override
@@ -140,28 +137,7 @@ public final class SimpleSelector extends Selector
         if (!isSet)
         {
             isSet = true;
-<<<<<<< HEAD
-<<<<<<< HEAD
             current = input.getValue(idx);
-=======
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-            writetimes = input.getWritetimes(idx);
-            ttls = input.getTtls(idx);
-
-            /*
-            We apply the column mask of the column unless:
-            - The column doesn't have a mask
-            - This selector is for a query with ORDER BY post-ordering, indicated by this.useForPostOrdering
-            - The input row is for a user with UNMASK permission, indicated by input.unmask()
-             */
-            ColumnMask mask = useForPostOrdering || input.unmask() ? null : column.getMask();
-            ByteBuffer value = input.getValue(idx);
-            current = mask == null ? value : mask.mask(input.getProtocolVersion(), value);
-<<<<<<< HEAD
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
-=======
->>>>>>> b0aa44b27da97b37345ee6fafbee16d66f3b384f
         }
     }
 
@@ -190,12 +166,11 @@ public final class SimpleSelector extends Selector
         return column.name.toString();
     }
 
-    private SimpleSelector(ColumnMetadata column, int idx, boolean useForPostOrdering)
+    private SimpleSelector(ColumnMetadata column, int idx)
     {
         super(Kind.SIMPLE_SELECTOR);
         this.column = column;
         this.idx = idx;
-        this.useForPostOrdering = useForPostOrdering;
     }
 
     @Override
@@ -235,6 +210,6 @@ public final class SimpleSelector extends Selector
     protected void serialize(DataOutputPlus out, int version) throws IOException
     {
         ByteBufferUtil.writeWithVIntLength(column.name.bytes, out);
-        out.writeInt(idx);
+        out.writeInt(idx);;
     }
 }

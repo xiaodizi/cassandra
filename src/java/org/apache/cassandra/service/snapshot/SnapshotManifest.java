@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.cassandra.config.DurationSpec;
 import org.apache.cassandra.io.util.File;
-import org.apache.cassandra.utils.JsonUtils;
+import org.apache.cassandra.utils.FBUtilities;
 
 // Only serialize fields
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY,
@@ -78,12 +78,12 @@ public class SnapshotManifest
 
     public void serializeToJsonFile(File outputFile) throws IOException
     {
-        JsonUtils.serializeToJsonFile(this, outputFile);
+        FBUtilities.serializeToJsonFile(this, outputFile);
     }
 
     public static SnapshotManifest deserializeFromJsonFile(File file) throws IOException
     {
-        return JsonUtils.deserializeFromJsonFile(SnapshotManifest.class, file);
+        return FBUtilities.deserializeFromJsonFile(SnapshotManifest.class, file);
     }
 
     @Override

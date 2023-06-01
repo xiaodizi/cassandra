@@ -36,7 +36,6 @@ import org.apache.cassandra.net.Verb;
 import org.apache.cassandra.schema.TableId;
 import org.apache.cassandra.schema.TableMetadata;
 
-import static org.apache.cassandra.config.CassandraRelevantProperties.DIAGNOSTIC_SNAPSHOT_INTERVAL_NANOS;
 import static org.apache.cassandra.utils.Clock.Global.nanoTime;
 import static org.apache.cassandra.concurrent.ExecutorFactory.Global.executorFactory;
 
@@ -77,6 +76,11 @@ public class DiagnosticSnapshotService
         this.executor = executor;
     }
 
+    // Issue at most 1 snapshot request per minute for any given table.
+    // Replicas will only create one snapshot per day, but this stops us
+    // from swamping the network.
+    // Overridable via system property for testing.
+    private static final long SNAPSHOT_INTERVAL_NANOS = TimeUnit.MINUTES.toNanos(1);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.BASIC_ISO_DATE;
     private final ConcurrentHashMap<TableId, AtomicLong> lastSnapshotTimes = new ConcurrentHashMap<>();
 
@@ -118,7 +122,7 @@ public class DiagnosticSnapshotService
         long now = nanoTime();
         AtomicLong cached = lastSnapshotTimes.computeIfAbsent(metadata.id, u -> new AtomicLong(0));
         long last = cached.get();
-        long interval = DIAGNOSTIC_SNAPSHOT_INTERVAL_NANOS.getLong();
+        long interval = Long.getLong("cassandra.diagnostic_snapshot_interval_nanos", SNAPSHOT_INTERVAL_NANOS);
         if (now - last > interval && cached.compareAndSet(last, now))
         {
             Message<SnapshotCommand> msg = Message.out(Verb.SNAPSHOT_REQ,

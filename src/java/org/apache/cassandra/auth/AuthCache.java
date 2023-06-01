@@ -48,15 +48,17 @@ import org.apache.cassandra.utils.MBeanWrapper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.cassandra.concurrent.ExecutorFactory.Global.executorFactory;
-import static org.apache.cassandra.config.CassandraRelevantProperties.AUTH_CACHE_WARMING_MAX_RETRIES;
-import static org.apache.cassandra.config.CassandraRelevantProperties.AUTH_CACHE_WARMING_RETRY_INTERVAL_MS;
-import static org.apache.cassandra.config.CassandraRelevantProperties.DISABLE_AUTH_CACHES_REMOTE_CONFIGURATION;
 
 public class AuthCache<K, V> implements AuthCacheMBean, Shutdownable
 {
     private static final Logger logger = LoggerFactory.getLogger(AuthCache.class);
 
     public static final String MBEAN_NAME_BASE = "org.apache.cassandra.auth:type=";
+
+    // We expect default values on cache retries and interval to be sufficient for everyone but have this escape hatch
+    // just in case.
+    static final String CACHE_LOAD_RETRIES_PROPERTY = "cassandra.auth_cache.warming.max_retries";
+    static final String CACHE_LOAD_RETRY_INTERVAL_PROPERTY = "cassandra.auth_cache.warming.retry_interval_ms";
 
     private volatile ScheduledFuture cacheRefresher = null;
 
@@ -252,7 +254,7 @@ public class AuthCache<K, V> implements AuthCacheMBean, Shutdownable
      */
     public synchronized void setValidity(int validityPeriod)
     {
-        if (DISABLE_AUTH_CACHES_REMOTE_CONFIGURATION.getBoolean())
+        if (Boolean.getBoolean("cassandra.disable_auth_caches_remote_configuration"))
             throw new UnsupportedOperationException("Remote configuration of auth caches is disabled");
 
         setValidityDelegate.accept(validityPeriod);
@@ -270,7 +272,7 @@ public class AuthCache<K, V> implements AuthCacheMBean, Shutdownable
      */
     public synchronized void setUpdateInterval(int updateInterval)
     {
-        if (DISABLE_AUTH_CACHES_REMOTE_CONFIGURATION.getBoolean())
+        if (Boolean.getBoolean("cassandra.disable_auth_caches_remote_configuration"))
             throw new UnsupportedOperationException("Remote configuration of auth caches is disabled");
 
         setUpdateIntervalDelegate.accept(updateInterval);
@@ -288,7 +290,7 @@ public class AuthCache<K, V> implements AuthCacheMBean, Shutdownable
      */
     public synchronized void setMaxEntries(int maxEntries)
     {
-        if (DISABLE_AUTH_CACHES_REMOTE_CONFIGURATION.getBoolean())
+        if (Boolean.getBoolean("cassandra.disable_auth_caches_remote_configuration"))
             throw new UnsupportedOperationException("Remote configuration of auth caches is disabled");
 
         setMaxEntriesDelegate.accept(maxEntries);
@@ -307,7 +309,7 @@ public class AuthCache<K, V> implements AuthCacheMBean, Shutdownable
 
     public synchronized void setActiveUpdate(boolean update)
     {
-        if (DISABLE_AUTH_CACHES_REMOTE_CONFIGURATION.getBoolean())
+        if (Boolean.getBoolean("cassandra.disable_auth_caches_remote_configuration"))
             throw new UnsupportedOperationException("Remote configuration of auth caches is disabled");
 
         setActiveUpdate.accept(update);
@@ -407,8 +409,8 @@ public class AuthCache<K, V> implements AuthCacheMBean, Shutdownable
             return;
         }
 
-        int retries = AUTH_CACHE_WARMING_MAX_RETRIES.getInt(10);
-        long retryInterval = AUTH_CACHE_WARMING_RETRY_INTERVAL_MS.getLong(1000);
+        int retries = Integer.getInteger(CACHE_LOAD_RETRIES_PROPERTY, 10);
+        long retryInterval = Long.getLong(CACHE_LOAD_RETRY_INTERVAL_PROPERTY, 1000);
 
         while (retries-- > 0)
         {

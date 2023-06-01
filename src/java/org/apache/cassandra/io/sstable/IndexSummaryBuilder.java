@@ -25,20 +25,21 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.cassandra.config.Config;
 import org.apache.cassandra.db.DecoratedKey;
 import org.apache.cassandra.db.TypeSizes;
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.cassandra.io.util.Memory;
 import org.apache.cassandra.io.util.SafeMemoryWriter;
 
-import static org.apache.cassandra.config.CassandraRelevantProperties.INDEX_SUMMARY_EXPECTED_KEY_SIZE;
 import static org.apache.cassandra.io.sstable.Downsampling.BASE_SAMPLING_LEVEL;
 
 public class IndexSummaryBuilder implements AutoCloseable
 {
     private static final Logger logger = LoggerFactory.getLogger(IndexSummaryBuilder.class);
 
-    static long defaultExpectedKeySize = INDEX_SUMMARY_EXPECTED_KEY_SIZE.getLong();
+    static final String defaultExpectedKeySizeName = Config.PROPERTY_PREFIX + "index_summary_expected_key_size";
+    static long defaultExpectedKeySize = Long.valueOf(System.getProperty(defaultExpectedKeySizeName, "64"));
 
     // the offset in the keys memory region to look for a given summary boundary
     private final SafeMemoryWriter offsets;

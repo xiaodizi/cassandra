@@ -113,7 +113,7 @@ public class SSTableTxnWriter extends Transactional.AbstractTransactional implem
                                                     long repairedAt,
                                                     TimeUUID pendingRepair,
                                                     boolean isTransient,
-                                                    SSTableFormat<?, ?> type,
+                                                    SSTableFormat.Type type,
                                                     int sstableLevel,
                                                     SerializationHeader header)
     {
