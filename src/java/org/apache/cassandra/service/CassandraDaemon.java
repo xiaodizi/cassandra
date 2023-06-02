@@ -108,7 +108,7 @@ public class CassandraDaemon
 {
     public static final String MBEAN_NAME = "org.apache.cassandra.db:type=NativeAccess";
 
-    private static final Logger logger=LoggerFactory.getLogger(CassandraDaemon.class);
+    private static final Logger logger;
 
     @VisibleForTesting
     public static CassandraDaemon getInstanceForTesting()
@@ -117,26 +117,24 @@ public class CassandraDaemon
     }
 
     static {
-        try {
-            // Need to register metrics before instrumented appender is created(first access to LoggerFactory).
-            // 在创建插入指令的附加程序之前需要注册度量（首次访问LoggerFactory）。
-            SharedMetricRegistries.getOrCreate("logback-metrics").addListener(new MetricRegistryListener.Base() {
-                @Override
-                public void onMeterAdded(String metricName, Meter meter) {
-                    // Given metricName consists of appender name in logback.xml + "." + metric name.
-                    // We first separate appender name
-                    int separator = metricName.lastIndexOf('.');
-                    String appenderName = metricName.substring(0, separator);
-                    String metric = metricName.substring(separator + 1); // remove "."
-                    ObjectName name = DefaultNameFactory.createMetricName(appenderName, metric, null).getMBeanName();
-                    CassandraMetricsRegistry.Metrics.registerMBean(meter, name);
-                }
-            });
-            System.setProperty("logback.configurationFile", "./config/logback.xml");
-            //logger = LoggerFactory.getLogger(CassandraDaemon.class);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        // Need to register metrics before instrumented appender is created(first access to LoggerFactory).
+        // 在创建插入指令的附加程序之前需要注册度量（首次访问LoggerFactory）。
+        SharedMetricRegistries.getOrCreate("logback-metrics").addListener(new MetricRegistryListener.Base()
+        {
+            @Override
+            public void onMeterAdded(String metricName, Meter meter)
+            {
+                // Given metricName consists of appender name in logback.xml + "." + metric name.
+                // We first separate appender name
+                int separator = metricName.lastIndexOf('.');
+                String appenderName = metricName.substring(0, separator);
+                String metric = metricName.substring(separator + 1); // remove "."
+                ObjectName name = DefaultNameFactory.createMetricName(appenderName, metric, null).getMBeanName();
+                CassandraMetricsRegistry.Metrics.registerMBean(meter, name);
+            }
+        });
+        System.setProperty("logback.configurationFile","./config/logback.xml");
+        logger = LoggerFactory.getLogger(CassandraDaemon.class);
     }
 
     private void maybeInitJmx()
@@ -255,12 +253,7 @@ public class CassandraDaemon
 
         logSystemInfo();
 
-        try {
-
-            NativeLibrary.tryMlockall();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        //NativeLibrary.tryMlockall();
 
         CommitLog.instance.start();
 
