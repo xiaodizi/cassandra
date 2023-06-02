@@ -39,7 +39,7 @@ import static org.apache.cassandra.utils.NativeLibrary.OSType.LINUX;
 import static org.apache.cassandra.utils.NativeLibrary.OSType.MAC;
 import static org.apache.cassandra.utils.NativeLibrary.OSType.AIX;
 
-public class NativeLibrary
+public final class NativeLibrary
 {
     private static final Logger logger = LoggerFactory.getLogger(NativeLibrary.class);
     private static final boolean REQUIRE = !IGNORE_MISSING_NATIVE_FILE_HINTS.getBoolean();
