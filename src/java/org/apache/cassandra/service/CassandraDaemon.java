@@ -253,7 +253,12 @@ public class CassandraDaemon
 
         logSystemInfo();
 
-        NativeLibrary.tryMlockall();
+        try {
+
+            NativeLibrary.tryMlockall();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         CommitLog.instance.start();
 
