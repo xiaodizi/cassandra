@@ -127,7 +127,7 @@ public final class NativeLibrary
         }
     }
 
-    private NativeLibrary() {}
+    public NativeLibrary() {}
 
     /**
      * @return the detected OSType of the Operating System running the JVM using crude string matching
