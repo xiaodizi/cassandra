@@ -133,7 +133,7 @@ public class YamlConfigurationLoader implements ConfigurationLoader
                 throw new AssertionError(e);
             }
 
-            SafeConstructor constructor = new CustomClassLoaderConstructor(Yaml.class.getClassLoader(),new LoaderOptions());
+            SafeConstructor constructor = new CustomConstructor(Config.class, Yaml.class.getClassLoader());
             Map<Class<?>, Map<String, Replacement>> replacements = getNameReplacements(Config.class);
             verifyReplacements(replacements, configBytes);
             PropertiesChecker propertiesChecker = new PropertiesChecker(replacements);
