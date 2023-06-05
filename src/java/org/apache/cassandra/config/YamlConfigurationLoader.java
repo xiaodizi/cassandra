@@ -144,8 +144,9 @@ public class YamlConfigurationLoader implements ConfigurationLoader
             maybeAddSystemProperties(result);
             return result;
         }
-        catch (YAMLException e)
+        catch (Exception e)
         {
+            e.printStackTrace();
             throw new ConfigurationException("Invalid yaml: " + url, e);
         }
     }
