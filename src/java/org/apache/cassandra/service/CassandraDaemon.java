@@ -115,6 +115,8 @@ public class CassandraDaemon {
     }
 
     static {
+        System.setProperty("cassandra.config", "file://" + System.getProperty("opensearch.path.conf") + "/cassandra.yaml");
+        System.setProperty("cassandra.storagedir", "./");
         // Need to register metrics before instrumented appender is created(first access to LoggerFactory).
         // 在创建插入指令的附加程序之前需要注册度量（首次访问LoggerFactory）。
         SharedMetricRegistries.getOrCreate("logback-metrics").addListener(new MetricRegistryListener.Base() {
@@ -670,26 +672,25 @@ public class CassandraDaemon {
 
             start();
             logger.info("Startup complete");
-        } catch (Exception e) {
-//            boolean logStackTrace =
-//                    e instanceof ConfigurationException ? ((ConfigurationException) e).logStackTrace : true;
-//
-//            System.out.println("Exception (" + e.getClass().getName() + ") encountered during startup: " + e.getMessage());
-//
-//            if (logStackTrace) {
-//                if (runManaged)
-//                    logger.error("Exception encountered during startup", e);
-//                // try to warn user on stdout too, if we haven't already detached
-//                e.printStackTrace();
-//                exitOrFail(3, "Exception encountered during startup", e);
-//            } else {
-//                if (runManaged)
-//                    logger.error("Exception encountered during startup: {}", e.getMessage());
-//                // try to warn user on stdout too, if we haven't already detached
-//                System.err.println(e.getMessage());
-//                exitOrFail(3, "Exception encountered during startup: " + e.getMessage());
-//            }
-            e.printStackTrace();
+        } catch (Throwable e) {
+            boolean logStackTrace =
+                    e instanceof ConfigurationException ? ((ConfigurationException) e).logStackTrace : true;
+
+            System.out.println("Exception (" + e.getClass().getName() + ") encountered during startup: " + e.getMessage());
+
+            if (logStackTrace) {
+                if (runManaged)
+                    logger.error("Exception encountered during startup", e);
+                // try to warn user on stdout too, if we haven't already detached
+                e.printStackTrace();
+                exitOrFail(3, "Exception encountered during startup", e);
+            } else {
+                if (runManaged)
+                    logger.error("Exception encountered during startup: {}", e.getMessage());
+                // try to warn user on stdout too, if we haven't already detached
+                System.err.println(e.getMessage());
+                exitOrFail(3, "Exception encountered during startup: " + e.getMessage());
+            }
         }
     }
 
