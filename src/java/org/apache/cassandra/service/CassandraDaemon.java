@@ -115,8 +115,6 @@ public class CassandraDaemon {
     }
 
     static {
-        System.setProperty("cassandra.config", "file://" + System.getProperty("opensearch.path.conf") + "/cassandra.yaml");
-        System.setProperty("cassandra.storagedir", "./");
         // Need to register metrics before instrumented appender is created(first access to LoggerFactory).
         // 在创建插入指令的附加程序之前需要注册度量（首次访问LoggerFactory）。
         SharedMetricRegistries.getOrCreate("logback-metrics").addListener(new MetricRegistryListener.Base() {
