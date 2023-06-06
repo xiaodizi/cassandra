@@ -80,15 +80,13 @@ public final class NativeLibrary
 
     static
     {
-
+        FILE_DESCRIPTOR_FD_FIELD = FBUtilities.getProtectedField(FileDescriptor.class, "fd");
         try
         {
-            FILE_DESCRIPTOR_FD_FIELD = FBUtilities.getProtectedField(FileDescriptor.class, "fd");
             FILE_CHANNEL_FD_FIELD = FBUtilities.getProtectedField(Class.forName("sun.nio.ch.FileChannelImpl"), "fd");
         }
-        catch (Exception e)
+        catch (ClassNotFoundException e)
         {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
