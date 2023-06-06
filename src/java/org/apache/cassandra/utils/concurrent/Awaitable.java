@@ -186,9 +186,8 @@ public interface Awaitable
                     await.await();
                     break;
                 }
-                catch (Exception e)
+                catch (InterruptedException e)
                 {
-                    e.printStackTrace();
                     interrupted = true;
                 }
             }
