@@ -28,7 +28,7 @@ import org.apache.cassandra.io.util.FileInputStreamPlus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jna.LastErrorException;
+//import com.sun.jna.LastErrorException;
 
 import org.apache.cassandra.io.FSWriteError;
 
@@ -150,17 +150,18 @@ public final class NativeLibrary
 
     private static int errno(RuntimeException e)
     {
-        assert e instanceof LastErrorException;
-        try
-        {
-            return ((LastErrorException) e).getErrorCode();
-        }
-        catch (NoSuchMethodError x)
-        {
-            if (REQUIRE)
-                logger.warn("Obsolete version of JNA present; unable to read errno. Upgrade to JNA 3.2.7 or later");
-            return 0;
-        }
+//        assert e instanceof LastErrorException;
+//        try
+//        {
+//            return ((LastErrorException) e).getErrorCode();
+//        }
+//        catch (NoSuchMethodError x)
+//        {
+//            if (REQUIRE)
+//                logger.warn("Obsolete version of JNA present; unable to read errno. Upgrade to JNA 3.2.7 or later");
+//            return 0;
+//        }
+        return 1;
     }
 
     /**
@@ -191,20 +192,20 @@ public final class NativeLibrary
         }
         catch (RuntimeException e)
         {
-            if (!(e instanceof LastErrorException))
-                throw e;
-
-            if (errno(e) == ENOMEM && osType == LINUX)
-            {
-                logger.warn("Unable to lock JVM memory (ENOMEM)."
-                        + " This can result in part of the JVM being swapped out, especially with mmapped I/O enabled."
-                        + " Increase RLIMIT_MEMLOCK.");
-            }
-            else if (osType != MAC)
-            {
-                // OS X allows mlockall to be called, but always returns an error
-                logger.warn("Unknown mlockall error {}", errno(e));
-            }
+//            if (!(e instanceof LastErrorException))
+//                throw e;
+//
+//            if (errno(e) == ENOMEM && osType == LINUX)
+//            {
+//                logger.warn("Unable to lock JVM memory (ENOMEM)."
+//                        + " This can result in part of the JVM being swapped out, especially with mmapped I/O enabled."
+//                        + " Increase RLIMIT_MEMLOCK.");
+//            }
+//            else if (osType != MAC)
+//            {
+//                // OS X allows mlockall to be called, but always returns an error
+//                logger.warn("Unknown mlockall error {}", errno(e));
+//            }
         }
     }
 
@@ -265,8 +266,8 @@ public final class NativeLibrary
         }
         catch (RuntimeException e)
         {
-            if (!(e instanceof LastErrorException))
-                throw e;
+//            if (!(e instanceof LastErrorException))
+//                throw e;
 
             logger.warn("posix_fadvise({}, {}) failed, errno ({}).", fd, offset, errno(e));
         }
@@ -287,8 +288,8 @@ public final class NativeLibrary
         }
         catch (RuntimeException e)
         {
-            if (!(e instanceof LastErrorException))
-                throw e;
+//            if (!(e instanceof LastErrorException))
+//                throw e;
 
             if (REQUIRE)
                 logger.warn("fcntl({}, {}, {}) failed, errno ({}).", fd, command, flags, errno(e));
@@ -311,8 +312,8 @@ public final class NativeLibrary
         }
         catch (RuntimeException e)
         {
-            if (!(e instanceof LastErrorException))
-                throw e;
+//            if (!(e instanceof LastErrorException))
+//                throw e;
 
             if (REQUIRE)
                 logger.warn("open({}, O_RDONLY) failed, errno ({}).", path, errno(e));
@@ -336,8 +337,8 @@ public final class NativeLibrary
         }
         catch (RuntimeException e)
         {
-            if (!(e instanceof LastErrorException))
-                throw e;
+//            if (!(e instanceof LastErrorException))
+//                throw e;
 
             if (REQUIRE)
             {
@@ -363,8 +364,8 @@ public final class NativeLibrary
         }
         catch (RuntimeException e)
         {
-            if (!(e instanceof LastErrorException))
-                throw e;
+//            if (!(e instanceof LastErrorException))
+//                throw e;
 
             if (REQUIRE)
             {
