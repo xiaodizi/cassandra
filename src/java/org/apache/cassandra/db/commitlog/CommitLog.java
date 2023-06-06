@@ -126,7 +126,7 @@ public class CommitLog implements CommitLogMBean
     /**
      * Tries to start the CommitLog if not already started.
      */
-    synchronized public CommitLog start() throws Exception
+    synchronized public CommitLog start()
     {
         if (started)
             return this;
