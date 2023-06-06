@@ -181,32 +181,34 @@ public final class NativeLibrary
     {
         try
         {
+
             wrappedLibrary.callMlockall(MCL_CURRENT);
             jnaLockable = true;
             logger.info("JNA mlockall successful");
+        }catch (Exception e){
+            e.printStackTrace();
         }
         catch (UnsatisfiedLinkError e)
         {
             // this will have already been logged by CLibrary, no need to repeat it
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            if (!(e instanceof LastErrorException))
-                throw e;
-
-            if (errno(e) == ENOMEM && osType == LINUX)
-            {
-                logger.warn("Unable to lock JVM memory (ENOMEM)."
-                        + " This can result in part of the JVM being swapped out, especially with mmapped I/O enabled."
-                        + " Increase RLIMIT_MEMLOCK.");
-            }
-            else if (osType != MAC)
-            {
-                // OS X allows mlockall to be called, but always returns an error
-                logger.warn("Unknown mlockall error {}", errno(e));
-            }
-        }
+//        catch (RuntimeException e)
+//        {
+//            if (!(e instanceof LastErrorException))
+//                throw e;
+//
+//            if (errno(e) == ENOMEM && osType == LINUX)
+//            {
+//                logger.warn("Unable to lock JVM memory (ENOMEM)."
+//                        + " This can result in part of the JVM being swapped out, especially with mmapped I/O enabled."
+//                        + " Increase RLIMIT_MEMLOCK.");
+//            }
+//            else if (osType != MAC)
+//            {
+//                // OS X allows mlockall to be called, but always returns an error
+//                logger.warn("Unknown mlockall error {}", errno(e));
+//            }
+//        }
     }
 
     public static void trySkipCache(String path, long offset, long len)
