@@ -189,8 +189,9 @@ public final class NativeLibrary
         {
             // this will have already been logged by CLibrary, no need to repeat it
         }
-        catch (RuntimeException e)
+        catch (Exception e)
         {
+            e.printStackTrace();
             if (!(e instanceof LastErrorException))
                 throw e;
 
