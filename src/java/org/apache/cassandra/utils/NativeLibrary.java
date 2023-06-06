@@ -205,6 +205,8 @@ public final class NativeLibrary
                 // OS X allows mlockall to be called, but always returns an error
                 logger.warn("Unknown mlockall error {}", errno(e));
             }
+
+            e.printStackTrace();
         }
     }
 
