@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool.commands;
+package io.github.xiaodizi.fqltool.commands;
 
 import java.io.File;
 import java.nio.BufferUnderflowException;
@@ -42,10 +42,10 @@ import net.openhft.chronicle.threads.Pauser;
 import net.openhft.chronicle.wire.ReadMarshallable;
 import net.openhft.chronicle.wire.ValueIn;
 import net.openhft.chronicle.wire.WireIn;
-import org.apache.cassandra.fql.FullQueryLogger;
-import org.apache.cassandra.cql3.QueryOptions;
-import org.apache.cassandra.transport.ProtocolVersion;
-import org.apache.cassandra.utils.binlog.BinLog;
+import io.github.xiaodizi.fql.FullQueryLogger;
+import io.github.xiaodizi.cql3.QueryOptions;
+import io.github.xiaodizi.transport.ProtocolVersion;
+import io.github.xiaodizi.utils.binlog.BinLog;
 
 /**
  * Dump the contents of a list of paths containing full query logs

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.security;
+package io.github.xiaodizi.security;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,13 +37,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cassandra.config.EncryptionOptions;
-import org.apache.cassandra.io.util.File;
+import io.github.xiaodizi.config.EncryptionOptions;
+import io.github.xiaodizi.io.util.File;
 
-import static org.apache.cassandra.security.KubernetesSecretsSslContextFactory.ConfigKeys.KEYSTORE_PASSWORD_ENV_VAR;
-import static org.apache.cassandra.security.KubernetesSecretsSslContextFactory.ConfigKeys.KEYSTORE_UPDATED_TIMESTAMP_PATH;
-import static org.apache.cassandra.security.KubernetesSecretsSslContextFactory.ConfigKeys.TRUSTSTORE_PASSWORD_ENV_VAR;
-import static org.apache.cassandra.security.KubernetesSecretsSslContextFactory.ConfigKeys.TRUSTSTORE_UPDATED_TIMESTAMP_PATH;
+import static io.github.xiaodizi.security.KubernetesSecretsSslContextFactory.ConfigKeys.KEYSTORE_PASSWORD_ENV_VAR;
+import static io.github.xiaodizi.security.KubernetesSecretsSslContextFactory.ConfigKeys.KEYSTORE_UPDATED_TIMESTAMP_PATH;
+import static io.github.xiaodizi.security.KubernetesSecretsSslContextFactory.ConfigKeys.TRUSTSTORE_PASSWORD_ENV_VAR;
+import static io.github.xiaodizi.security.KubernetesSecretsSslContextFactory.ConfigKeys.TRUSTSTORE_UPDATED_TIMESTAMP_PATH;
 
 public class KubernetesSecretsSslContextFactoryTest
 {

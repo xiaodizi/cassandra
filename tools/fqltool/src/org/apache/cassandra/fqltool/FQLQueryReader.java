@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 
 import java.nio.ByteBuffer;
@@ -29,24 +29,24 @@ import net.openhft.chronicle.core.io.IORuntimeException;
 import net.openhft.chronicle.wire.ReadMarshallable;
 import net.openhft.chronicle.wire.ValueIn;
 import net.openhft.chronicle.wire.WireIn;
-import org.apache.cassandra.cql3.QueryOptions;
-import org.apache.cassandra.transport.ProtocolVersion;
+import io.github.xiaodizi.cql3.QueryOptions;
+import io.github.xiaodizi.transport.ProtocolVersion;
 
-import static org.apache.cassandra.fql.FullQueryLogger.CURRENT_VERSION;
-import static org.apache.cassandra.fql.FullQueryLogger.GENERATED_NOW_IN_SECONDS;
-import static org.apache.cassandra.fql.FullQueryLogger.GENERATED_TIMESTAMP;
-import static org.apache.cassandra.fql.FullQueryLogger.KEYSPACE;
-import static org.apache.cassandra.fql.FullQueryLogger.PROTOCOL_VERSION;
-import static org.apache.cassandra.fql.FullQueryLogger.QUERY_OPTIONS;
-import static org.apache.cassandra.fql.FullQueryLogger.QUERY_START_TIME;
-import static org.apache.cassandra.fql.FullQueryLogger.TYPE;
-import static org.apache.cassandra.fql.FullQueryLogger.VERSION;
-import static org.apache.cassandra.fql.FullQueryLogger.BATCH;
-import static org.apache.cassandra.fql.FullQueryLogger.BATCH_TYPE;
-import static org.apache.cassandra.fql.FullQueryLogger.QUERIES;
-import static org.apache.cassandra.fql.FullQueryLogger.QUERY;
-import static org.apache.cassandra.fql.FullQueryLogger.SINGLE_QUERY;
-import static org.apache.cassandra.fql.FullQueryLogger.VALUES;
+import static io.github.xiaodizi.fql.FullQueryLogger.CURRENT_VERSION;
+import static io.github.xiaodizi.fql.FullQueryLogger.GENERATED_NOW_IN_SECONDS;
+import static io.github.xiaodizi.fql.FullQueryLogger.GENERATED_TIMESTAMP;
+import static io.github.xiaodizi.fql.FullQueryLogger.KEYSPACE;
+import static io.github.xiaodizi.fql.FullQueryLogger.PROTOCOL_VERSION;
+import static io.github.xiaodizi.fql.FullQueryLogger.QUERY_OPTIONS;
+import static io.github.xiaodizi.fql.FullQueryLogger.QUERY_START_TIME;
+import static io.github.xiaodizi.fql.FullQueryLogger.TYPE;
+import static io.github.xiaodizi.fql.FullQueryLogger.VERSION;
+import static io.github.xiaodizi.fql.FullQueryLogger.BATCH;
+import static io.github.xiaodizi.fql.FullQueryLogger.BATCH_TYPE;
+import static io.github.xiaodizi.fql.FullQueryLogger.QUERIES;
+import static io.github.xiaodizi.fql.FullQueryLogger.QUERY;
+import static io.github.xiaodizi.fql.FullQueryLogger.SINGLE_QUERY;
+import static io.github.xiaodizi.fql.FullQueryLogger.VALUES;
 
 public class FQLQueryReader implements ReadMarshallable
 {

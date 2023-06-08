@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.security;
+package io.github.xiaodizi.security;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cassandra.config.EncryptionOptions;
+import io.github.xiaodizi.config.EncryptionOptions;
 
 /**
  * Custom {@link ISslContextFactory} implementation based on Kubernetes Secrets. It allows the keystore and

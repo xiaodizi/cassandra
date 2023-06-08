@@ -171,7 +171,7 @@
       <module name="" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.apache.cassandra.*" />
+          <option name="PATTERN" value="io.github.xiaodizi.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -219,7 +219,7 @@
     </configuration>
     <configuration default="false" name="Cassandra" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="org.apache.cassandra.service.CassandraDaemon" />
+      <option name="MAIN_CLASS_NAME" value="io.github.xiaodizi.service.CassandraDaemon" />
       <option name="VM_PARAMETERS" value="
                                           -Dcassandra-foreground=yes
                                           -Dcassandra.config=file://$PROJECT_DIR$/conf/cassandra.yaml

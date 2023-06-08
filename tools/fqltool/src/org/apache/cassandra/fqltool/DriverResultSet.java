@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -30,7 +30,7 @@ import com.google.common.collect.AbstractIterator;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import org.apache.cassandra.utils.ByteBufferUtil;
+import io.github.xiaodizi.utils.ByteBufferUtil;
 
 
 /**

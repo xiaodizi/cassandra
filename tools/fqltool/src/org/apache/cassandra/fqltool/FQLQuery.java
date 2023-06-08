@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -31,11 +31,11 @@ import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.SimpleStatement;
 import com.datastax.driver.core.Statement;
-import org.apache.cassandra.fql.FullQueryLogger;
-import org.apache.cassandra.cql3.QueryOptions;
-import org.apache.cassandra.service.ClientState;
-import org.apache.cassandra.service.QueryState;
-import org.apache.cassandra.utils.binlog.BinLog;
+import io.github.xiaodizi.fql.FullQueryLogger;
+import io.github.xiaodizi.cql3.QueryOptions;
+import io.github.xiaodizi.service.ClientState;
+import io.github.xiaodizi.service.QueryState;
+import io.github.xiaodizi.utils.binlog.BinLog;
 
 public abstract class FQLQuery implements Comparable<FQLQuery>
 {
@@ -250,7 +250,7 @@ public abstract class FQLQuery implements Comparable<FQLQuery>
                 queryStrings.add(q.query);
                 values.add(q.values);
             }
-            return new FullQueryLogger.Batch(org.apache.cassandra.cql3.statements.BatchStatement.Type.valueOf(batchType.name()), queryStrings, values, queryOptions, queryState, queryStartTime);
+            return new FullQueryLogger.Batch(io.github.xiaodizi.cql3.statements.BatchStatement.Type.valueOf(batchType.name()), queryStrings, values, queryOptions, queryState, queryStartTime);
         }
 
         public String toString()

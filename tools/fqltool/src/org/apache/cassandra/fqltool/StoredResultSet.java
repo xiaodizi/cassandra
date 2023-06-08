@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 
 import java.nio.ByteBuffer;
@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 import com.google.common.collect.AbstractIterator;
 
 import net.openhft.chronicle.queue.ExcerptTailer;
-import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.Pair;
+import io.github.xiaodizi.utils.ByteBufferUtil;
+import io.github.xiaodizi.utils.Pair;
 
 /**
  * represents a resultset defined by the format in ResultStore on disk

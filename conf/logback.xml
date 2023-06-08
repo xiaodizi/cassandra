@@ -112,7 +112,7 @@ appender reference in the root level section below.
   </appender>
 
   <!-- Audit Logging additivity to redirect audit logging events to audit/audit.log -->
-  <logger name="org.apache.cassandra.audit" additivity="false" level="INFO">
+  <logger name="io.github.xiaodizi.audit" additivity="false" level="INFO">
     <appender-ref ref="AUDIT"/>
   </logger>
 
@@ -129,5 +129,5 @@ appender reference in the root level section below.
     -->
   </root>
 
-  <logger name="org.apache.cassandra" level="DEBUG"/>
+  <logger name="io.github.xiaodizi" level="DEBUG"/>
 </configuration>

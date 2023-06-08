@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.net;
+package io.github.xiaodizi.net;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.IntConsumer;
 
-import org.apache.cassandra.utils.Pair;
+import io.github.xiaodizi.utils.Pair;
 
 public class BytesInFlightController
 {

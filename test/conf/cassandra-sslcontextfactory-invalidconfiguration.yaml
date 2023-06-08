@@ -32,7 +32,7 @@ commitlog_directory: build/test/cassandra/commitlog
 cdc_raw_directory: build/test/cassandra/cdc_raw
 cdc_enabled: false
 hints_directory: build/test/cassandra/hints
-partitioner: org.apache.cassandra.dht.ByteOrderedPartitioner
+partitioner: io.github.xiaodizi.dht.ByteOrderedPartitioner
 listen_address: 127.0.0.1
 storage_port: 7012
 ssl_storage_port: 17012
@@ -44,7 +44,7 @@ data_file_directories:
     - build/test/cassandra/data
 disk_access_mode: mmap
 seed_provider:
-    - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+    - class_name: io.github.xiaodizi.locator.SimpleSeedProvider
       parameters:
           - seeds: "127.0.0.1:7012"
 endpoint_snitch: org.apache.cassandra.locator.SimpleSnitch

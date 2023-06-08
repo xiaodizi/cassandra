@@ -66,7 +66,7 @@
       <property name="id" value="blockSystemClock"/>
       <property name="format" value="System\.(currentTimeMillis|nanoTime)"/>
       <property name="ignoreComments" value="true"/>
-      <property name="message" value="Avoid System for time, should use org.apache.cassandra.utils.Clock.Global or org.apache.cassandra.utils.Clock interface" />
+      <property name="message" value="Avoid System for time, should use io.github.xiaodizi.utils.Clock.Global or io.github.xiaodizi.utils.Clock interface" />
     </module>
 
     <module name="RegexpSinglelineJava">
@@ -74,7 +74,7 @@
       <property name="id" value="blockInstantNow"/>
       <property name="format" value="Instant\.now"/>
       <property name="ignoreComments" value="true"/>
-      <property name="message" value="Avoid Instant.now() for time, should use org.apache.cassandra.util.FBUtilities.now()" />
+      <property name="message" value="Avoid Instant.now() for time, should use io.github.xiaodizi.util.FBUtilities.now()" />
     </module>
 
     <module name="RegexpSinglelineJava">
@@ -82,7 +82,7 @@
       <property name="id" value="blockExecutors"/>
       <property name="format" value="newSingleThreadExecutor|newFixedThreadPool|newCachedThreadPool|newSingleThreadScheduledExecutor|newWorkStealingPool|newScheduledThreadPool|defaultThreadFactory"/>
       <property name="ignoreComments" value="true"/>
-      <property name="message" value="Avoid creating an executor directly, should use org.apache.cassandra.concurrent.ExecutorFactory.Global#executorFactory" />
+      <property name="message" value="Avoid creating an executor directly, should use io.github.xiaodizi.concurrent.ExecutorFactory.Global#executorFactory" />
     </module>
     <module name="RegexpSinglelineJava">
       <!-- block guavas directExecutor -->

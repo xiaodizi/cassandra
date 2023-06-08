@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 
 import java.io.File;
@@ -39,8 +39,8 @@ import net.openhft.chronicle.wire.ValueOut;
 import net.openhft.chronicle.wire.WireIn;
 import net.openhft.chronicle.wire.WireOut;
 import net.openhft.chronicle.wire.WriteMarshallable;
-import org.apache.cassandra.utils.Pair;
-import org.apache.cassandra.utils.binlog.BinLog;
+import io.github.xiaodizi.utils.Pair;
+import io.github.xiaodizi.utils.binlog.BinLog;
 
 /**
  * note that we store each row as a separate chronicle document to be able to

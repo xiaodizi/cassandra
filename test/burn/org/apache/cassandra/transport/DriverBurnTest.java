@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.transport;
+package io.github.xiaodizi.transport;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -33,19 +33,19 @@ import org.junit.Test;
 
 import com.datastax.driver.core.*;
 import io.netty.buffer.ByteBuf;
-import org.apache.cassandra.cql3.CQLTester;
-import org.apache.cassandra.service.NativeTransportService;
-import org.apache.cassandra.service.QueryState;
-import org.apache.cassandra.transport.messages.QueryMessage;
-import org.apache.cassandra.transport.messages.ResultMessage;
-import org.apache.cassandra.utils.AssertUtil;
+import io.github.xiaodizi.cql3.CQLTester;
+import io.github.xiaodizi.service.NativeTransportService;
+import io.github.xiaodizi.service.QueryState;
+import io.github.xiaodizi.transport.messages.QueryMessage;
+import io.github.xiaodizi.transport.messages.ResultMessage;
+import io.github.xiaodizi.utils.AssertUtil;
 
-import static org.apache.cassandra.config.EncryptionOptions.TlsEncryptionPolicy.UNENCRYPTED;
-import static org.apache.cassandra.transport.BurnTestUtil.SizeCaps;
-import static org.apache.cassandra.transport.BurnTestUtil.generateQueryMessage;
-import static org.apache.cassandra.transport.BurnTestUtil.generateQueryStatement;
-import static org.apache.cassandra.transport.BurnTestUtil.generateRows;
-import static org.apache.cassandra.utils.Clock.Global.nanoTime;
+import static io.github.xiaodizi.config.EncryptionOptions.TlsEncryptionPolicy.UNENCRYPTED;
+import static io.github.xiaodizi.transport.BurnTestUtil.SizeCaps;
+import static io.github.xiaodizi.transport.BurnTestUtil.generateQueryMessage;
+import static io.github.xiaodizi.transport.BurnTestUtil.generateQueryStatement;
+import static io.github.xiaodizi.transport.BurnTestUtil.generateRows;
+import static io.github.xiaodizi.utils.Clock.Global.nanoTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DriverBurnTest extends CQLTester

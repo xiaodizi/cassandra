@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 import java.util.List;
 
@@ -31,10 +31,10 @@ import io.airlift.airline.ParseCommandUnrecognizedException;
 import io.airlift.airline.ParseOptionConversionException;
 import io.airlift.airline.ParseOptionMissingException;
 import io.airlift.airline.ParseOptionMissingValueException;
-import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.fqltool.commands.Compare;
-import org.apache.cassandra.fqltool.commands.Dump;
-import org.apache.cassandra.fqltool.commands.Replay;
+import io.github.xiaodizi.config.DatabaseDescriptor;
+import io.github.xiaodizi.fqltool.commands.Compare;
+import io.github.xiaodizi.fqltool.commands.Dump;
+import io.github.xiaodizi.fqltool.commands.Replay;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 import static com.google.common.collect.Lists.newArrayList;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.security;
+package io.github.xiaodizi.security;
 
 import java.util.Map;
 import javax.net.ssl.KeyManagerFactory;

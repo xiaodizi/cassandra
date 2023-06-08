@@ -36,7 +36,7 @@ if [ -f "$CASSANDRA_CONF/cassandra-env.sh" ]; then
     . "$CASSANDRA_CONF/cassandra-env.sh"
 fi
 
-class="org.apache.cassandra.transport.Client"
+class="io.github.xiaodizi.transport.Client"
 cassandra_parms="-Dlogback.configurationFile=logback-tools.xml"
 "$JAVA" $JVM_OPTS $cassandra_parms  -cp "$CLASSPATH" "$class" $@
 

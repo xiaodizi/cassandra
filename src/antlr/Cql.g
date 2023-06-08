@@ -26,7 +26,7 @@ options {
 import Parser,Lexer;
 
 @header {
-    package org.apache.cassandra.cql3;
+    package io.github.xiaodizi.cql3;
 
     import java.util.Collections;
     import java.util.EnumSet;
@@ -36,18 +36,18 @@ import Parser,Lexer;
     import java.util.Map;
     import java.util.Set;
 
-    import org.apache.cassandra.auth.*;
-    import org.apache.cassandra.cql3.conditions.*;
-    import org.apache.cassandra.cql3.functions.*;
-    import org.apache.cassandra.cql3.restrictions.CustomIndexExpression;
-    import org.apache.cassandra.cql3.selection.*;
-    import org.apache.cassandra.cql3.statements.*;
-    import org.apache.cassandra.cql3.statements.schema.*;
-    import org.apache.cassandra.exceptions.ConfigurationException;
-    import org.apache.cassandra.exceptions.InvalidRequestException;
-    import org.apache.cassandra.exceptions.SyntaxException;
-    import org.apache.cassandra.schema.ColumnMetadata;
-    import org.apache.cassandra.utils.Pair;
+    import io.github.xiaodizi.auth.*;
+    import io.github.xiaodizi.cql3.conditions.*;
+    import io.github.xiaodizi.cql3.functions.*;
+    import io.github.xiaodizi.cql3.restrictions.CustomIndexExpression;
+    import io.github.xiaodizi.cql3.selection.*;
+    import io.github.xiaodizi.cql3.statements.*;
+    import io.github.xiaodizi.cql3.statements.schema.*;
+    import io.github.xiaodizi.exceptions.ConfigurationException;
+    import io.github.xiaodizi.exceptions.InvalidRequestException;
+    import io.github.xiaodizi.exceptions.SyntaxException;
+    import io.github.xiaodizi.schema.ColumnMetadata;
+    import io.github.xiaodizi.utils.Pair;
 }
 
 @members {
@@ -90,7 +90,7 @@ import Parser,Lexer;
 }
 
 @lexer::header {
-    package org.apache.cassandra.cql3;
+    package io.github.xiaodizi.cql3;
 }
 
 @lexer::members {

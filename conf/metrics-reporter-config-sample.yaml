@@ -31,11 +31,11 @@ console:
       color: "white"
       useQualifiedName: true
       patterns:
-        - "^org.apache.cassandra.metrics.Cache.+"
-        - "^org.apache.cassandra.metrics.ClientRequest.+" # includes ClientRequestMetrics
-        - "^org.apache.cassandra.metrics.CommitLog.+"
-        - "^org.apache.cassandra.metrics.Compaction.+"
-        - "^org.apache.cassandra.metrics.DroppedMessage.+"
-        - "^org.apache.cassandra.metrics.ReadRepair.+"
-        - "^org.apache.cassandra.metrics.Storage.+"
-        - "^org.apache.cassandra.metrics.ThreadPools.+"
+        - "^io.github.xiaodizi.metrics.Cache.+"
+        - "^io.github.xiaodizi.metrics.ClientRequest.+" # includes ClientRequestMetrics
+        - "^io.github.xiaodizi.metrics.CommitLog.+"
+        - "^io.github.xiaodizi.metrics.Compaction.+"
+        - "^io.github.xiaodizi.metrics.DroppedMessage.+"
+        - "^io.github.xiaodizi.metrics.ReadRepair.+"
+        - "^io.github.xiaodizi.metrics.Storage.+"
+        - "^io.github.xiaodizi.metrics.ThreadPools.+"

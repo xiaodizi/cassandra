@@ -103,14 +103,14 @@
     <!-- details of how and which Maven repository we publish to -->
     <property name="maven.version" value="3.0.3"/>
     <condition property="maven-repository-url"
-               value="https://repository.apache.org/service/local/staging/deploy/maven2">
+               value="https://s01.oss.sonatype.org/content/repositories/snapshots">
         <isset property="release"/>
     </condition>
-    <condition property="maven-repository-id" value="apache.releases.https">
+    <condition property="maven-repository-id" value="ossrh">
         <isset property="release"/>
     </condition>
-    <property name="maven-repository-url" value="https://repository.apache.org/content/repositories/snapshots"/>
-    <property name="maven-repository-id" value="apache.snapshots.https"/>
+    <property name="maven-repository-url" value="https://s01.oss.sonatype.org/content/repositories/snapshots"/>
+    <property name="maven-repository-id" value="ossrh"/>
 
     <property name="test.timeout" value="480000"/>
     <property name="test.memory.timeout" value="480000"/>
@@ -183,7 +183,7 @@
     <macrodef name="keepbrief">
         <sequential>
             <javac srcdir="test/anttasks" destdir="${test.classes}" includeantruntime="true"/>
-            <taskdef name="KeepBriefBrief" classname="org.apache.cassandra.anttasks.KeepBriefBrief"
+            <taskdef name="KeepBriefBrief" classname="io.github.xiaodizi.anttasks.KeepBriefBrief"
                      classpath="${test.classes}"/>
             <KeepBriefBrief property="cassandra.keepBriefBrief"/>
         </sequential>
@@ -494,7 +494,7 @@
     -->
     <target name="generate-jflex-java" description="Generate Java from jflex grammar">
         <taskdef classname="jflex.anttask.JFlexTask" classpathref="jflex.classpath" name="jflex"/>
-        <jflex file="${build.src.java}/org/apache/cassandra/index/sasi/analyzer/StandardTokenizerImpl.jflex"
+        <jflex file="${build.src.java}/io/github/xiaodizi/index/sasi/analyzer/StandardTokenizerImpl.jflex"
                destdir="${build.src.gen-java}/"/>
     </target>
 
@@ -536,7 +536,7 @@
             description="Define dependencies and dependency versions">
         <!-- The parent pom defines the versions of all dependencies -->
         <artifact:pom id="parent-pom"
-                      groupId="org.xiaodizi.cassandra"
+                      groupId="io.github.xiaodizi"
                       artifactId="cassandra-parent"
                       packaging="pom"
                       version="${version}"
@@ -652,7 +652,7 @@
 
                 <dependency groupId="org.apache.ant" artifactId="ant-junit" version="1.10.12" scope="test"/>
 
-                <dependency groupId="org.xiaodizi.cassandra" artifactId="cassandra-all" version="${version}"/>
+                <dependency groupId="io.github.xiaodizi" artifactId="cassandra-all" version="${version}"/>
                 <dependency groupId="io.dropwizard.metrics" artifactId="metrics-core" version="3.1.5"/>
                 <dependency groupId="io.dropwizard.metrics" artifactId="metrics-jvm" version="3.1.5"/>
                 <dependency groupId="io.dropwizard.metrics" artifactId="metrics-logback" version="3.1.5"/>
@@ -804,7 +804,7 @@
         <!-- each dependency set then defines the subset of the dependencies for that dependency set -->
         <artifact:pom id="build-deps-pom"
                       artifactId="cassandra-build-deps">
-            <parent groupId="org.xiaodizi.cassandra"
+            <parent groupId="io.github.xiaodizi"
                     artifactId="cassandra-parent"
                     version="${version}"
                     relativePath="${final.name}-parent.pom"/>
@@ -848,7 +848,7 @@
                       artifactId="cassandra-all"
                       url="https://cassandra.apache.org"
                       name="xiaodizi Cassandra">
-            <parent groupId="org.xiaodizi.cassandra"
+            <parent groupId="io.github.xiaodizi"
                     artifactId="cassandra-parent"
                     version="${version}"
                     relativePath="${final.name}-parent.pom"/>
@@ -965,7 +965,7 @@
 
     <target name="test-run" depends="jar"
             description="Run in test mode.  Not for production use!">
-        <java classname="org.apache.cassandra.service.CassandraDaemon" fork="true">
+        <java classname="io.github.xiaodizi.service.CassandraDaemon" fork="true">
             <classpath>
                 <path refid="cassandra.classpath.test"/>
                 <pathelement location="${test.conf}"/>

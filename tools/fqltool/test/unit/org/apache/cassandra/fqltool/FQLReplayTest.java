@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,20 +42,20 @@ import net.openhft.chronicle.queue.impl.single.SingleChronicleQueueBuilder;
 import net.openhft.chronicle.queue.ExcerptAppender;
 import net.openhft.chronicle.queue.ExcerptTailer;
 import net.openhft.chronicle.wire.WireOut;
-import org.apache.cassandra.fql.FullQueryLogger;
-import org.apache.cassandra.cql3.QueryOptions;
-import org.apache.cassandra.cql3.statements.BatchStatement;
-import org.apache.cassandra.fqltool.commands.Compare;
-import org.apache.cassandra.fqltool.commands.Replay;
-import org.apache.cassandra.service.ClientState;
-import org.apache.cassandra.service.QueryState;
-import org.apache.cassandra.tools.Util;
-import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.MergeIterator;
-import org.apache.cassandra.utils.Pair;
-import org.apache.cassandra.utils.binlog.BinLog;
+import io.github.xiaodizi.fql.FullQueryLogger;
+import io.github.xiaodizi.cql3.QueryOptions;
+import io.github.xiaodizi.cql3.statements.BatchStatement;
+import io.github.xiaodizi.fqltool.commands.Compare;
+import io.github.xiaodizi.fqltool.commands.Replay;
+import io.github.xiaodizi.service.ClientState;
+import io.github.xiaodizi.service.QueryState;
+import io.github.xiaodizi.tools.Util;
+import io.github.xiaodizi.utils.ByteBufferUtil;
+import io.github.xiaodizi.utils.MergeIterator;
+import io.github.xiaodizi.utils.Pair;
+import io.github.xiaodizi.utils.binlog.BinLog;
 
-import static org.apache.cassandra.fqltool.QueryReplayer.ParsedTargetHost.fromString;
+import static io.github.xiaodizi.fqltool.QueryReplayer.ParsedTargetHost.fromString;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

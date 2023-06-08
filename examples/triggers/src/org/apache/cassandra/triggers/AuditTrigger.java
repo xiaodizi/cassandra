@@ -15,21 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.cassandra.triggers;
+package io.github.xiaodizi.triggers;
 
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
-import org.apache.cassandra.schema.TableMetadata;
-import org.apache.cassandra.schema.Schema;
-import org.apache.cassandra.db.Mutation;
-import org.apache.cassandra.db.partitions.Partition;
-import org.apache.cassandra.db.partitions.PartitionUpdate;
-import org.apache.cassandra.io.util.FileUtils;
-import org.apache.cassandra.utils.FBUtilities;
-import org.apache.cassandra.utils.TimeUUID;
+import io.github.xiaodizi.schema.TableMetadata;
+import io.github.xiaodizi.schema.Schema;
+import io.github.xiaodizi.db.Mutation;
+import io.github.xiaodizi.db.partitions.Partition;
+import io.github.xiaodizi.db.partitions.PartitionUpdate;
+import io.github.xiaodizi.io.util.FileUtils;
+import io.github.xiaodizi.utils.FBUtilities;
+import io.github.xiaodizi.utils.TimeUUID;
 
 public class AuditTrigger implements ITrigger
 {

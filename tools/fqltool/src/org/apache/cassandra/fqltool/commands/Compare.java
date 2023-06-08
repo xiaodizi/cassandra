@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool.commands;
+package io.github.xiaodizi.fqltool.commands;
 
 
 import java.util.ArrayList;
@@ -34,9 +34,9 @@ import net.openhft.chronicle.core.io.Closeable;
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueueBuilder;
 import net.openhft.chronicle.queue.ExcerptTailer;
-import org.apache.cassandra.fqltool.FQLQueryIterator;
-import org.apache.cassandra.fqltool.ResultHandler;
-import org.apache.cassandra.fqltool.StoredResultSet;
+import io.github.xiaodizi.fqltool.FQLQueryIterator;
+import io.github.xiaodizi.fqltool.ResultHandler;
+import io.github.xiaodizi.fqltool.StoredResultSet;
 
 /**
  */

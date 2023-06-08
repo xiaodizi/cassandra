@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.net;
+package io.github.xiaodizi.net;
 
 import java.nio.BufferOverflowException;
 import java.util.Arrays;
@@ -33,38 +33,38 @@ import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.LongObjectHashMap;
 import com.carrotsearch.hppc.procedures.LongObjectProcedure;
-import org.apache.cassandra.net.Verifier.ExpiredMessageEvent.ExpirationType;
-import org.apache.cassandra.utils.concurrent.WaitQueue;
+import io.github.xiaodizi.net.Verifier.ExpiredMessageEvent.ExpirationType;
+import io.github.xiaodizi.utils.concurrent.WaitQueue;
 
 import static java.util.concurrent.TimeUnit.*;
-import static org.apache.cassandra.net.MessagingService.VERSION_40;
-import static org.apache.cassandra.net.MessagingService.current_version;
-import static org.apache.cassandra.net.ConnectionType.LARGE_MESSAGES;
-import static org.apache.cassandra.net.OutboundConnection.LargeMessageDelivery.DEFAULT_BUFFER_SIZE;
-import static org.apache.cassandra.net.OutboundConnections.LARGE_MESSAGE_THRESHOLD;
-import static org.apache.cassandra.net.Verifier.EventCategory.OTHER;
-import static org.apache.cassandra.net.Verifier.EventCategory.RECEIVE;
-import static org.apache.cassandra.net.Verifier.EventCategory.SEND;
-import static org.apache.cassandra.net.Verifier.EventType.ARRIVE;
-import static org.apache.cassandra.net.Verifier.EventType.CLOSED_BEFORE_ARRIVAL;
-import static org.apache.cassandra.net.Verifier.EventType.DESERIALIZE;
-import static org.apache.cassandra.net.Verifier.EventType.ENQUEUE;
-import static org.apache.cassandra.net.Verifier.EventType.FAILED_CLOSING;
-import static org.apache.cassandra.net.Verifier.EventType.FAILED_DESERIALIZE;
-import static org.apache.cassandra.net.Verifier.EventType.FAILED_EXPIRED_ON_SEND;
-import static org.apache.cassandra.net.Verifier.EventType.FAILED_EXPIRED_ON_RECEIVE;
-import static org.apache.cassandra.net.Verifier.EventType.FAILED_FRAME;
-import static org.apache.cassandra.net.Verifier.EventType.FAILED_OVERLOADED;
-import static org.apache.cassandra.net.Verifier.EventType.FAILED_SERIALIZE;
-import static org.apache.cassandra.net.Verifier.EventType.FINISH_SERIALIZE_LARGE;
-import static org.apache.cassandra.net.Verifier.EventType.PROCESS;
-import static org.apache.cassandra.net.Verifier.EventType.SEND_FRAME;
-import static org.apache.cassandra.net.Verifier.EventType.SENT_FRAME;
-import static org.apache.cassandra.net.Verifier.EventType.SERIALIZE;
-import static org.apache.cassandra.net.Verifier.ExpiredMessageEvent.ExpirationType.ON_SENT;
-import static org.apache.cassandra.utils.Clock.Global.nanoTime;
-import static org.apache.cassandra.utils.MonotonicClock.Global.approxTime;
-import static org.apache.cassandra.utils.concurrent.WaitQueue.newWaitQueue;
+import static io.github.xiaodizi.net.MessagingService.VERSION_40;
+import static io.github.xiaodizi.net.MessagingService.current_version;
+import static io.github.xiaodizi.net.ConnectionType.LARGE_MESSAGES;
+import static io.github.xiaodizi.net.OutboundConnection.LargeMessageDelivery.DEFAULT_BUFFER_SIZE;
+import static io.github.xiaodizi.net.OutboundConnections.LARGE_MESSAGE_THRESHOLD;
+import static io.github.xiaodizi.net.Verifier.EventCategory.OTHER;
+import static io.github.xiaodizi.net.Verifier.EventCategory.RECEIVE;
+import static io.github.xiaodizi.net.Verifier.EventCategory.SEND;
+import static io.github.xiaodizi.net.Verifier.EventType.ARRIVE;
+import static io.github.xiaodizi.net.Verifier.EventType.CLOSED_BEFORE_ARRIVAL;
+import static io.github.xiaodizi.net.Verifier.EventType.DESERIALIZE;
+import static io.github.xiaodizi.net.Verifier.EventType.ENQUEUE;
+import static io.github.xiaodizi.net.Verifier.EventType.FAILED_CLOSING;
+import static io.github.xiaodizi.net.Verifier.EventType.FAILED_DESERIALIZE;
+import static io.github.xiaodizi.net.Verifier.EventType.FAILED_EXPIRED_ON_SEND;
+import static io.github.xiaodizi.net.Verifier.EventType.FAILED_EXPIRED_ON_RECEIVE;
+import static io.github.xiaodizi.net.Verifier.EventType.FAILED_FRAME;
+import static io.github.xiaodizi.net.Verifier.EventType.FAILED_OVERLOADED;
+import static io.github.xiaodizi.net.Verifier.EventType.FAILED_SERIALIZE;
+import static io.github.xiaodizi.net.Verifier.EventType.FINISH_SERIALIZE_LARGE;
+import static io.github.xiaodizi.net.Verifier.EventType.PROCESS;
+import static io.github.xiaodizi.net.Verifier.EventType.SEND_FRAME;
+import static io.github.xiaodizi.net.Verifier.EventType.SENT_FRAME;
+import static io.github.xiaodizi.net.Verifier.EventType.SERIALIZE;
+import static io.github.xiaodizi.net.Verifier.ExpiredMessageEvent.ExpirationType.ON_SENT;
+import static io.github.xiaodizi.utils.Clock.Global.nanoTime;
+import static io.github.xiaodizi.utils.MonotonicClock.Global.approxTime;
+import static io.github.xiaodizi.utils.concurrent.WaitQueue.newWaitQueue;
 
 /**
  * This class is a single-threaded verifier monitoring a single link, with events supplied by inbound and outbound threads

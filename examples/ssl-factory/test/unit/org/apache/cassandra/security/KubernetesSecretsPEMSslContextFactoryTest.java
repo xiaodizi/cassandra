@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.security;
+package io.github.xiaodizi.security;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,12 +38,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.cassandra.security.KubernetesSecretsPEMSslContextFactory.DEFAULT_PRIVATE_KEY_ENV_VAR_NAME;
-import static org.apache.cassandra.security.KubernetesSecretsPEMSslContextFactory.DEFAULT_PRIVATE_KEY_PASSWORD_ENV_VAR_NAME;
-import static org.apache.cassandra.security.KubernetesSecretsPEMSslContextFactory.PEMConfigKey.PRIVATE_KEY_PASSWORD_ENV_VAR;
-import static org.apache.cassandra.security.KubernetesSecretsPEMSslContextFactory.PEMConfigKey.TRUSTED_CERTIFICATE_ENV_VAR;
-import static org.apache.cassandra.security.KubernetesSecretsSslContextFactory.ConfigKeys.KEYSTORE_UPDATED_TIMESTAMP_PATH;
-import static org.apache.cassandra.security.KubernetesSecretsSslContextFactory.ConfigKeys.TRUSTSTORE_UPDATED_TIMESTAMP_PATH;
+import static io.github.xiaodizi.security.KubernetesSecretsPEMSslContextFactory.DEFAULT_PRIVATE_KEY_ENV_VAR_NAME;
+import static io.github.xiaodizi.security.KubernetesSecretsPEMSslContextFactory.DEFAULT_PRIVATE_KEY_PASSWORD_ENV_VAR_NAME;
+import static io.github.xiaodizi.security.KubernetesSecretsPEMSslContextFactory.PEMConfigKey.PRIVATE_KEY_PASSWORD_ENV_VAR;
+import static io.github.xiaodizi.security.KubernetesSecretsPEMSslContextFactory.PEMConfigKey.TRUSTED_CERTIFICATE_ENV_VAR;
+import static io.github.xiaodizi.security.KubernetesSecretsSslContextFactory.ConfigKeys.KEYSTORE_UPDATED_TIMESTAMP_PATH;
+import static io.github.xiaodizi.security.KubernetesSecretsSslContextFactory.ConfigKeys.TRUSTSTORE_UPDATED_TIMESTAMP_PATH;
 
 public class KubernetesSecretsPEMSslContextFactoryTest
 {

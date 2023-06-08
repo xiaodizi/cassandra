@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.cassandra.utils.memory;
+package io.github.xiaodizi.utils.memory;
 
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
@@ -34,12 +34,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cassandra.concurrent.NamedThreadFactory;
-import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.io.compress.BufferType;
-import org.apache.cassandra.utils.DynamicList;
+import io.github.xiaodizi.concurrent.NamedThreadFactory;
+import io.github.xiaodizi.config.DatabaseDescriptor;
+import io.github.xiaodizi.io.compress.BufferType;
+import io.github.xiaodizi.utils.DynamicList;
 
-import static org.apache.cassandra.utils.Clock.Global.nanoTime;
+import static io.github.xiaodizi.utils.Clock.Global.nanoTime;
 import static org.junit.Assert.*;
 
 /**

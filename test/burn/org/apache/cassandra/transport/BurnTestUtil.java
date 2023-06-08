@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.transport;
+package io.github.xiaodizi.transport;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -25,19 +25,19 @@ import java.util.Random;
 import java.util.function.Function;
 
 import com.datastax.driver.core.SimpleStatement;
-import org.apache.cassandra.cql3.ColumnIdentifier;
-import org.apache.cassandra.cql3.ColumnSpecification;
-import org.apache.cassandra.cql3.QueryOptions;
-import org.apache.cassandra.cql3.ResultSet;
-import org.apache.cassandra.db.ConsistencyLevel;
-import org.apache.cassandra.db.marshal.BytesType;
-import org.apache.cassandra.net.AbstractMessageHandler;
-import org.apache.cassandra.net.ResourceLimits;
-import org.apache.cassandra.transport.messages.QueryMessage;
-import org.apache.cassandra.transport.messages.ResultMessage;
-import org.apache.cassandra.utils.concurrent.NonBlockingRateLimiter;
+import io.github.xiaodizi.cql3.ColumnIdentifier;
+import io.github.xiaodizi.cql3.ColumnSpecification;
+import io.github.xiaodizi.cql3.QueryOptions;
+import io.github.xiaodizi.cql3.ResultSet;
+import io.github.xiaodizi.db.ConsistencyLevel;
+import io.github.xiaodizi.db.marshal.BytesType;
+import io.github.xiaodizi.net.AbstractMessageHandler;
+import io.github.xiaodizi.net.ResourceLimits;
+import io.github.xiaodizi.transport.messages.QueryMessage;
+import io.github.xiaodizi.transport.messages.ResultMessage;
+import io.github.xiaodizi.utils.concurrent.NonBlockingRateLimiter;
 
-import static org.apache.cassandra.utils.concurrent.NonBlockingRateLimiter.NO_OP_LIMITER;
+import static io.github.xiaodizi.utils.concurrent.NonBlockingRateLimiter.NO_OP_LIMITER;
 
 public class BurnTestUtil
 {

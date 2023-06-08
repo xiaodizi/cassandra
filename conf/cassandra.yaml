@@ -272,7 +272,7 @@ credentials_validity: 2000ms
 # OrderPreservingPartitioner have been included for backward compatibility only.
 # For new clusters, you should NOT change this value.
 #
-partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+partitioner: io.github.xiaodizi.dht.Murmur3Partitioner
 
 # Directories where Cassandra should store data on disk. If multiple
 # directories are specified, Cassandra will spread data evenly across
@@ -546,7 +546,7 @@ seed_provider:
   # Cassandra nodes use this list of hosts to find each other and learn
   # the topology of the ring.  You must change this if you are running
   # multiple nodes!
-  - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+  - class_name: io.github.xiaodizi.locator.SimpleSeedProvider
     parameters:
       # seeds is actually a comma-delimited list of addresses.
       # Ex: "<ip1>,<ip2>,<ip3>"
@@ -1442,7 +1442,7 @@ transparent_data_encryption_options:
   # CBC IV length for AES needs to be 16 bytes (which is also the default size)
   # iv_length: 16
   key_provider:
-    - class_name: org.apache.cassandra.security.JKSKeyProvider
+    - class_name: io.github.xiaodizi.security.JKSKeyProvider
       parameters:
         - keystore: conf/.keystore
           keystore_password: cassandra

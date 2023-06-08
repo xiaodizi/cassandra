@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.net;
+package io.github.xiaodizi.net;
 
 final class MessageGenerators
 {

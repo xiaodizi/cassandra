@@ -22,7 +22,7 @@
   <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
 
   <!-- Status listener is used to wrap stdout/stderr and tee to log file -->
-  <statusListener class="org.apache.cassandra.LogbackStatusListener" />
+  <statusListener class="io.github.xiaodizi.LogbackStatusListener" />
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
@@ -43,7 +43,7 @@
     <immediateFlush>false</immediateFlush>
   </appender>
 
-  <appender name="STDOUT" target="System.out" class="org.apache.cassandra.ConsoleAppender">
+  <appender name="STDOUT" target="System.out" class="io.github.xiaodizi.ConsoleAppender">
     <encoder>
       <pattern>%-5level [%thread] %date{ISO8601} %F:%L - %msg%n</pattern>
     </encoder>
@@ -52,14 +52,14 @@
     </filter>
   </appender>
 
-  <appender name="TEE" class="org.apache.cassandra.TeeingAppender">
+  <appender name="TEE" class="io.github.xiaodizi.TeeingAppender">
       <appender-ref ref="FILE"/>
       <appender-ref ref="STDOUT"/>
   </appender>
 
   <logger name="org.apache.hadoop" level="WARN"/>
 
-  <logger name="org.apache.cassandra.db.monitoring" level="DEBUG"/>
+  <logger name="io.github.xiaodizi.db.monitoring" level="DEBUG"/>
 
   <!-- Do not change the name of this appender. LogbackStatusListener uses the thread name
        tied to the appender name to know when to write to real stdout/stderr vs forwarding to logback -->

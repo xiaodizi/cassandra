@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool.commands;
+package io.github.xiaodizi.fqltool.commands;
 
 
 import java.io.File;
@@ -35,11 +35,11 @@ import io.airlift.airline.Option;
 import net.openhft.chronicle.core.io.Closeable;
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueueBuilder;
-import org.apache.cassandra.fqltool.FQLQuery;
-import org.apache.cassandra.fqltool.FQLQueryIterator;
-import org.apache.cassandra.fqltool.QueryReplayer;
-import org.apache.cassandra.utils.AbstractIterator;
-import org.apache.cassandra.utils.MergeIterator;
+import io.github.xiaodizi.fqltool.FQLQuery;
+import io.github.xiaodizi.fqltool.FQLQueryIterator;
+import io.github.xiaodizi.fqltool.QueryReplayer;
+import io.github.xiaodizi.utils.AbstractIterator;
+import io.github.xiaodizi.utils.MergeIterator;
 
 /**
  * replay the contents of a list of paths containing full query logs

@@ -22,7 +22,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.apache.cassandra</groupId>
+    <groupId>io.github.xiaodizi</groupId>
     <artifactId>cassandra-dtest-shaded</artifactId>
     <version>4.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -45,7 +45,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.apache.cassandra</groupId>
+            <groupId>io.github.xiaodizi</groupId>
             <artifactId>cassandra-dtest-local</artifactId>
             <version>${dtest-local.version}</version>
         </dependency>
@@ -74,7 +74,7 @@
 
                     <artifactSet>
                         <includes>
-                            <include>org.apache.cassandra:cassandra-dtest-local</include>
+                            <include>io.github.xiaodizi:cassandra-dtest-local</include>
                         </includes>
                     </artifactSet>
 

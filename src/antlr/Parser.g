@@ -1341,7 +1341,7 @@ userPassword[RoleOptions opts]
 /**
  * DESCRIBE statement(s)
  *
- * Must be in sync with the javadoc for org.apache.cassandra.cql3.statements.DescribeStatement and the
+ * Must be in sync with the javadoc for io.github.xiaodizi.cql3.statements.DescribeStatement and the
  * cqlsh syntax definition in for cqlsh_describe_cmd_syntax_rules pylib/cqlshlib/cqlshhandling.py.
  */
 describeStatement returns [DescribeStatement stmt]

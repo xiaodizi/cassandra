@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool.commands;
+package io.github.xiaodizi.fqltool.commands;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -28,10 +28,10 @@ import org.junit.Test;
 
 import net.openhft.chronicle.wire.ValueIn;
 import net.openhft.chronicle.wire.WireIn;
-import org.apache.cassandra.cql3.QueryOptions;
-import org.apache.cassandra.db.ConsistencyLevel;
-import org.apache.cassandra.fql.FullQueryLogger;
-import org.apache.cassandra.transport.ProtocolVersion;
+import io.github.xiaodizi.cql3.QueryOptions;
+import io.github.xiaodizi.db.ConsistencyLevel;
+import io.github.xiaodizi.fql.FullQueryLogger;
+import io.github.xiaodizi.transport.ProtocolVersion;
 import org.mockito.Mockito;
 
 public class DumpTest

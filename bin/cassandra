@@ -217,7 +217,7 @@ launch_service()
 args=`getopt vRfhp:bD:H:E: "$@"`
 eval set -- "$args"
 
-classname="org.apache.cassandra.service.CassandraDaemon"
+classname="io.github.xiaodizi.service.CassandraDaemon"
 
 while true; do
     case "$1" in
@@ -234,7 +234,7 @@ while true; do
             exit 0
         ;;
         -v)
-            "$JAVA" -cp "$CLASSPATH" "-Dlogback.configurationFile=logback-tools.xml" org.apache.cassandra.tools.GetVersion
+            "$JAVA" -cp "$CLASSPATH" "-Dlogback.configurationFile=logback-tools.xml" io.github.xiaodizi.tools.GetVersion
             exit 0
         ;;
         -R)

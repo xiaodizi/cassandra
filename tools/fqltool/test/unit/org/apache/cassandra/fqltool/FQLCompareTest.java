@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,9 +34,9 @@ import org.junit.Test;
 import net.openhft.chronicle.core.io.Closeable;
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueueBuilder;
-import org.apache.cassandra.cql3.QueryOptions;
-import org.apache.cassandra.fqltool.commands.Compare;
-import org.apache.cassandra.tools.Util;
+import io.github.xiaodizi.cql3.QueryOptions;
+import io.github.xiaodizi.fqltool.commands.Compare;
+import io.github.xiaodizi.tools.Util;
 
 
 import static org.psjava.util.AssertStatus.assertTrue;

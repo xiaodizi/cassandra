@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 import java.util.PriorityQueue;
 
 import net.openhft.chronicle.queue.ExcerptTailer;
-import org.apache.cassandra.utils.AbstractIterator;
+import io.github.xiaodizi.utils.AbstractIterator;
 
 public class FQLQueryIterator extends AbstractIterator<FQLQuery>
 {

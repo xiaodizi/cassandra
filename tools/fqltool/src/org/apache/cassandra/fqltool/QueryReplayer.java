@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.cassandra.fqltool;
+package io.github.xiaodizi.fqltool;
 
 import java.io.Closeable;
 import java.io.File;
@@ -44,9 +44,9 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
-import org.apache.cassandra.utils.FBUtilities;
+import io.github.xiaodizi.utils.FBUtilities;
 
-import static org.apache.cassandra.concurrent.ExecutorFactory.Global.executorFactory;
+import static io.github.xiaodizi.concurrent.ExecutorFactory.Global.executorFactory;
 
 public class QueryReplayer implements Closeable
 {
