@@ -49,9 +49,9 @@ default_env_vars: &default_env_vars
 
     # Comma-separated list of tests that should be included in the repeated run for regular unit tests,
     # in addition to automatically detected new and modified tests. For example:
-    # REPEATED_UTESTS: org.apache.cassandra.cql3.ViewTest
-    # REPEATED_UTESTS: org.apache.cassandra.cql3.ViewTest#testCountersTable
-    # REPEATED_UTESTS: org.apache.cassandra.cql3.ViewTest,org.apache.cassandra.cql3.functions.TimeFctsTest
+    # REPEATED_UTESTS: io.github.xiaodizicql3.ViewTest
+    # REPEATED_UTESTS: io.github.xiaodizi.cql3.ViewTest#testCountersTable
+    # REPEATED_UTESTS: io.github.xiaodizi.cql3.ViewTest,io.github.xiaodizi.cql3.functions.TimeFctsTest
     REPEATED_UTESTS:
     # The number of times that new, modified or manually specified unit tests should be run.
     REPEATED_UTESTS_COUNT: 500
@@ -140,8 +140,8 @@ default_env_vars: &default_env_vars
     # REPEATED_ANT_TEST_TARGET: test-system-keyspace-directory
     REPEATED_ANT_TEST_TARGET: testsome
     # The name of JUnit class to be run multiple times, for example:
-    # REPEATED_ANT_TEST_CLASS: org.apache.cassandra.cql3.ViewTest
-    # REPEATED_ANT_TEST_CLASS: org.apache.cassandra.distributed.test.PagingTest
+    # REPEATED_ANT_TEST_CLASS: io.github.xiaodizi.cql3.ViewTest
+    # REPEATED_ANT_TEST_CLASS: io.github.xiaodizi.distributed.test.PagingTest
     REPEATED_ANT_TEST_CLASS:
     # The optional specific methods within REPEATED_ANT_TEST_CLASS to be run, for example:
     # REPEATED_ANT_TEST_METHODS: testCompoundPartitionKey

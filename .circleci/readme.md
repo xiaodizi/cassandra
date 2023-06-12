@@ -95,23 +95,23 @@ In addition to the automatically detected tests, it's also possible to provide l
 specific tests to be repeated:
 ```
 generate.sh -p \
-  -e REPEATED_UTESTS=org.apache.cassandra.cql3.ViewTest,org.apache.cassandra.db.CellTest \
-  -e REPEATED_UTESTS_FQLTOOL=org.apache.cassandra.fqltool.FQLCompareTest \
-  -e REPEATED_UTESTS_LONG=org.apache.cassandra.io.sstable.CQLSSTableWriterLongTest#testWideRow \
-  -e REPEATED_UTESTS_STRESS=org.apache.cassandra.stress.generate.DistributionGaussianTest \
-  -e REPEATED_SIMULATOR_DTESTS=org.apache.cassandra.simulator.test.TrivialSimulationTest \
+  -e REPEATED_UTESTS=io.github.xiaodizi.cql3.ViewTest,org.apache.cassandra.db.CellTest \
+  -e REPEATED_UTESTS_FQLTOOL=io.github.xiaodizifqltool.FQLCompareTest \
+  -e REPEATED_UTESTS_LONG=io.github.xiaodizi.io.sstable.CQLSSTableWriterLongTest#testWideRow \
+  -e REPEATED_UTESTS_STRESS=io.github.xiaodizi.stress.generate.DistributionGaussianTest \
+  -e REPEATED_SIMULATOR_DTESTS=io.github.xiaodizi.simulator.test.TrivialSimulationTest \
   -e REPEATED_DTESTS=cql_test.py,consistency_test.py::TestAvailability::test_simple_strategy \
   -e REPEATED_LARGE_DTESTS=replace_address_test.py::TestReplaceAddress::test_replace_stopped_node \
-  -e REPEATED_JVM_DTESTS=org.apache.cassandra.distributed.test.PagingTest#testPaging \
+  -e REPEATED_JVM_DTESTS=io.github.xiaodizi.distributed.test.PagingTest#testPaging \
   -e REPEATED_UPGRADE_DTESTS=upgrade_tests/cql_tests.py \
-  -e REPEATED_JVM_UPGRADE_DTESTS=org.apache.cassandra.distributed.upgrade.GroupByTest
+  -e REPEATED_JVM_UPGRADE_DTESTS=io.github.xiaodizi.distributed.upgrade.GroupByTest
 ```
 For particular Ant test targets that are not included in the regular test suites, you can
 use the `run_repeated_utest` job:
 ```
 generate.sh -p \
   -e REPEATED_ANT_TEST_TARGET=test-cdc \
-  -e REPEATED_ANT_TEST_CLASS=org.apache.cassandra.cql3.ViewTest \
+  -e REPEATED_ANT_TEST_CLASS=io.github.xiaodizi.cql3.ViewTest \
   -e REPEATED_ANT_TEST_METHODS=testCompoundPartitionKey,testStaticTable \
   -e REPEATED_ANT_TEST_VNODES=false \
   -e REPEATED_ANT_TEST_COUNT=500
@@ -120,7 +120,7 @@ Putting all together, you can have runs as complex as:
 ```
 generate.sh -p \
   -e REPEATED_TESTS_STOP_ON_FAILURE=true \
-  -e REPEATED_UTESTS=org.apache.cassandra.cql3.ViewTest,org.apache.cassandra.db.CellTest \
+  -e REPEATED_UTESTS=io.github.xiaodizi.cql3.ViewTest,org.apache.cassandra.db.CellTest \
   -e REPEATED_UTESTS_COUNT=500 \
   -e REPEATED_UTESTS_FQLTOOL=org.apache.cassandra.fqltool.FQLCompareTest \
   -e REPEATED_UTESTS_FQLTOOL_COUNT=500 \
@@ -141,7 +141,7 @@ generate.sh -p \
   -e REPEATED_JVM_UPGRADE_DTESTS=org.apache.cassandra.distributed.upgrade.GroupByTest \
   -e REPEATED_JVM_UPGRADE_DTESTS_COUNT=500 \
   -e REPEATED_ANT_TEST_TARGET=test-cdc \
-  -e REPEATED_ANT_TEST_CLASS=org.apache.cassandra.cql3.ViewTest \
+  -e REPEATED_ANT_TEST_CLASS=io.github.xiaodizi.cql3.ViewTest \
   -e REPEATED_ANT_TEST_METHODS=testCompoundPartitionKey,testStaticTable \
   -e REPEATED_ANT_TEST_VNODES=false \
   -e REPEATED_ANT_TEST_COUNT=500
