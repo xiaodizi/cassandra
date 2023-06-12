@@ -138,6 +138,7 @@ public interface Index
 {
     /**
      * Supported loads. An index could be badly initialized and support only reads i.e.
+     * 支持的负载。索引可能初始化不正确，只支持读取，即。
      */
     public enum LoadType
     {
@@ -156,11 +157,13 @@ public interface Index
 
     /*
      * Helpers for building indexes from SSTable data
+     * 从SSTable数据构建索引的帮助程序
      */
 
     /**
      * Provider of {@code SecondaryIndexBuilder} instances. See {@code getBuildTaskSupport} and
      * {@code SecondaryIndexManager.buildIndexesBlocking} for more detail.
+     * ｛@code SecondaryIndexBuilder｝实例的提供程序。有关更多详细信息，请参阅｛@code getBuildTaskSupport｝和｛@codeSecondaryIndexManager.buildIndexesBlocking｝。
      */
     interface IndexBuildingSupport
     {
@@ -170,6 +173,8 @@ public interface Index
     /**
      * Default implementation of {@code IndexBuildingSupport} which uses a {@code ReducingKeyIterator} to obtain a
      * collated view of the data in the SSTables.
+     * ｛@code IndexBuildingSupport｝的默认实现，该实现使用｛@code-ReducingKeyIterator｝获取SSTables中数据的整理视图。
+     *
      */
     public static class CollatedViewIndexBuildingSupport implements IndexBuildingSupport
     {
@@ -183,11 +188,13 @@ public interface Index
     /**
      * Singleton instance of {@code CollatedViewIndexBuildingSupport}, which may be used by any {@code Index}
      * implementation.
+     * ｛@code CollatedViewIndexBuildingSupport｝的单实例，该实例可由任何｛@codeIndex｝实现使用。
      */
     public static final CollatedViewIndexBuildingSupport INDEX_BUILDER_SUPPORT = new CollatedViewIndexBuildingSupport();
 
     /*
      * Management functions
+     * 管理职能
      */
 
     /**
@@ -199,6 +206,9 @@ public interface Index
      *
      * @return an instance of the index build task helper. Index implementations which return <b>the same instance</b>
      * will be built using a single task.
+     *
+     * 获取一个助手的实例，以提供从一组SSTable数据构建索引的任务。在处理要重建的多个索引时，SecondaryIndexManager.buildIndexesBlocking会将具有相同IndexBuildingSupport实例的索引分组，从而允许通过一次数据传递来构建多个索引。默认方法实现返回的singleton实例使用ReducingKeyIterator构建索引，以提供SSTable数据的整理视图。 退货： 索引生成任务帮助程序的实例。返回相同实例的索引实现将使用单个任务构建。 org.apache.cassandra.index.索引
+     *
      */
     default IndexBuildingSupport getBuildTaskSupport()
     {
