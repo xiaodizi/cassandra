@@ -230,34 +230,34 @@
 <!--            <url url="${lib.download.base.url}/lib/sigar-bin/libsigar-x86-solaris.so"/>-->
 <!--        </get>-->
         
-        <copy todir="${build.lib}" quiet="true">
-            <file file="${local.repository}/org/apache/cassandra/deps/futures-2.1.6-py2.py3-none-any.zip"/>
-            <file file="${local.repository}/org/apache/cassandra/deps/six-1.12.0-py2.py3-none-any.zip"/>
-            <file file="${download.file}/geomet-0.1.0.zip"/>
-            <file file="${local.repository}/org/apache/cassandra/deps/pure_sasl-0.6.2-py2-none-any.zip"/>
-            <file file="${local.repository}/org/apache/cassandra/deps/wcwidth-0.2.5-py2.py3-none-any.zip"/>
-        </copy>
-        <copy todir="${build.lib}/sigar-bin/" quiet="true">
-            <file file="${download.file}/sigar-bin/libsigar-amd64-freebsd-6.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-amd64-linux.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-amd64-solaris.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-ia64-hpux-11.sl"/>
-            <file file="${download.file}/sigar-bin/libsigar-ia64-linux.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-pa-hpux-11.sl"/>
-            <file file="${download.file}/sigar-bin/libsigar-ppc-aix-5.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-ppc-linux.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-ppc64-aix-5.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-ppc64-linux.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-ppc64le-linux.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-s390x-linux.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-sparc-solaris.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-sparc64-solaris.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-universal-macosx.dylib"/>
-            <file file="${download.file}/sigar-bin/libsigar-universal64-macosx.dylib"/>
-            <file file="${download.file}/sigar-bin/libsigar-x86-freebsd-5.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-x86-freebsd-6.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-x86-linux.so"/>
-            <file file="${download.file}/sigar-bin/libsigar-x86-solaris.so"/>
-        </copy>
+<!--        <copy todir="${build.lib}" quiet="true">-->
+<!--            <file file="${local.repository}/org/apache/cassandra/deps/futures-2.1.6-py2.py3-none-any.zip"/>-->
+<!--            <file file="${local.repository}/org/apache/cassandra/deps/six-1.12.0-py2.py3-none-any.zip"/>-->
+<!--            <file file="${download.file}/lib/geomet-0.1.0.zip"/>-->
+<!--            <file file="${local.repository}/org/apache/cassandra/deps/pure_sasl-0.6.2-py2-none-any.zip"/>-->
+<!--            <file file="${local.repository}/org/apache/cassandra/deps/wcwidth-0.2.5-py2.py3-none-any.zip"/>-->
+<!--        </copy>-->
+<!--        <copy todir="${build.lib}/sigar-bin/" quiet="true">-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-amd64-freebsd-6.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-amd64-linux.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-amd64-solaris.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-ia64-hpux-11.sl"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-ia64-linux.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-pa-hpux-11.sl"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-ppc-aix-5.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-ppc-linux.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-ppc64-aix-5.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-ppc64-linux.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-ppc64le-linux.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-s390x-linux.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-sparc-solaris.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-sparc64-solaris.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-universal-macosx.dylib"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-universal64-macosx.dylib"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-x86-freebsd-5.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-x86-freebsd-6.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-x86-linux.so"/>-->
+<!--            <file file="${download.file}/sigar-bin/libsigar-x86-solaris.so"/>-->
+<!--        </copy>-->
     </target>
 </project>

@@ -28,70 +28,80 @@ public interface INodeProvisionStrategy
     public enum Strategy
     {
         OneNetworkInterface
-        {
-            INodeProvisionStrategy create(int subnet) {
-                return new INodeProvisionStrategy()
                 {
-                    public String seedIp()
-                    {
-                        return "127.0." + subnet + ".1";
-                    }
+                    INodeProvisionStrategy create(int subnet) {
+                        return new INodeProvisionStrategy()
+                        {
+                            public String seedIp()
+                            {
+                                return "127.0." + subnet + ".1";
+                            }
 
-                    public int seedPort()
-                    {
-                        return 7012;
-                    }
+                            public int seedPort()
+                            {
+                                return 7012;
+                            }
 
-                    public String ipAddress(int nodeNum)
-                    {
-                        return "127.0." + subnet + ".1";
-                    }
+                            public String ipAddress(int nodeNum)
+                            {
+                                return "127.0." + subnet + ".1";
+                            }
 
-                    public int storagePort(int nodeNum)
-                    {
-                        return 7011 + nodeNum;
-                    }
+                            public int storagePort(int nodeNum)
+                            {
+                                return 7011 + nodeNum;
+                            }
 
-                    public int nativeTransportPort(int nodeNum)
-                    {
-                        return 9041 + nodeNum;
+                            public int nativeTransportPort(int nodeNum)
+                            {
+                                return 9041 + nodeNum;
+                            }
+
+                            public int jmxPort(int nodeNum)
+                            {
+                                return 7199 + nodeNum;
+                            }
+                        };
                     }
-                };
-            }
-        },
+                },
         MultipleNetworkInterfaces
-        {
-            INodeProvisionStrategy create(int subnet) {
-                String ipPrefix = "127.0." + subnet + ".";
-                return new INodeProvisionStrategy()
                 {
-                    public String seedIp()
-                    {
-                        return ipPrefix + "1";
-                    }
+                    INodeProvisionStrategy create(int subnet) {
+                        String ipPrefix = "127.0." + subnet + ".";
+                        return new INodeProvisionStrategy()
+                        {
+                            public String seedIp()
+                            {
+                                return ipPrefix + "1";
+                            }
 
-                    public int seedPort()
-                    {
-                        return 7012;
-                    }
+                            public int seedPort()
+                            {
+                                return 7012;
+                            }
 
-                    public String ipAddress(int nodeNum)
-                    {
-                        return ipPrefix + nodeNum;
-                    }
+                            public String ipAddress(int nodeNum)
+                            {
+                                return ipPrefix + nodeNum;
+                            }
 
-                    public int storagePort(int nodeNum)
-                    {
-                        return 7012;
-                    }
+                            public int storagePort(int nodeNum)
+                            {
+                                return 7012;
+                            }
 
-                    public int nativeTransportPort(int nodeNum)
-                    {
-                        return 9042;
+                            public int nativeTransportPort(int nodeNum)
+                            {
+                                return 9042;
+                            }
+
+                            public int jmxPort(int nodeNum)
+                            {
+                                return 7199;
+                            }
+                        };
                     }
                 };
-            }
-        };
         abstract INodeProvisionStrategy create(int subnet);
     }
 
@@ -100,4 +110,5 @@ public interface INodeProvisionStrategy
     abstract String ipAddress(int nodeNum);
     abstract int storagePort(int nodeNum);
     abstract int nativeTransportPort(int nodeNum);
+    abstract int jmxPort(int nodeNum);
 }
