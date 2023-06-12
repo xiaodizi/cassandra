@@ -30,7 +30,7 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Statement;
 import io.github.xiaodizi.db.ColumnFamilyStore;
 import io.github.xiaodizi.db.ConsistencyLevel;
-import io.github.xiaodizi.sstable.StressCQLSSTableWriter;
+import io.github.xiaodizi.io.sstable.StressCQLSSTableWriter;
 import io.github.xiaodizi.stress.WorkManager;
 import io.github.xiaodizi.stress.generate.*;
 import io.github.xiaodizi.stress.report.Timer;

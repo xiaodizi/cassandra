@@ -469,7 +469,7 @@ public class TableMetadata implements SchemaElement
         return !columnName.bytes.hasRemaining();
     }
 
-    void validateCompatibility(TableMetadata previous)
+    public void validateCompatibility(TableMetadata previous)
     {
         if (isIndex())
             return;

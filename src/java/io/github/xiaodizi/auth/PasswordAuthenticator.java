@@ -73,7 +73,7 @@ public class PasswordAuthenticator implements IAuthenticator, AuthCache.BulkLoad
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
 
-    static final byte NUL = 0;
+    public static final byte NUL = 0;
     private SelectStatement authenticateStatement;
 
     private final CredentialsCache cache;
@@ -114,7 +114,7 @@ public class PasswordAuthenticator implements IAuthenticator, AuthCache.BulkLoad
         return cache;
     }
 
-    protected static boolean checkpw(String password, String hash)
+    public static boolean checkpw(String password, String hash)
     {
         try
         {

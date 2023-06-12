@@ -41,7 +41,7 @@ import io.github.xiaodizi.db.compaction.CompactionManager;
 import io.github.xiaodizi.db.lifecycle.LifecycleTransaction;
 import io.github.xiaodizi.dht.IPartitioner;
 import io.github.xiaodizi.dht.Token;
-import io.github.xiaodizi.sstable.StressCQLSSTableWriter;
+import io.github.xiaodizi.io.sstable.StressCQLSSTableWriter;
 import io.github.xiaodizi.io.sstable.Component;
 import io.github.xiaodizi.io.sstable.Descriptor;
 import io.github.xiaodizi.io.sstable.format.SSTableReader;

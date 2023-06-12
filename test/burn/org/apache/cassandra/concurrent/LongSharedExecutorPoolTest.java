@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.xiaodizi.concurrent;
+package org.apache.cassandra.concurrent;
 
 import java.util.BitSet;
 import java.util.TreeSet;
@@ -31,7 +31,7 @@ import org.apache.commons.math3.distribution.WeibullDistribution;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static io.github.xiaodizi.utils.Clock.Global.nanoTime;
+import static org.apache.cassandra.utils.Clock.Global.nanoTime;
 
 public class LongSharedExecutorPoolTest
 {

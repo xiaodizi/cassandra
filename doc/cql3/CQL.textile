@@ -2265,7 +2265,7 @@ CREATE FUNCTION fct_using_udt ( somearg int )
     return udt;
   $$;
 
-The definition of the @UDFContext@ interface can be found in the Apache Cassandra source code for @org.apache.cassandra.cql3.functions.UDFContext@.
+The definition of the @UDFContext@ interface can be found in the Apache Cassandra source code for @io.github.xiaodizi.cql3.functions.UDFContext@.
 
 bc(sample). 
 public interface UDFContext

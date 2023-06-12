@@ -1787,8 +1787,8 @@
     </target>
 
     <!-- Use this with an FQDN for test class, and an optional csv list of methods like this:
-      ant long-testsome -Dtest.name=org.apache.cassandra.cql3.ManyRowsTest
-      ant long-testsome -Dtest.name=org.apache.cassandra.cql3.ManyRowsTest -Dtest.methods=testLargeCount
+      ant long-testsome -Dtest.name=io.github.xiaodizi.cql3.ManyRowsTest
+      ant long-testsome -Dtest.name=io.github.xiaodizi.cql3.ManyRowsTest -Dtest.methods=testLargeCount
     -->
     <target name="long-testsome" depends="maybe-build-test" description="Execute specific long unit tests">
         <testmacro inputdir="${test.long.src}" timeout="${test.long.timeout}">
@@ -1956,9 +1956,9 @@
                         <include name="**/*.jar"/>
                     </fileset>
                 </classpath>
-                <test unless:blank="${test.methods}" name="org.apache.cassandra.cql3.${test.name}"
+                <test unless:blank="${test.methods}" name="io.github.xiaodizi.cql3.${test.name}"
                       methods="${test.methods}" todir="${build.test.dir}/output"/>
-                <test if:blank="${test.methods}" name="org.apache.cassandra.cql3.${test.name}"
+                <test if:blank="${test.methods}" name="io.github.xiaodizi.cql3.${test.name}"
                       todir="${build.test.dir}/output"/>
             </junit>
         </sequential>

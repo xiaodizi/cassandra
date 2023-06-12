@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.github.xiaodizi.transport;
+package org.apache.cassandra.transport;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -38,23 +38,23 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import io.netty.buffer.ByteBuf;
-import io.github.xiaodizi.auth.AllowAllAuthenticator;
-import io.github.xiaodizi.auth.AllowAllAuthorizer;
-import io.github.xiaodizi.auth.AllowAllNetworkAuthorizer;
-import io.github.xiaodizi.config.DatabaseDescriptor;
-import io.github.xiaodizi.config.EncryptionOptions;
-import io.github.xiaodizi.exceptions.OverloadedException;
-import io.github.xiaodizi.metrics.ClientMetrics;
-import io.github.xiaodizi.service.QueryState;
-import io.github.xiaodizi.transport.messages.QueryMessage;
-import io.github.xiaodizi.transport.messages.ResultMessage;
-import io.github.xiaodizi.utils.AssertUtil;
-import io.github.xiaodizi.utils.Throwables;
+import org.apache.cassandra.auth.AllowAllAuthenticator;
+import org.apache.cassandra.auth.AllowAllAuthorizer;
+import org.apache.cassandra.auth.AllowAllNetworkAuthorizer;
+import org.apache.cassandra.config.DatabaseDescriptor;
+import org.apache.cassandra.config.EncryptionOptions;
+import org.apache.cassandra.exceptions.OverloadedException;
+import org.apache.cassandra.metrics.ClientMetrics;
+import org.apache.cassandra.service.QueryState;
+import org.apache.cassandra.transport.messages.QueryMessage;
+import org.apache.cassandra.transport.messages.ResultMessage;
+import org.apache.cassandra.utils.AssertUtil;
+import org.apache.cassandra.utils.Throwables;
 
-import static io.github.xiaodizi.transport.BurnTestUtil.SizeCaps;
-import static io.github.xiaodizi.transport.BurnTestUtil.generateQueryMessage;
-import static io.github.xiaodizi.transport.BurnTestUtil.generateRows;
-import static io.github.xiaodizi.utils.Clock.Global.nanoTime;
+import static org.apache.cassandra.transport.BurnTestUtil.SizeCaps;
+import static org.apache.cassandra.transport.BurnTestUtil.generateQueryMessage;
+import static org.apache.cassandra.transport.BurnTestUtil.generateRows;
+import static org.apache.cassandra.utils.Clock.Global.nanoTime;
 
 @RunWith(Parameterized.class)
 public class SimpleClientPerfTest

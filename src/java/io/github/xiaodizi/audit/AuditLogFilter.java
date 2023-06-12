@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class AuditLogFilter
+public final class AuditLogFilter
 {
     private static final Logger logger = LoggerFactory.getLogger(AuditLogFilter.class);
 
@@ -132,7 +132,7 @@ final class AuditLogFilter
      * @param auditLogEntry AuditLogEntry to verify
      * @return true if it is filtered, false otherwise
      */
-    boolean isFiltered(AuditLogEntry auditLogEntry)
+    public boolean isFiltered(AuditLogEntry auditLogEntry)
     {
         return isFiltered(auditLogEntry.getKeyspace(), includedKeyspaces, excludedKeyspaces)
                || isFiltered(auditLogEntry.getType().getCategory().toString(), includedCategories, excludedCategories)
@@ -151,7 +151,7 @@ final class AuditLogFilter
      * @param excludeSet Exclude filtering set
      * @return true if the input is filtered, false when the input is not filtered
      */
-    static boolean isFiltered(String input, Set<String> includeSet, Set<String> excludeSet)
+    public static boolean isFiltered(String input, Set<String> includeSet, Set<String> excludeSet)
     {
         if (!excludeSet.isEmpty() && excludeSet.contains(input))
             return true;

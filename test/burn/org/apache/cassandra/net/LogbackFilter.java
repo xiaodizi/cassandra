@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.github.xiaodizi.net;
+package org.apache.cassandra.net;
 
 import java.io.EOFException;
 import java.nio.BufferOverflowException;

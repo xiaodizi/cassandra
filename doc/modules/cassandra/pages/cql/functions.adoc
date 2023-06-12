@@ -291,7 +291,7 @@ The implicitly available `udfContext` field (or binding for script UDFs) provide
 include::example$CQL/function_udfcontext.cql[]
 ----
 
-The definition of the `UDFContext` interface can be found in the Apache Cassandra source code for `org.apache.cassandra.cql3.functions.UDFContext`.
+The definition of the `UDFContext` interface can be found in the Apache Cassandra source code for `io.github.xiaodizi.cql3.functions.UDFContext`.
 
 [source,java]
 ----

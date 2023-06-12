@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.github.xiaodizi.net;
+package org.apache.cassandra.net;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -43,7 +43,7 @@ import java.util.stream.IntStream;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Uninterruptibles;
 
-import io.github.xiaodizi.utils.concurrent.FutureCombiner;
+import org.apache.cassandra.utils.concurrent.FutureCombiner;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,23 +51,23 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 import net.openhft.chronicle.core.util.ThrowingBiConsumer;
 import net.openhft.chronicle.core.util.ThrowingRunnable;
-import io.github.xiaodizi.config.DatabaseDescriptor;
-import io.github.xiaodizi.db.commitlog.CommitLog;
-import io.github.xiaodizi.io.IVersionedSerializer;
-import io.github.xiaodizi.io.util.DataInputPlus;
-import io.github.xiaodizi.io.util.DataOutputPlus;
-import io.github.xiaodizi.locator.InetAddressAndPort;
-import io.github.xiaodizi.net.MessageGenerator.UniformPayloadGenerator;
-import io.github.xiaodizi.utils.ExecutorUtils;
-import io.github.xiaodizi.utils.MonotonicClock;
-import io.github.xiaodizi.utils.memory.BufferPools;
+import org.apache.cassandra.config.DatabaseDescriptor;
+import org.apache.cassandra.db.commitlog.CommitLog;
+import org.apache.cassandra.io.IVersionedSerializer;
+import org.apache.cassandra.io.util.DataInputPlus;
+import org.apache.cassandra.io.util.DataOutputPlus;
+import org.apache.cassandra.locator.InetAddressAndPort;
+import org.apache.cassandra.net.MessageGenerator.UniformPayloadGenerator;
+import org.apache.cassandra.utils.ExecutorUtils;
+import org.apache.cassandra.utils.MonotonicClock;
+import org.apache.cassandra.utils.memory.BufferPools;
 
 import static java.lang.Math.min;
-import static io.github.xiaodizi.net.MessagingService.current_version;
-import static io.github.xiaodizi.net.ConnectionType.LARGE_MESSAGES;
-import static io.github.xiaodizi.utils.Clock.Global.nanoTime;
-import static io.github.xiaodizi.utils.MonotonicClock.Global.approxTime;
-import static io.github.xiaodizi.utils.MonotonicClock.Global.preciseTime;
+import static org.apache.cassandra.net.MessagingService.current_version;
+import static org.apache.cassandra.net.ConnectionType.LARGE_MESSAGES;
+import static org.apache.cassandra.utils.Clock.Global.nanoTime;
+import static org.apache.cassandra.utils.MonotonicClock.Global.approxTime;
+import static org.apache.cassandra.utils.MonotonicClock.Global.preciseTime;
 
 public class ConnectionBurnTest
 {

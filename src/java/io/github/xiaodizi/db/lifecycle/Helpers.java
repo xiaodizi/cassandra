@@ -33,7 +33,7 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getFirst;
 import static io.github.xiaodizi.utils.Throwables.merge;
 
-class Helpers
+public class Helpers
 {
     /**
      * update the contents of a set with the provided sets, ensuring that the items to remove are

@@ -23,11 +23,11 @@ import io.github.xiaodizi.db.marshal.UTF8Type;
 import io.github.xiaodizi.dht.LocalPartitioner;
 import io.github.xiaodizi.schema.TableMetadata;
 
-final class JmxPermissionsCacheKeysTable extends AbstractMutableVirtualTable
+public final class JmxPermissionsCacheKeysTable extends AbstractMutableVirtualTable
 {
     private static final String ROLE = "role";
 
-    JmxPermissionsCacheKeysTable(String keyspace)
+    public JmxPermissionsCacheKeysTable(String keyspace)
     {
         super(TableMetadata.builder(keyspace, "jmx_permissions_cache_keys")
                 .comment("keys in the JMX permissions cache")

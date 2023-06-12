@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.github.xiaodizi.utils;
+package org.apache.cassandra.utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -44,16 +44,16 @@ import org.junit.Test;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
-import io.github.xiaodizi.concurrent.NamedThreadFactory;
-import io.github.xiaodizi.utils.btree.*;
+import org.apache.cassandra.concurrent.NamedThreadFactory;
+import org.apache.cassandra.utils.btree.*;
 
 import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
-import static io.github.xiaodizi.utils.btree.BTree.iterable;
-import static io.github.xiaodizi.utils.Clock.Global.currentTimeMillis;
+import static org.apache.cassandra.utils.btree.BTree.iterable;
+import static org.apache.cassandra.utils.Clock.Global.currentTimeMillis;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

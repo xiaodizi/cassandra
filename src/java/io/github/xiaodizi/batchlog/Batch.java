@@ -42,8 +42,8 @@ public final class Batch
     public final long creationTime; // time of batch creation (in microseconds)
 
     // one of these will always be empty
-    final Collection<Mutation> decodedMutations;
-    final Collection<ByteBuffer> encodedMutations;
+    public final Collection<Mutation> decodedMutations;
+    public final Collection<ByteBuffer> encodedMutations;
 
     private Batch(TimeUUID id, long creationTime, Collection<Mutation> decodedMutations, Collection<ByteBuffer> encodedMutations)
     {

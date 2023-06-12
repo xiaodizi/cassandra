@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.github.xiaodizi.anttasks;
+package org.apache.cassandra.anttasks;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;

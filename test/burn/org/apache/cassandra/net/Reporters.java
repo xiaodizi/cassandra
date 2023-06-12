@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.github.xiaodizi.net;
+package org.apache.cassandra.net;
 
 import java.util.Arrays;
 import java.util.BitSet;
@@ -28,9 +28,9 @@ import java.util.function.ToLongFunction;
 
 import com.google.common.collect.ImmutableList;
 
-import io.github.xiaodizi.locator.InetAddressAndPort;
+import org.apache.cassandra.locator.InetAddressAndPort;
 
-import static io.github.xiaodizi.utils.Clock.Global.nanoTime;
+import static org.apache.cassandra.utils.Clock.Global.nanoTime;
 
 class Reporters
 {

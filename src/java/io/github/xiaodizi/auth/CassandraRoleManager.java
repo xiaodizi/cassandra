@@ -81,14 +81,14 @@ public class CassandraRoleManager implements IRoleManager
     private static final Logger logger = LoggerFactory.getLogger(CassandraRoleManager.class);
 
     public static final String DEFAULT_SUPERUSER_NAME = "cassandra";
-    static final String DEFAULT_SUPERUSER_PASSWORD = "cassandra";
+    public static final String DEFAULT_SUPERUSER_PASSWORD = "cassandra";
 
     /**
      * We need to treat the default superuser as a special case since during initial node startup, we may end up with
      * duplicate creation or deletion + re-creation of this user on different nodes unless we check at quorum to see if
      * it's already been done.
      */
-    static final ConsistencyLevel DEFAULT_SUPERUSER_CONSISTENCY_LEVEL = ConsistencyLevel.QUORUM;
+    public static final ConsistencyLevel DEFAULT_SUPERUSER_CONSISTENCY_LEVEL = ConsistencyLevel.QUORUM;
 
     // Transform a row in the AuthKeyspace.ROLES to a Role instance
     private static final Function<UntypedResultSet.Row, Role> ROW_TO_ROLE = row ->
@@ -117,7 +117,7 @@ public class CassandraRoleManager implements IRoleManager
     public static final String GENSALT_LOG2_ROUNDS_PROPERTY = Config.PROPERTY_PREFIX + "auth_bcrypt_gensalt_log2_rounds";
     private static final int GENSALT_LOG2_ROUNDS = getGensaltLogRounds();
 
-    static int getGensaltLogRounds()
+    public static int getGensaltLogRounds()
     {
          int rounds = Integer.getInteger(GENSALT_LOG2_ROUNDS_PROPERTY, 10);
          if (rounds < 4 || rounds > 30)
@@ -536,14 +536,14 @@ public class CassandraRoleManager implements IRoleManager
      * @param role 仅仅是个描述
      * @return ConsistencyLevel 仅仅是个描述
      */
-    protected static ConsistencyLevel consistencyForRoleWrite(String role)
+    public static ConsistencyLevel consistencyForRoleWrite(String role)
     {
         return role.equals(DEFAULT_SUPERUSER_NAME) ?
                DEFAULT_SUPERUSER_CONSISTENCY_LEVEL :
                CassandraAuthorizer.authWriteConsistencyLevel();
     }
 
-    protected static ConsistencyLevel consistencyForRoleRead(String role)
+    public static ConsistencyLevel consistencyForRoleRead(String role)
     {
         return role.equals(DEFAULT_SUPERUSER_NAME) ?
                DEFAULT_SUPERUSER_CONSISTENCY_LEVEL :

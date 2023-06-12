@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.github.xiaodizi.net;
+package org.apache.cassandra.net;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
@@ -27,15 +27,15 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import io.github.xiaodizi.io.util.DataInputPlus;
-import io.github.xiaodizi.io.util.DataOutputPlus;
-import io.github.xiaodizi.locator.InetAddressAndPort;
-import io.github.xiaodizi.net.Verifier.Destiny;
+import org.apache.cassandra.io.util.DataInputPlus;
+import org.apache.cassandra.io.util.DataOutputPlus;
+import org.apache.cassandra.locator.InetAddressAndPort;
+import org.apache.cassandra.net.Verifier.Destiny;
 
-import static io.github.xiaodizi.net.MessagingService.VERSION_40;
-import static io.github.xiaodizi.net.MessagingService.current_version;
-import static io.github.xiaodizi.utils.ExecutorUtils.runWithThreadName;
-import static io.github.xiaodizi.utils.MonotonicClock.Global.approxTime;
+import static org.apache.cassandra.net.MessagingService.VERSION_40;
+import static org.apache.cassandra.net.MessagingService.current_version;
+import static org.apache.cassandra.utils.ExecutorUtils.runWithThreadName;
+import static org.apache.cassandra.utils.MonotonicClock.Global.approxTime;
 
 public class Connection implements InboundMessageCallbacks, OutboundMessageCallbacks, OutboundDebugCallbacks
 {

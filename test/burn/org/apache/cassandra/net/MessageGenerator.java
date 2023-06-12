@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package io.github.xiaodizi.net;
+package org.apache.cassandra.net;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -25,13 +25,13 @@ import java.nio.ByteOrder;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import io.github.xiaodizi.io.util.DataInputPlus;
-import io.github.xiaodizi.io.util.DataOutputPlus;
-import io.github.xiaodizi.utils.vint.VIntCoding;
+import org.apache.cassandra.io.util.DataInputPlus;
+import org.apache.cassandra.io.util.DataOutputPlus;
+import org.apache.cassandra.utils.vint.VIntCoding;
 import sun.misc.Unsafe;
 
-import static io.github.xiaodizi.net.MessagingService.VERSION_40;
-import static io.github.xiaodizi.utils.MonotonicClock.Global.approxTime;
+import static org.apache.cassandra.net.MessagingService.VERSION_40;
+import static org.apache.cassandra.utils.MonotonicClock.Global.approxTime;
 
 abstract class MessageGenerator
 {
