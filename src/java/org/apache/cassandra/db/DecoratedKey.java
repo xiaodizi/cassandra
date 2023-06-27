@@ -18,9 +18,8 @@
 package org.apache.cassandra.db;
 
 import java.nio.ByteBuffer;
-import java.util.Comparator;
-import java.util.List;
-import java.util.StringJoiner;
+import java.nio.charset.CharacterCodingException;
+import java.util.*;
 
 import org.apache.cassandra.db.marshal.CompositeType;
 import org.apache.cassandra.dht.IPartitioner;
@@ -156,6 +155,36 @@ public abstract class DecoratedKey implements PartitionPosition, FilterKey
     {
         return String.format("%s = %s", metadata.name.toCQLString(), metadata.type.toCQLString(key));
     }
+
+
+    public String getPrimaryKeyValue(TableMetadata metadata)
+    {
+        List<ColumnMetadata> columns = metadata.partitionKeyColumns();
+
+        if (columns.size() == 1) {
+            return columns.get(0).type.toCQLString(getKey());
+        }
+
+        ByteBuffer[] values = ((CompositeType) metadata.partitionKeyType).split(getKey());
+        String value="";
+        for (int i = 0; i < columns.size(); i++)
+            if (i==0){
+                value=columns.get(i).type.toCQLString(values[i]);
+            }else {
+                value = value + "-" + columns.get(i).type.toCQLString(values[i]);
+            }
+            return value;
+    }
+
+
+
+    public String getPrimaryKey(TableMetadata metadata){
+        List<ColumnMetadata> columns = metadata.partitionKeyColumns();
+        return columns.get(0).toString();
+    }
+
+
+
 
     public Token getToken()
     {

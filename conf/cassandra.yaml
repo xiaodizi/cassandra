@@ -1549,7 +1549,7 @@ compaction_tombstone_warning_threshold: 100000
 # Audit logging - Logs every incoming CQL command request, authentication to a node. See the docs
 # on audit_logging for full details about the various configuration options.
 audit_logging_options:
-  enabled: true
+  enabled: false
   logger:
     - class_name: FileAuditLogger
   # audit_logs_dir:

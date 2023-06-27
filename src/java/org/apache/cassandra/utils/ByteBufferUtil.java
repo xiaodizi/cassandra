@@ -30,6 +30,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.UUID;
 
 import net.nicoulaj.compilecommand.annotations.Inline;

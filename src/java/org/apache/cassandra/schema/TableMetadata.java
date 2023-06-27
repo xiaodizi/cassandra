@@ -140,6 +140,7 @@ public class TableMetadata implements SchemaElement
      * On top of that, we keep separated collection of each kind of definition, to
      * 1) allow easy access to each kind and
      * 2) for the partition key and clustering key ones, those list are ordered by the "component index" of the elements.
+     * 所有CQL3列定义都存储在列映射中。除此之外，我们保留每种定义的单独集合，以1）允许轻松访问每种定义，2）对于分区键和聚类键，这些列表按元素的“组件索引”排序。
      */
     public final ImmutableMap<ByteBuffer, DroppedColumn> droppedColumns;
     final ImmutableMap<ByteBuffer, ColumnMetadata> columns;
@@ -1368,6 +1369,7 @@ public class TableMetadata implements SchemaElement
 
     /**
      * Returns a string representation of a primary key in a CQL-friendly format.
+     * 以CQL友好格式返回主键的字符串表示形式。
      *
      * @param partitionKey the partition key part of the primary key
      * @param clustering the clustering key part of the primary key
