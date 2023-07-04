@@ -24,10 +24,13 @@ import org.apache.cassandra.db.DeletionTime;
 import org.apache.cassandra.db.rows.Row;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.second.ElasticSecondaryIndex;
+import org.apache.second.EsPartitionIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 public class EsIndexer extends NoOpIndexer {
@@ -71,7 +74,6 @@ public class EsIndexer extends NoOpIndexer {
 
     @Override
     public void updateRow(Row oldRowData, Row newRowData) {
-        System.out.println("update");
         Stopwatch time = Stopwatch.createStarted();
         index.index(key, newRowData, oldRowData, nowInSec);
         LOGGER.debug("{} updateRow {} took {}ms", index.index_name, id, time.elapsed(TimeUnit.MILLISECONDS));
@@ -98,8 +100,7 @@ public class EsIndexer extends NoOpIndexer {
     public void commit() {
         // 最后统一提交写入
         while (!rowLinkedBlockingQueue.isEmpty()) {
-            Row row = rowLinkedBlockingQueue.poll();
-            index.index(this.key, row, null, nowInSec);
+            index.index(this.key, rowLinkedBlockingQueue.poll(), null, nowInSec);
         }
     }
 }

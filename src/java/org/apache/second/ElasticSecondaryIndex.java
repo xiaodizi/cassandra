@@ -38,6 +38,7 @@ import org.apache.cassandra.notifications.INotificationConsumer;
 import org.apache.cassandra.schema.ColumnMetadata;
 import org.apache.cassandra.schema.IndexMetadata;
 import org.apache.cassandra.schema.TableMetadata;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.second.esclient.ElasticIndex;
 import org.apache.second.esclient.EsPartitionIterator;
@@ -70,8 +71,13 @@ public class ElasticSecondaryIndex implements Index, INotificationConsumer {
     private static final Logger logger = LoggerFactory.getLogger(ElasticSecondaryIndex.class);
 
 
+//    final HttpHost[] hosts = new HttpHost[]{
+//            new HttpHost(DatabaseDescriptor.getRpcAddress().getHostAddress(), 9200, "http")
+//    };
+
+    // 测试地址
     final HttpHost[] hosts = new HttpHost[]{
-            new HttpHost(DatabaseDescriptor.getRpcAddress().getHostAddress(), 9200, "http")
+            new HttpHost("192.168.184.88", 9200, "http")
     };
 
     // Initialize the client with SSL and TLS enabled
@@ -283,13 +289,11 @@ public class ElasticSecondaryIndex implements Index, INotificationConsumer {
     public void index(@Nonnull DecoratedKey decoratedKey, @Nonnull Row newRow, @Nullable Row oldRow, int nowInSec) {
         final Stopwatch time = Stopwatch.createStarted();
         String primaryKey = decoratedKey.getPrimaryKey(this.baseCfs.metadata());
-        String primaryKeyValue = decoratedKey.getPrimaryKeyValue(this.baseCfs.metadata());
-
+        String primaryKeyValue = decoratedKey.getPrimaryKeyValue(this.baseCfs.metadata()).replace("'","");
         try {
             Map<String, Object> maps = Utils.toMaps(newRow,this.schema);
             maps.put(primaryKey, primaryKeyValue);
             HashMap<String, Object> jsonMap = new HashMap<>();
-
             for (String key : this.schema.keySet()) {
                 jsonMap.put(key, maps.get(key));
             }
@@ -314,15 +318,17 @@ public class ElasticSecondaryIndex implements Index, INotificationConsumer {
     }
 
 
+
     @Nonnull
     public UnfilteredPartitionIterator search(ReadCommand command) {
         final Stopwatch time = Stopwatch.createStarted();
         final String queryString = Utils.queryString(command);
         Map map = JSONObject.parseObject(Utils.pattern(queryString), Map.class);
 
-        System.out.println("查询条件:"+map.size());
+        System.out.println("bool查询条件:"+map);
 
         boolean refresh=map.get("refresh")==null ? false:Boolean.parseBoolean(map.get("refresh").toString());
+
         if (refresh){
             try {
                 boolean b = elasticIndex.refreshData(index_name);
