@@ -337,6 +337,225 @@ SELECT * FROM demo.tweets WHERE expr(tweets_index, '{
 在查询的时候，增加了refresh这个配置，如果为true，会强制进行刷新索引。
 
 
+=== 4、数据类型对应关系
+
+|===
+|CQL 类型 |对应Java类型 | ES类型 | 描述
+
+|ascii
+|String
+|text
+|asii字符串
+
+|bigint
+|long
+|long
+|64位整数
+
+|blob
+|ByteBuffer/byte[]
+|text
+|二进制数组 存入ES后，继续解析回成字符串存储
+
+|boolean
+|Boolean
+|boolean
+|布尔
+
+|decimal
+|BigDecimal
+|float
+|高精度小数
+
+|double
+|double
+|double
+|64位浮点小数
+
+|float
+|float
+|float
+|32位浮点数
+
+|inet
+|String
+| ip
+|ipv4或ipv6协议的ip地址(ipv6 暂时没测试)
+
+|int
+|int
+|integer
+|32位浮点数
+
+
+|text
+|String
+|text
+|utf-8编码的字符串
+
+|timestamp
+|Date
+|date
+|日期 Es 支持的日期，yyyy-MM-dd 或者  yyyy-MM-ddTHH:MM:SSZ ,代码内自动转换
+
+|uuid
+|UUID
+|text
+|UUID类型
+
+|timeuuid
+|UUID
+|text
+|时间相关的UUID
+
+|varchar
+|string
+|text
+|text的别名
+
+|varint
+|BigInteger
+|text
+|高精度整型
+
+|duration
+|String
+|text
+|以纳秒为单位的持续时间
+
+|smallint
+|Integer
+|integer
+|16位浮点数
+
+|tinyint
+|Integer
+|integer
+|8位浮点数
+
+|list<T>
+|String
+|text
+|存入到ES之后是array
+
+|time
+|long
+|long
+|纳秒级别的时间戳，格式 hh:mm:ss 的纳秒精准度，存入ES是64位整数
+
+|set<T>
+|Set<T>
+|text
+|存入到ES之后是array
+
+|map<T,T>
+|Map<T,T>
+|nested
+|复合结构，支持子查询
+|===
+
+
+=== 5、数据类型测试数据
+====a.测试数据
+-----
+CREATE TABLE demo.tweets (
+   id bigint PRIMARY KEY,
+   user ascii,
+   body blob,
+   time TIMESTAMP,
+   latitude FLOAT,
+   longitude FLOAT,
+   test boolean,
+   test1 double,
+   test2 inet,
+   test3 int,
+   test4 text,
+   test5 uuid,
+   test6 varchar,
+   test7 varint,
+   test8 duration,
+   test9 smallint,
+   test10 tinyint,
+   test11 list<text>,
+   test12 set<text>,
+   test13 map<text,text>,
+   test14 time
+);
+
+CREATE CUSTOM INDEX tweets_index ON demo.tweets ()
+USING 'org.apache.second.ElasticSecondaryIndex'
+WITH OPTIONS = {
+   'refresh_seconds': '10',
+   'schema': '{
+      fields: {
+         id: {type: "long"},
+         user: {type: "text"},
+         body: {type: "text", analyzer: "english"},
+         time: {type: "date", pattern: "yyyy-MM-dd"},
+         latitude: {type: "float"},
+         longitude: {type:"float"},
+         test:{type:"boolean"},
+         test1:{type:"double"},
+         test2:{type:"ip"},
+         test3:{type:"integer"},
+         test4:{type:"text"},
+         test5:{type:"text"},
+         test6:{type:"text"},
+         test7:{type:"text"},
+         test8:{type:"text"},
+         test9:{type:"integer"},
+         test10:{type:"integer"},
+         test11:{type:"text"},
+         test12:{type:"text"},
+         test13:{type:"text"},
+         test14:{type:"long"}
+      }
+   }'
+};
+
+
+
+INSERT INTO demo.tweets (id, user, body, time,latitude,longitude,test,test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11,test12,test13,test14) VALUES (1, 'fu', textasblob('123456'),'2015-05-15',41.12,-71.34,true,12.33,'192.168.88.1',1,'lei1',now(),'a',9999,1h4m48s20ms,9,0,['a','b'],{'settext1','settext2'},{'a':'fu','b':'lei'},'04:05:00');
+
+
+INSERT INTO demo.tweets (id, user, body, time,latitude,longitude,test,test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11,test12,test13,test14) VALUES (2, 'fu', textasblob('123456'),'2019-05-15',41.12,-71.34,false,12.34,'192.168.88.3',2,'lei2',now(),'b',8888,2h4m48s20ms,8,8,['c','d'],{'abc1@gmail.com','xyz1@hotmail.com'},{'c':'fu','d':'lei'},'13:12:54');
+
+INSERT INTO demo.tweets (id, user, body, time,latitude,longitude,test,test1,test2,test3,test4,test5,test6,test7,test8,test9,test10,test11,test12,test13,test14) VALUES (3, 'lei', textasblob('123456'),'2019-05-15',41.12,-71.34,true,12.35,'172.16.1.10',3,'lei3',now(),'c',7777,3h4m48s20ms,7,7,['e','f'],{'abc2@gmail.com','xyz2@hotmail.com'},{'e':'fu','f':'lei'},'22:12:54');
+-----
+
+====b.测试数据2
+-----
+######### 测试集合类型 ##########
+
+CREATE TABLE demo.tweets_new (
+   id bigint PRIMARY KEY,
+   test1 list<text>,
+   test2 set<text>,
+   test3 map<text,text>
+);
+
+
+CREATE CUSTOM INDEX tweets_index_new ON demo.tweets_new ()
+USING 'org.apache.second.ElasticSecondaryIndex'
+WITH OPTIONS = {
+   'refresh_seconds': '10',
+   'schema': '{
+      fields: {
+         id: {type: "long"},
+         test1:{type:"text"},
+         test2:{type:"text"},
+         test3:{type:"nested"}
+      }
+   }'
+};
+
+INSERT INTO demo.tweets_new (id,test1,test2,test3) VALUES (1,['a','b'],{'settext1','settext2'},{'a':'fu','b':'lei'});
+
+
+INSERT INTO demo.tweets_new (id,test1,test2,test3) VALUES (2, ['c','d'],{'abc1@gmail.com','xyz1@hotmail.com'},{'c':'fu','d':'lei'});
+
+INSERT INTO demo.tweets_new (id,test1,test2,test3) VALUES (3,['e','f'],{'abc2@gmail.com','xyz2@hotmail.com'},{'e':'fu','f':'lei'});
+-----
 
 
 

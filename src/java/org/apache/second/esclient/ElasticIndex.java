@@ -65,7 +65,7 @@ public class ElasticIndex {
         this.client = client;
     }
 
-    public Boolean newIndex(String indexName, Map<String, Map<String, String>> fields,Integer refreshSecond) throws IOException {
+    public Boolean newIndex(String indexName, Map<String, Map<String, String>> fields, Integer refreshSecond) throws IOException {
 
         int dataNodes = client.cluster().health().numberOfDataNodes();
 
@@ -77,6 +77,15 @@ public class ElasticIndex {
                 String value2 = filedmap.get(key2);
                 if (key2.equals("type") || key2.equals("analyzer")) {
                     map2.put(key2, value2);
+                    if (value2.equals("text")) {
+                        Map<String, Object> childMap = new HashMap<>();
+                        childMap.put("type", "keyword");
+                        childMap.put("ignore_above", 256);
+                        Map<String, Object> keywordMap = new HashMap<>();
+                        keywordMap.put("keyword", childMap);
+                        map2.put("fields", keywordMap);
+                    }
+
                 }
             }
             map1.put(key, map2);
@@ -89,17 +98,7 @@ public class ElasticIndex {
         JsonpMapper mapper = client._transport().jsonpMapper();
         JsonParser parser = Json.createParser(new StringReader(JSON.toJSONString(mappings)));
 
-        CreateIndexRequest index = new CreateIndexRequest.Builder()
-                .index(indexName)
-                .settings(new IndexSettings.Builder()
-                        .numberOfShards(String.valueOf(dataNodes))
-                        .numberOfReplicas(String.valueOf(dataNodes - 1))
-                        .refreshInterval(new Time.Builder()
-                                .time(refreshSecond.toString()+"s")
-                                .build())
-                        .build())
-                .mappings(TypeMapping._DESERIALIZER.deserialize(parser, mapper))
-                .build();
+        CreateIndexRequest index = new CreateIndexRequest.Builder().index(indexName).settings(new IndexSettings.Builder().numberOfShards(String.valueOf(dataNodes)).numberOfReplicas(String.valueOf(dataNodes - 1)).refreshInterval(new Time.Builder().time(refreshSecond.toString() + "s").build()).build()).mappings(TypeMapping._DESERIALIZER.deserialize(parser, mapper)).build();
         CreateIndexResponse createIndexResponse = client.indices().create(index);
         return createIndexResponse.acknowledged();
     }
@@ -121,38 +120,26 @@ public class ElasticIndex {
         return false;
     }
 
-    public Boolean bulkData(Map<String,Object> maps,String indexName,String primaryKeyValue) {
+    public Boolean bulkData(Map<String, Object> maps, String indexName, String primaryKeyValue) {
 
         JSONObject object = JSONObject.parseObject(JSON.toJSONString(maps));
-        List<BulkOperation> operationList=new ArrayList<>();
-        BulkOperation operation=new BulkOperation.Builder()
-                .index(new IndexOperation.Builder<>()
-                        .id(primaryKeyValue)
-                        .index(indexName)
-                        .document(object)
-                        .build())
-                .build();
+        List<BulkOperation> operationList = new ArrayList<>();
+        BulkOperation operation = new BulkOperation.Builder().index(new IndexOperation.Builder<>().id(primaryKeyValue).index(indexName).document(object).build()).build();
         try {
             operationList.add(operation);
-            BulkRequest request = new BulkRequest.Builder()
-                    .index(indexName)
-                    .operations(operationList)
-                    .source(new SourceConfigParam.Builder()
-                            .fetch(true)
-                            .build())
-                    .build();
+            BulkRequest request = new BulkRequest.Builder().index(indexName).operations(operationList).source(new SourceConfigParam.Builder().fetch(true).build()).build();
             BulkResponse bulk = client.bulk(request);
             if (bulk.errors() == false) {
                 System.out.println("这里............");
                 return true;
-            }else {
+            } else {
                 logger.debug("Bluk 返回结果:" + bulk.errors() + ";");
                 bulk.items().stream().forEach(i -> {
-                    logger.debug(" Bluk Data ID:"+i.id()+";错误原因:"+i.error().reason());
+                    logger.debug(" Bluk Data ID:" + i.id() + ";错误原因:" + i.error().reason());
                 });
             }
-        }catch (Exception e){
-            logger.error("Bluk 数据过程有错误:",e);
+        } catch (Exception e) {
+            logger.error("Bluk 数据过程有错误:", e);
         }
         return false;
     }
@@ -160,10 +147,7 @@ public class ElasticIndex {
 
     public Boolean delData(String indexName, String primaryKeyValue) throws IOException {
 
-        DeleteRequest request = new DeleteRequest.Builder()
-                .index(indexName)
-                .id(primaryKeyValue)
-                .build();
+        DeleteRequest request = new DeleteRequest.Builder().index(indexName).id(primaryKeyValue).build();
         DeleteResponse delete = client.delete(request);
         if (delete.shards().successful().intValue() != 0) {
             return true;
@@ -172,39 +156,32 @@ public class ElasticIndex {
     }
 
     public void dropIndex(String indexName) throws IOException {
-        DeleteIndexRequest request=new DeleteIndexRequest.Builder()
-                .index(indexName)
-                .build();
+        DeleteIndexRequest request = new DeleteIndexRequest.Builder().index(indexName).build();
         DeleteIndexResponse delete = client.indices().delete(request);
-        logger.info("删除索引返回:"+delete.acknowledged());
+        logger.info("删除索引返回:" + delete.acknowledged());
     }
 
 
     public boolean refreshData(String indexName) throws IOException {
-        RefreshRequest request=new RefreshRequest.Builder()
-                .index(indexName)
-                .build();
+        RefreshRequest request = new RefreshRequest.Builder().index(indexName).build();
         RefreshResponse refresh = client.indices().refresh(request);
-        if (refresh.shards().failed().intValue() == 0){
+        if (refresh.shards().failed().intValue() == 0) {
             return true;
         }
         return false;
     }
 
     public SearchResult searchData(String indexName, Map<String, Object> mappings) throws IOException {
-        Map<String,Object> query =(Map<String,Object>) mappings.get("query");
-        String json="";
-        if (query.get("bool") !=null){
+        Map<String, Object> query = (Map<String, Object>) mappings.get("query");
+        String json = "";
+        if (query.get("bool") != null) {
             json = parseEsBool(query);
-        }else {
+        } else {
             json = parseEsQuery(query);
         }
         JsonpMapper mapper = client._transport().jsonpMapper();
         JsonParser parser = Json.createParser(new StringReader(json));
-        SearchRequest searchRequest = new SearchRequest.Builder()
-                .index(indexName)
-                .query(Query._DESERIALIZER.deserialize(parser, mapper))
-                .build();
+        SearchRequest searchRequest = new SearchRequest.Builder().index(indexName).query(Query._DESERIALIZER.deserialize(parser, mapper)).build();
 
         SearchResponse<JSONObject> search = client.search(searchRequest, JSONObject.class);
 
@@ -246,70 +223,59 @@ public class ElasticIndex {
 
     // 普通查询
     private static String parseEsQuery(Map<String, Object> queryMps) {
-        Map<String,Object> aggsMaps=new HashMap<>();
-        Map<String,Object> fieldMaps=new HashMap<>();
-        Map<String,Object> whereMaps=new HashMap<>();
-        for (String m: queryMps.keySet()){
-            if (!m.equals("type") && !m.equals("field")){
-                whereMaps.put(m,queryMps.get(m));
+        Map<String, Object> aggsMaps = new HashMap<>();
+        Map<String, Object> fieldMaps = new HashMap<>();
+        Map<String, Object> whereMaps = new HashMap<>();
+        for (String m : queryMps.keySet()) {
+            if (!m.equals("type") && !m.equals("field")) {
+                whereMaps.put(m, queryMps.get(m));
             }
         }
         Object value = queryMps.get("value");
         if (value == null) {
             fieldMaps.put(queryMps.get("field").toString(), whereMaps);
-        }else {
-            fieldMaps.put(queryMps.get("field").toString(),value);
+        } else {
+            fieldMaps.put(queryMps.get("field").toString(), value);
         }
-        aggsMaps.put(queryMps.get("type").toString(),fieldMaps);
+        aggsMaps.put(queryMps.get("type").toString(), fieldMaps);
         return JSON.toJSONString(aggsMaps);
     }
 
     // bool 查询
-    private static String parseEsBool(Map<String,Object> boolMps){
-        Map<String,Object> aggsMaps=new HashMap<>();
-        Map<String,List<Map<String,Object>>> filter = (Map<String, List<Map<String, Object>>>) boolMps.get("bool");
-        Map<String,Object> boolWhere=new HashMap<>();
-        for (String key:filter.keySet()){
-            List<Object> list=new ArrayList<>();
+    private static String parseEsBool(Map<String, Object> boolMps) {
+        Map<String, Object> aggsMaps = new HashMap<>();
+        Map<String, List<Map<String, Object>>> filter = (Map<String, List<Map<String, Object>>>) boolMps.get("bool");
+        Map<String, Object> boolWhere = new HashMap<>();
+        for (String key : filter.keySet()) {
+            List<Object> list = new ArrayList<>();
             List<Map<String, Object>> mapList = filter.get(key);
-            mapList.stream().forEach(mps->{
+            mapList.stream().forEach(mps -> {
                 String s = parseEsQuery(mps);
                 Map map = JSONObject.parseObject(s, Map.class);
                 list.add(map);
             });
-            boolWhere.put(key,list);
+            boolWhere.put(key, list);
         }
-        aggsMaps.put("bool",boolWhere);
+        aggsMaps.put("bool", boolWhere);
         return JSON.toJSONString(aggsMaps);
     }
 
 
     public static void main(String[] args) {
-        String json="{\n" +
-                "   query: {bool:{filter:[{type: \"range\", field: \"time\", gte: \"2014-04-25\", lte: \"2014-05-21\"},{type: \"match_phrase\", field: \"body\", value: \"123456\"}]}}\n" +
-                "}";
+        String json = "{\n" + "   query: {bool:{filter:[{type: \"range\", field: \"time\", gte: \"2014-04-25\", lte: \"2014-05-21\"},{type: \"match_phrase\", field: \"body\", value: \"123456\"}]}}\n" + "}";
         Map map = JSONObject.parseObject(Utils.pattern(json), Map.class);
-        Map<String,Object> query =(Map<String, Object>) map.get("query");
+        Map<String, Object> query = (Map<String, Object>) map.get("query");
 
-        if (query.get("bool") !=null){
+        if (query.get("bool") != null) {
             System.out.println("bool 查询");
             String s = parseEsBool(query);
             System.out.println(s);
-        }else {
+        } else {
             System.out.println("query 普通查询");
             String s = parseEsQuery(query);
             System.out.println(s);
         }
     }
-
-
-
-
-
-
-
-
-
 
 
 }
