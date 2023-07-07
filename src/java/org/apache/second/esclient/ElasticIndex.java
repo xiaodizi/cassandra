@@ -23,10 +23,12 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.json.Json;
 import jakarta.json.stream.JsonParser;
+import org.apache.second.AggsUtils;
 import org.apache.second.Utils;
 import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Time;
+import org.opensearch.client.opensearch._types.aggregations.*;
 import org.opensearch.client.opensearch._types.mapping.*;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.*;
@@ -174,17 +176,26 @@ public class ElasticIndex {
     public SearchResult searchData(String indexName, Map<String, Object> mappings) throws IOException {
         Map<String, Object> query = (Map<String, Object>) mappings.get("query");
         String json = "";
-        if (query.get("bool") != null) {
-            json = parseEsBool(query);
+        SearchRequest request=null;
+        if (query != null) {
+            if (query.get("bool") != null) {
+                json = parseEsBool(query);
+            } else {
+                json = parseEsQuery(query);
+            }
+            JsonpMapper mapper = client._transport().jsonpMapper();
+            JsonParser parser = Json.createParser(new StringReader(json));
+            Query deserialize = Query._DESERIALIZER.deserialize(parser, mapper);
+            request = new SearchRequest.Builder().index(indexName).query(deserialize).build();
         } else {
-            json = parseEsQuery(query);
+            json = parseAggs(mappings);
+            JsonpMapper mapper = client._transport().jsonpMapper();
+            JsonParser parser = Json.createParser(new StringReader(json));
+            Aggregation aggregation=Aggregation._DESERIALIZER.deserialize(parser,mapper);
+            request = new SearchRequest.Builder().index(indexName).aggregations("aggs", aggregation).build();
         }
-        JsonpMapper mapper = client._transport().jsonpMapper();
-        JsonParser parser = Json.createParser(new StringReader(json));
-        SearchRequest searchRequest = new SearchRequest.Builder().index(indexName).query(Query._DESERIALIZER.deserialize(parser, mapper)).build();
 
-        SearchResponse<JSONObject> search = client.search(searchRequest, JSONObject.class);
-
+        SearchResponse<JSONObject> search = client.search(request, JSONObject.class);
         List<String> primaryKeys;
 
         if (hasClusteringColumns) {
@@ -194,7 +205,6 @@ public class ElasticIndex {
         } else {
             primaryKeys = partitionKeysNames;
         }
-
 
         int pkSize = primaryKeys.size();
 
@@ -217,7 +227,20 @@ public class ElasticIndex {
             SearchResultRow searchResultRow = new SearchResultRow(primaryKey, doc.source());
             rowList.add(searchResultRow);
         });
+        Map<String, Aggregate> aggregations = search.aggregations();
+        if (aggregations.size() != 0){
+            Aggregate aggs = aggregations.get("aggs");
+            Map<String, Object> map = AggsUtils.termsAggs(aggs);
+            String[] primaryKey = new String[1];
+            primaryKey[0] = String.valueOf(search.hits().hits().size()+1);
+            SearchResultRow row=new SearchResultRow(primaryKey,JSONObject.parseObject(JSON.toJSONString(map)));
+            rowList.add(row);
+        }
         return new SearchResult(rowList);
+    }
+
+    private String parseAggs(Map<String, Object> mappings) {
+        return mappings.get("aggs").toString();
     }
 
 

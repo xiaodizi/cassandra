@@ -38,6 +38,7 @@ import org.apache.cassandra.notifications.INotificationConsumer;
 import org.apache.cassandra.schema.ColumnMetadata;
 import org.apache.cassandra.schema.IndexMetadata;
 import org.apache.cassandra.schema.TableMetadata;
+import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.second.esclient.ElasticIndex;
@@ -126,11 +127,13 @@ public class ElasticSecondaryIndex implements Index, INotificationConsumer {
         this.baseCfs = baseCfs;
         this.config = config;
         this.index_name = baseCfs.keyspace.getName() + "." + baseCfs.name;
-        this.metadata = baseCfs.metadata.get();
+
+        this.metadata = this.baseCfs.metadata();
 
         this.ksName = metadata.keyspace;
         this.cfName = metadata.name;
         this.idxName = config.name;
+
 
         indexColumnName = unQuote(config.options.get(IndexTarget.TARGET_OPTION_NAME));
 
@@ -276,7 +279,7 @@ public class ElasticSecondaryIndex implements Index, INotificationConsumer {
     @Override
     public Searcher searcherFor(ReadCommand command) {
         System.out.println("------------lei test18----------");
-        return executionController -> search(command);
+        return executionController -> search(executionController,command);
     }
 
     @Override
@@ -320,7 +323,7 @@ public class ElasticSecondaryIndex implements Index, INotificationConsumer {
 
 
     @Nonnull
-    public UnfilteredPartitionIterator search(ReadCommand command) {
+    public UnfilteredPartitionIterator search(ReadExecutionController controller,ReadCommand command) {
         final Stopwatch time = Stopwatch.createStarted();
         final String queryString = Utils.queryString(command);
         Map map = JSONObject.parseObject(Utils.pattern(queryString), Map.class);
@@ -341,14 +344,17 @@ public class ElasticSecondaryIndex implements Index, INotificationConsumer {
         final String searchId = UUID.randomUUID().toString();
 
         SearchResult searchResult = null;
+        SearchResultRow searchResultRow=null;
         try {
             searchResult = elasticIndex.searchData(index_name, map);
+            searchResultRow = searchResult.items.get((searchResult.items.size() - 1));
+            searchResult.items.remove((searchResult.items.size()-1));
             fillPartitionAndClusteringKeys(searchResult.items);
         } catch (IOException e) {
             logger.error("query data faild:",e);
         }
         logger.info("{} select data took {}ms", index_name, time.elapsed(TimeUnit.MILLISECONDS));
-        return new EsPartitionIterator(this, searchResult,partitionKeysNames, command, searchId);
+        return new EsPartitionIterator(this, searchResult,partitionKeysNames, command, searchId,searchResultRow.docMetadata);
     }
 
 

@@ -22,6 +22,9 @@ import com.alibaba.fastjson2.JSONObject;
 import org.apache.cassandra.db.*;
 import org.apache.cassandra.db.filter.DataLimits;
 import org.apache.cassandra.db.filter.RowFilter;
+import org.apache.cassandra.db.marshal.AsciiType;
+import org.apache.cassandra.db.marshal.StringType;
+import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.db.partitions.PartitionIterator;
 import org.apache.cassandra.db.partitions.UnfilteredPartitionIterator;
 import org.apache.cassandra.db.rows.*;
@@ -32,7 +35,10 @@ import org.apache.cassandra.tracing.Tracing;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.second.ElasticSecondaryIndex;
 
+import java.nio.ByteBuffer;
 import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 public class EsPartitionIterator implements UnfilteredPartitionIterator {
@@ -51,13 +57,17 @@ public class EsPartitionIterator implements UnfilteredPartitionIterator {
 
     private final List<String> partitionKeysNames;
 
+    private final JSONObject aggsResult;
 
-    public EsPartitionIterator(ElasticSecondaryIndex index, SearchResult searchResult, List<String> partitionKeysNames, ReadCommand command, String searchId) {
+
+    public EsPartitionIterator(ElasticSecondaryIndex index, SearchResult searchResult, List<String> partitionKeysNames, ReadCommand command, String searchId,JSONObject object) {
         this.baseCfs = index.baseCfs;
+
         this.esResultIterator = searchResult.items.iterator();
         this.command = command;
         this.index = index;
         this.partitionKeysNames = partitionKeysNames;
+        this.aggsResult= object;
         Tracing.trace("ESI {} FakePartitionIterator initialized", searchId);
     }
 
@@ -83,14 +93,6 @@ public class EsPartitionIterator implements UnfilteredPartitionIterator {
             return null;
         }
 
-
-
-        //Build the minimum row
-        Row.Builder rowBuilder = BTreeRow.unsortedBuilder();
-        rowBuilder.newRow(Clustering.EMPTY);
-        rowBuilder.addPrimaryKeyLivenessInfo(LivenessInfo.EMPTY);
-        rowBuilder.addRowDeletion(Row.Deletion.LIVE);
-
         SearchResultRow esResult = esResultIterator.next();
 
         JSONObject jsonMetadata = esResult.docMetadata;
@@ -98,8 +100,17 @@ public class EsPartitionIterator implements UnfilteredPartitionIterator {
         //And PK value
         DecoratedKey partitionKey = baseCfs.getPartitioner().decorateKey(esResult.partitionKey);
 
+        ColumnMetadata columnMetadata = ColumnMetadata.regularColumn(this.baseCfs.metadata(), ByteBufferUtil.bytes("aggs"), UTF8Type.instance);
+
+        TableMetadata.Builder tableBuild=this.baseCfs.metadata().unbuild();
+        //tableBuild.addColumn(columnMetadata);
+        TableMetadata build = tableBuild.build();
+
+
+
+
         SinglePartitionReadCommand readCommand = SinglePartitionReadCommand.create(
-                this.baseCfs.metadata(),
+                build,
                 command.nowInSec(),
                 command.columnFilter(),
                 RowFilter.NONE,
@@ -107,13 +118,41 @@ public class EsPartitionIterator implements UnfilteredPartitionIterator {
                 partitionKey,
                 command.clusteringIndexFilter(partitionKey));
 
+
         PartitionIterator partition =
                 StorageProxy.read(SinglePartitionReadCommand.Group.one(readCommand), ConsistencyLevel.ALL, System.nanoTime());
 
+
         Row next = partition.next().next();
 
+        // 以下新增，分割线
+        Row.Builder rowBuilder = BTreeRow.unsortedBuilder();
 
-        System.out.println("继续执行");
-        return new SingleRowIterator(this.baseCfs.metadata(), next, partitionKey, this.baseCfs.metadata().regularAndStaticColumns());
+        rowBuilder.newRow(next.clustering());  //need to be first
+        rowBuilder.addPrimaryKeyLivenessInfo(next.primaryKeyLivenessInfo());
+        rowBuilder.addRowDeletion(next.deletion());
+
+        // 判断是否显示聚合的结果，要是不显示聚合结果，就显示es取回来的原始数据
+        JSONObject result = null;
+        if (!aggsResult.isEmpty()){
+            result=aggsResult;
+        }else {
+            result = jsonMetadata;
+        }
+
+        //add metadata cell
+        ByteBuffer value = ByteBufferUtil.bytes(result.toString(), UTF_8);
+        BufferCell metadataCell = BufferCell.live(columnMetadata, System.currentTimeMillis(), value);
+        rowBuilder.addCell(metadataCell);
+        //copy existing cells
+        next.cells().forEach(cell -> {
+            if (!index.indexColumnName.equals(cell.column().name.toString())) {
+                rowBuilder.addCell(cell);
+            }
+        });
+
+        next = rowBuilder.build();
+
+        return new SingleRowIterator(build, next, partitionKey, build.regularAndStaticColumns());
     }
 }

@@ -54,6 +54,7 @@ public interface Row extends Unfiltered, Iterable<ColumnData>, IMeasurableMemory
 {
     /**
      * The clustering values for this row.
+     * 此行的聚类值。
      */
     @Override
     public Clustering<?> clustering();
@@ -61,6 +62,7 @@ public interface Row extends Unfiltered, Iterable<ColumnData>, IMeasurableMemory
     /**
      * An in-natural-order collection of the columns for which data (incl. simple tombstones)
      * is present in this row.
+     * 该行中存在数据（包括简单逻辑删除）的列的自然顺序集合。
      */
     public Collection<ColumnMetadata> columns();
 

@@ -1813,7 +1813,6 @@ public class StorageProxy implements StorageProxyMBean
                 }
             }
         }
-
         return consistencyLevel.isSerialConsistency()
              ? readWithPaxos(group, consistencyLevel, queryStartNanoTime)
              : readRegular(group, consistencyLevel, queryStartNanoTime);
