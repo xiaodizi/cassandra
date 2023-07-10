@@ -229,8 +229,7 @@ public class ElasticIndex {
         });
         Map<String, Aggregate> aggregations = search.aggregations();
         if (aggregations.size() != 0){
-            Aggregate aggs = aggregations.get("aggs");
-            Map<String, Object> map = AggsUtils.termsAggs(aggs);
+            Map<Object, Object> map = AggsUtils.aggsData(aggregations.get("aggs"));
             String[] primaryKey = new String[1];
             primaryKey[0] = String.valueOf(search.hits().hits().size()+1);
             SearchResultRow row=new SearchResultRow(primaryKey,JSONObject.parseObject(JSON.toJSONString(map)));

@@ -100,6 +100,7 @@ public class EsPartitionIterator implements UnfilteredPartitionIterator {
         //And PK value
         DecoratedKey partitionKey = baseCfs.getPartitioner().decorateKey(esResult.partitionKey);
 
+
         ColumnMetadata columnMetadata = ColumnMetadata.regularColumn(this.baseCfs.metadata(), ByteBufferUtil.bytes("aggs"), UTF8Type.instance);
 
         TableMetadata.Builder tableBuild=this.baseCfs.metadata().unbuild();
@@ -140,6 +141,9 @@ public class EsPartitionIterator implements UnfilteredPartitionIterator {
             result = jsonMetadata;
         }
 
+        if (!this.baseCfs.metadata().columns().contains(columnMetadata)){
+            columnMetadata = this.baseCfs.metadata().columns().iterator().next();
+        }
         //add metadata cell
         ByteBuffer value = ByteBufferUtil.bytes(result.toString(), UTF_8);
         BufferCell metadataCell = BufferCell.live(columnMetadata, System.currentTimeMillis(), value);

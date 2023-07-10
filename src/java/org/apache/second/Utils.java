@@ -91,8 +91,8 @@ public class Utils {
                     case "decimal":
                         ByteBuffer buffer9 = (ByteBuffer) row.value();
                         if (buffer9.capacity() != 0) {
-                            String filedValue9 = DecimalType.instance.toJSONString(buffer9, ProtocolVersion.V4);
-                            maps.put(filedKeyName, filedValue9);
+                            String filedValue9 = DecimalType.instance.getString(buffer9);
+                            maps.put(filedKeyName, Double.valueOf(filedValue9));
                         } else {
                             maps.put(filedKeyName, 0);
                         }
