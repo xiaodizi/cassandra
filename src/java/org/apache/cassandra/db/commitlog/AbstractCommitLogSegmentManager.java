@@ -109,21 +109,25 @@ public abstract class AbstractCommitLogSegmentManager
 
     void start()
     {
-        // For encrypted segments we want to keep the compression buffers on-heap as we need those bytes for encryption,
-        // and we want to avoid copying from off-heap (compression buffer) to on-heap encryption APIs
-        BufferType bufferType = commitLog.configuration.useEncryption() || !commitLog.configuration.useCompression()
-                                ? BufferType.ON_HEAP
-                                : commitLog.configuration.getCompressor().preferredBufferType();
+        try {
+            // For encrypted segments we want to keep the compression buffers on-heap as we need those bytes for encryption,
+            // and we want to avoid copying from off-heap (compression buffer) to on-heap encryption APIs
+            BufferType bufferType = commitLog.configuration.useEncryption() || !commitLog.configuration.useCompression()
+                    ? BufferType.ON_HEAP
+                    : commitLog.configuration.getCompressor().preferredBufferType();
 
-        this.bufferPool = new SimpleCachedBufferPool(DatabaseDescriptor.getCommitLogMaxCompressionBuffersInPool(),
-                                                     DatabaseDescriptor.getCommitLogSegmentSize(),
-                                                     bufferType);
+            this.bufferPool = new SimpleCachedBufferPool(DatabaseDescriptor.getCommitLogMaxCompressionBuffersInPool(),
+                    DatabaseDescriptor.getCommitLogSegmentSize(),
+                    bufferType);
 
 
-        AllocatorRunnable allocator = new AllocatorRunnable();
-        executor = executorFactory().infiniteLoop("COMMIT-LOG-ALLOCATOR", allocator, SAFE, NON_DAEMON, SYNCHRONIZED);
-        // for simplicity, ensure the first segment is allocated before continuing
-        advanceAllocatingFrom(null);
+            AllocatorRunnable allocator = new AllocatorRunnable();
+            executor = executorFactory().infiniteLoop("COMMIT-LOG-ALLOCATOR", allocator, SAFE, NON_DAEMON, SYNCHRONIZED);
+            // for simplicity, ensure the first segment is allocated before continuing
+            advanceAllocatingFrom(null);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     class AllocatorRunnable implements Interruptible.Task
@@ -301,11 +305,15 @@ public abstract class AbstractCommitLogSegmentManager
     {
         do
         {
-            WaitQueue.Signal prepared = segmentPrepared.register(commitLog.metrics.waitingOnSegmentAllocation.time(), Context::stop);
-            if (availableSegment == null && allocatingFrom == currentAllocatingFrom)
-                prepared.awaitUninterruptibly();
-            else
-                prepared.cancel();
+            try {
+                WaitQueue.Signal prepared = segmentPrepared.register(commitLog.metrics.waitingOnSegmentAllocation.time(), Context::stop);
+                if (availableSegment == null && allocatingFrom == currentAllocatingFrom)
+                    prepared.awaitUninterruptibly();
+                else
+                    prepared.cancel();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         while (availableSegment == null && allocatingFrom == currentAllocatingFrom);
     }
