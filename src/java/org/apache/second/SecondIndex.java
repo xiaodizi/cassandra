@@ -28,6 +28,8 @@ import org.apache.cassandra.exceptions.InvalidRequestException;
 import org.apache.cassandra.index.Index;
 import org.apache.cassandra.index.IndexRegistry;
 import org.apache.cassandra.index.transactions.IndexTransaction;
+import org.apache.cassandra.notifications.INotification;
+import org.apache.cassandra.notifications.INotificationConsumer;
 import org.apache.cassandra.schema.ColumnMetadata;
 import org.apache.cassandra.schema.IndexMetadata;
 
@@ -35,7 +37,16 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.BiFunction;
 
-public class SecondIndex implements Index {
+public class SecondIndex implements Index, INotificationConsumer {
+
+
+    public final ColumnFamilyStore baseCfs;
+    public final IndexMetadata config;
+
+    public SecondIndex(ColumnFamilyStore baseCfs, IndexMetadata config){
+        this.baseCfs = baseCfs;
+        this.config = config;
+    }
 
 
     @Override
@@ -45,7 +56,7 @@ public class SecondIndex implements Index {
 
     @Override
     public IndexMetadata getIndexMetadata() {
-        return null;
+        return config;
     }
 
     @Override
@@ -55,7 +66,7 @@ public class SecondIndex implements Index {
 
     @Override
     public void register(IndexRegistry registry) {
-
+        registry.registerIndex(this);
     }
 
     @Override
@@ -126,5 +137,10 @@ public class SecondIndex implements Index {
     @Override
     public Searcher searcherFor(ReadCommand command) {
         return null;
+    }
+
+    @Override
+    public void handleNotification(INotification notification, Object sender) {
+
     }
 }
