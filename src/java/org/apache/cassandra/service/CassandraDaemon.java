@@ -120,6 +120,12 @@ public class CassandraDaemon
 
     static {
         // Need to register metrics before instrumented appender is created(first access to LoggerFactory).
+        System.out.println("----------------------lei test----------------");
+        System.out.println("环境变量:"+System.getProperties());
+        System.out.println("----------------------------------");
+        System.out.println("环境变量2:"+System.getenv());
+        System.out.println("----------------------------------------------");
+
         SharedMetricRegistries.getOrCreate("logback-metrics").addListener(new MetricRegistryListener.Base()
         {
             @Override

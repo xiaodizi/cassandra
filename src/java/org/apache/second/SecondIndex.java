@@ -44,6 +44,7 @@ public class SecondIndex implements Index, INotificationConsumer {
     public final IndexMetadata config;
 
     public SecondIndex(ColumnFamilyStore baseCfs, IndexMetadata config){
+        System.out.println("二级索引构造函数...........");
         this.baseCfs = baseCfs;
         this.config = config;
     }
@@ -66,6 +67,7 @@ public class SecondIndex implements Index, INotificationConsumer {
 
     @Override
     public void register(IndexRegistry registry) {
+        System.out.println("二级索引注册自己............");
         registry.registerIndex(this);
     }
 
