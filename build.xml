@@ -564,13 +564,6 @@
                 <dependency groupId="com.boundary" artifactId="high-scale-lib" version="1.0.6"/>
                 <dependency groupId="com.github.jbellis" artifactId="jamm" version="${jamm.version}"/>
                 <dependency groupId="org.yaml" artifactId="snakeyaml" version="1.26"/>
-                <!--新增集成包-->
-<!--                <dependency groupId="com.alibaba.fastjson2" artifactId="fastjson2" version="2.0.33"/>-->
-<!--                <dependency groupId="org.opensearch.client" artifactId="opensearch-rest-client" version="2.4.1"/>-->
-<!--                <dependency groupId="org.opensearch.client" artifactId="opensearch-java" version="2.4.0"/>-->
-<!--                <dependency groupId="com.google.code.gson" artifactId="gson" version="2.10"/>-->
-<!--                <dependency groupId="org.glassfish" artifactId="jakarta.json" version="2.0.1"/>-->
-                <!--新增集成包-->
                 <dependency groupId="junit" artifactId="junit" version="4.12" scope="test">
                     <exclusion groupId="org.hamcrest" artifactId="hamcrest-core"/>
                 </dependency>
@@ -829,13 +822,6 @@
             <dependency groupId="com.googlecode.json-simple" artifactId="json-simple"/>
             <dependency groupId="com.boundary" artifactId="high-scale-lib"/>
             <dependency groupId="org.yaml" artifactId="snakeyaml"/>
-            <!--新增集成包-->
-<!--            <dependency groupId="com.alibaba.fastjson2" artifactId="fastjson2"/>-->
-<!--            <dependency groupId="org.opensearch.client" artifactId="opensearch-rest-client"/>-->
-<!--            <dependency groupId="org.opensearch.client" artifactId="opensearch-java"/>-->
-<!--            <dependency groupId="com.google.code.gson" artifactId="gson"/>-->
-<!--            <dependency groupId="org.glassfish" artifactId="jakarta.json"/>-->
-            <!--新增集成包-->
             <dependency groupId="org.mindrot" artifactId="jbcrypt"/>
             <dependency groupId="io.airlift" artifactId="airline"/>
             <dependency groupId="io.dropwizard.metrics" artifactId="metrics-core"/>
