@@ -378,6 +378,7 @@ public class Config
     /**
      * @deprecated since 4.0 This value was near useless, and we're not using it anymore
      */
+    @Deprecated
     public double commitlog_sync_batch_window_in_ms = Double.NaN;
     @Replaces(oldName = "commitlog_sync_group_window_in_ms", converter = Converters.MILLIS_DURATION_DOUBLE, deprecated = true)
     public DurationSpec.IntMillisecondsBound commitlog_sync_group_window = new DurationSpec.IntMillisecondsBound("0ms");
