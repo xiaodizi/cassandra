@@ -246,4 +246,28 @@ public abstract class DecoratedKey implements PartitionPosition, FilterKey
         assert terminator == ByteSource.TERMINATOR : "Decorated key encoding must end in terminator.";
         return keyBytes;
     }
+
+    public String getPrimaryKey(TableMetadata metadata){
+        List<ColumnMetadata> columns = metadata.partitionKeyColumns();
+        return columns.get(0).toString();
+    }
+
+    public String getPrimaryKeyValue(TableMetadata metadata)
+    {
+        List<ColumnMetadata> columns = metadata.partitionKeyColumns();
+
+        if (columns.size() == 1) {
+            return columns.get(0).type.toCQLString(getKey());
+        }
+
+        ByteBuffer[] values = ((CompositeType) metadata.partitionKeyType).split(getKey());
+        String value="";
+        for (int i = 0; i < columns.size(); i++)
+            if (i==0){
+                value=columns.get(i).type.toCQLString(values[i]);
+            }else {
+                value = value + "-" + columns.get(i).type.toCQLString(values[i]);
+            }
+        return value;
+    }
 }

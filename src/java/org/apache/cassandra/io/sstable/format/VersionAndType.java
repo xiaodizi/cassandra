@@ -33,6 +33,7 @@ import org.apache.cassandra.io.sstable.Descriptor;
  * the {{@link SSTableFormat.Type}} from that.
  * @deprecated TODO remove this class - Version contains SSTableFormat and you _can_ get its type from it
  */
+@Deprecated
 public final class VersionAndType
 {
     private static final Splitter splitOnDash = Splitter.on('-').omitEmptyStrings().trimResults();

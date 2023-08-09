@@ -71,6 +71,8 @@ import io.airlift.airline.HelpOption;
 import io.airlift.airline.Option;
 import org.apache.cassandra.io.util.File;
 import org.apache.cassandra.io.util.FileInputStreamPlus;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -165,7 +167,7 @@ public class JMXTool
             {
                 void dump(OutputStream output, Map<String, Info> map) throws IOException
                 {
-                    Representer representer = new Representer();
+                    Representer representer = new Representer(new DumperOptions());
                     representer.addClassTag(Info.class, Tag.MAP); // avoid the auto added tag
                     Yaml yaml = new Yaml(representer);
                     yaml.dump(map, new OutputStreamWriter(output));
@@ -396,6 +398,7 @@ public class JMXTool
 
             public CustomConstructor()
             {
+                super(null);
                 this.rootTag = new Tag(ROOT);
                 this.addTypeDescription(INFO_TYPE);
             }
